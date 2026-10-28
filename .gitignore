@@ -11,3 +11,9 @@ __pycache__/
 
 # innate-fe 基础仓定位配置（机器本地路径，不入库；见 tools/ui-sync.mjs）
 .innate-fe-cli.json
+artifacts/
+
+# smoke 截图、DOM 与 bounds 由测试脚本重建；仓库只保留 Markdown 验收摘要
+docs/susu/plan/evidence/**/smoke/
+docs/susu/plan/evidence/**/smoke-probe/
+docs/susu/plan/evidence/**/*-smoke/
