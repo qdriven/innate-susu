@@ -3,7 +3,8 @@ packages:
   - "packages/*"
 
 allowBuilds:
+  electron: true
   esbuild: true
 
 minimumReleaseAgeExclude:
-  - "@innate/ui@0.1.1"
+  - "@innate/ui@0.1.2"

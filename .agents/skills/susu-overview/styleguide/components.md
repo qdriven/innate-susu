@@ -1,119 +1,192 @@
 # Component specs
 
-Per-primitive detail behind [`docs/STYLEGUIDE.md`](../STYLEGUIDE.md#components). Read the section for the primitive you are adding or changing.
+[`../STYLEGUIDE.md`](../STYLEGUIDE.md#components) 的展开。**primitive 的唯一来源是 `@innate/ui`**（基础仓 innate-fe 的 `packages/ui`）。本仓**不新建** `components/ui/*`；缺件去基础仓补。
 
-## Primitive conventions
+## Primitive 约定
 
-The shadcn-style wrappers in `src/renderer/src/components/ui/` follow a consistent pattern:
+`@innate/ui` 的 wrapper 遵循统一模式，新写代码必须照着来：
 
-- Most carry a `data-slot="<name>"` attribute on their root for CSS targeting — do not strip it. The non-shadcn helpers in this folder (`sonner`, `repo-multi-combobox`) don't follow this pattern and shouldn't be modeled when adding new primitives that should.
-- Use `cn()` for class merging. Pass user `className` last so callers can override.
-- Use `class-variance-authority` (CVA) for variants when there are multiple.
-- Most wrap a Radix UI primitive. Exceptions are `command` (wraps `cmdk`), `sonner` (wraps `sonner`), and the visual-only wrappers (`badge`, `button-group`, `card`, `input`), which apply tokens and Tailwind utilities directly. Never reimplement headless behavior; extend the existing wrapper.
+- **底座是 Base UI（`@base-ui/react`），不是 Radix。** orca 的 `asChild` 写法在这里**不适用**——Base UI 用 `render` prop：
+  ```tsx
+  // ✅ @innate/ui 写法
+  <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />} />
+  // ❌ orca 的 Radix 写法（本仓禁用）
+  <DropdownMenuTrigger asChild><Button /></DropdownMenuTrigger>
+  ```
+- 组件 root 上带 `data-slot="<name>"`，**不要剥掉**——CSS 与测试都靠它定位。
+- 用 `cn()` 合并 class，**调用方的 `className` 放最后**。
+- 多变体用 CVA（`class-variance-authority`）。
+- 绝大多数包 Base UI；例外：`command`（包 `cmdk`）、`sonner`（包 `sonner`）、`calendar`（包 `react-day-picker`）、`carousel`（包 `embla-carousel-react`）、`chart`（包 `recharts`）、`resizable`（包 `react-resizable-panels`），以及纯视觉 wrapper（`badge`、`button-group`、`card`、`input`、`kbd`）。**不要重写无头行为**，扩展既有 wrapper。
 
-## Buttons (`button.tsx`)
+## `@innate/ui` primitive 清单（v0.1.2，58 个）
 
-Variants in priority order:
+| 分类 | primitive |
+| --- | --- |
+| 布局 | `sidebar`、`resizable`、`scroll-area`、`sheet`、`drawer`、`dialog`、`alert-dialog`、`popover`、`hover-card`、`card`、`separator`、`aspect-ratio`、`direction`、`domain-page-layout` |
+| 导航 | `breadcrumb`、`pagination`、`tabs`、`accordion`、`collapsible`、`menubar`、`navigation-menu`、`sidebar` |
+| 输入 | `input`、`textarea`、`input-group`、`input-otp`、`checkbox`、`radio-group`、`select`、`slider`、`switch`、`toggle`、`toggle-group`、`calendar`、`field`、`form` |
+| 动作 | `button`、`button-group`、`badge`、`item`、`empty` |
+| 浮层 | `dropdown-menu`、`context-menu`、`command`、`tooltip`、`alert`、`alert-dialog`、`sonner`、`spinner`、`progress`、`skeleton` |
+| 数据 | `table`、`chart`、`avatar` |
+| 主题 / 国际化 | `theme-provider`、`theme-selector`、`locale-provider`、`locale-selector` |
 
-| Variant       | Use case                                                           |
-| ------------- | ------------------------------------------------------------------ |
-| `default`     | The single affirmative action in a flow.                           |
-| `secondary`   | Lower-emphasis sibling next to a `default`.                        |
-| `outline`     | Toolbar / standalone actions where a filled button feels heavy.    |
-| `ghost`       | Icon buttons, list-row triggers, anywhere chrome should disappear. |
-| `link`        | Inline text actions inside paragraphs.                             |
-| `destructive` | Delete, discard, irreversible. Never for Cancel.                   |
+`field` / `form` / `item` / `input-group` / `empty` 是较新的 shadcn 分层：表单用 `Field` + `Label` + `Control`，列表项用 `Item`，空态用 `Empty`。**优先用它们，不要手搓等价物。**
 
-Sizes are defined in `button.tsx` (`default`, `sm`, `xs`, `lg`, plus `icon`, `icon-xs`, `icon-sm`, `icon-lg`). Match the size to the surrounding row height — don't drop a `default` button into a 28px toolbar.
+## 按钮
 
-## Picking the right primitive
+`@innate/ui` 的 `Button` 变体：`default`、`secondary`、`outline`、`ghost`、`destructive`、`link`。
+尺寸：`default`(h-7)、`sm`(h-6)、`xs`(h-5.5)、`lg`(h-8)、`icon`(size-7)、`icon-sm`(size-6)、`icon-xs`(size-5.5)、`icon-lg`(size-8)。
 
-| You want…                                                    | Reach for                                  | Don't use                             |
-| ------------------------------------------------------------ | ------------------------------------------ | ------------------------------------- |
-| Hover-only label on an icon-only button                      | `Tooltip`                                  | `HoverCard` (too heavy), title attr   |
-| Hover preview of richer content (avatar + summary)           | `HoverCard`                                | `Tooltip` (no rich content)           |
-| Click-revealed menu with actions                             | `DropdownMenu`                             | `Popover` with hand-rolled list       |
-| Right-click contextual actions                               | `ContextMenu`                              | `DropdownMenu` (different invocation) |
-| Click-revealed surface with arbitrary content (form, picker) | `Popover`                                  | `Dialog` (it traps focus and dims)    |
-| Modal that demands a decision before you continue            | `Dialog`                                   | `Popover`, inline overlay             |
-| Drawer / panel sliding in from an edge                       | `Sheet`                                    | `Dialog` centered                     |
-| Single choice from a known list                              | `Select`                                   | Custom listbox                        |
-| Single choice with search / fuzzy filtering                  | `Command` inside `Popover`                 | `Select` (no search)                  |
-| Multi-select with search                                     | `repo-multi-combobox` (mirror its pattern) | Roll a new one                        |
-| Transient confirmation ("Saved", "Copied")                   | `sonner` toast                             | `Dialog`, inline banner               |
-| Persistent inline status ("3 errors")                        | inline text + `Badge`                      | toast (toasts disappear)              |
+| 变体 | 用在哪 |
+| --- | --- |
+| `default` | 一个流程里唯一的肯定动作 |
+| `secondary` | 紧邻 `default` 的低强调兄弟 |
+| `outline` | toolbar / 独立动作，实心按钮太重时 |
+| `ghost` | 图标按钮、列表行触发、chrome 应消失处 |
+| `link` | 正文内联文字动作 |
+| `destructive` | 删除、丢弃、不可逆。**绝不用在 Cancel** |
 
-If you find yourself styling around a primitive (`<Popover>` to act like a `<Dialog>`, or vice versa), stop and reconsider — the focus-management semantics differ and a future contributor will be misled by the mismatch.
+### orca ↔ `@innate/ui` 按钮差异
 
-## Tooltips
+orca 的按钮是**宽松尺度**，`@innate/ui` 是**紧凑尺度**（整体小 2px）：
 
-Tooltips exist to _name_ a control whose meaning isn't obvious from its appearance. They are not the place to teach, persuade, or warn — anything users need to read while acting belongs in the visible UI.
+| 项 | orca | `@innate/ui` | 处置 |
+| --- | --- | --- | --- |
+| 基准字号 | `text-sm`（14px） | `text-[13px]` | 取 `@innate/ui`。桌面端密度更高，正文 14px 只用于内容区，chrome 用 13px。 |
+| 默认高度 | `h-9`（36px） | `h-7`（28px） | 取 `@innate/ui`。**影响 titlebar**：见 [toolbar.md](./toolbar.md)。 |
+| sm / xs / lg | h-8 / h-6 / h-10 | h-6 / h-5.5 / h-8 | 同上。 |
+| icon | `size-9` | `size-7` | 同上。 |
+| 图标默认尺寸 | `size-4` | `size-3` | 取 `@innate/ui`；需要 16px 时显式写 `size-4`。 |
+| `destructive` | **实心** `bg-destructive text-white` | **淡底** `bg-destructive/10 text-destructive` | 取 `@innate/ui`（淡底）。整行删除确认这类需要实心时，用 `variant="default"` + `className="bg-destructive text-white"` 局部覆盖，不要为此改基础仓。 |
+| `ghost` hover | `hover:bg-accent` | `hover:bg-muted` | 取 `@innate/ui`。注意基础仓的 ghost 走 `muted` 而非 `accent`，两者在暗色下亮度不同（见 [color.md](./color.md#orca--innateui-中性色对照)）。 |
+| `outline` | 带 `shadow-xs` | 无 shadow | 取 `@innate/ui`；需要发丝线+微阴影时自行加 `shadow-xs`。 |
+| 额外变体 | `pane-title`、`pane-title-close`、`destructive-chip` | 无 | orca 专属面板标题样式 → **不迁移**；需要时用 `className` 在本仓做局部样式（属于壳 chrome 层，不是 primitive）。 |
+| 额外尺寸 | `chip`（h-4） | 无 | 用 `Badge` 或 `<span>` + `text-3xs`，不要自造尺寸档。 |
 
-- **Use a tooltip when:** an icon-only button or compact chip needs a label. Toolbar icons, badges with abbreviations, truncated paths.
-- **Don't use a tooltip when:** the control already has a visible label, the content is interactive (links, buttons), or the message is critical (errors, blocking warnings — those go inline).
-- **Mounting:** the global `<TooltipProvider delayDuration={400}>` lives at the App root. Don't nest a second `TooltipProvider` unless you need a different delay for a tightly-scoped surface.
-- **Trigger pattern:** wrap the trigger element with `<TooltipTrigger asChild>` so the tooltip's accessibility props attach to the button (not a wrapper span). This is required for keyboard focus to surface the tooltip.
-- **Placement:** default `side="top" sideOffset={4}` — match the toolbar pattern in `sidebar/SidebarToolbar.tsx`. Pick a different side only when the default would clip against the viewport.
-- **Shortcut chips inside tooltips:** if the action has a keyboard shortcut, append `<ShortcutKeyCombo />` rather than baking the keys into the label string. The chips render correctly per platform; baked-in strings drift.
+尺寸要贴合所在行高——不要把 `default`（h-7）塞进 24px 的状态栏。
 
-```tsx
-<Tooltip>
-  <TooltipTrigger asChild>
-    <Button variant="ghost" size="icon-sm" onClick={openSettings}>
+## 选型表
+
+| 你想要… | 用 | 不要用 |
+| --- | --- | --- |
+| 图标按钮的悬停标签 | `Tooltip` | `HoverCard`（太重）、title 属性 |
+| 富内容预览（头像 + 摘要） | `HoverCard` | `Tooltip`（放不下富内容） |
+| 点击展开的操作菜单 | `DropdownMenu` | `Popover` 手搓列表 |
+| 右键上下文操作 | `ContextMenu` | `DropdownMenu`（调用方式不同） |
+| 点击展开的任意内容（表单、选择器） | `Popover` | `Dialog`（会抢焦点并压暗） |
+| 必须先做决定才能继续的模态 | `Dialog` / `AlertDialog` | `Popover`、内联遮罩 |
+| 从边缘滑入的面板 | `Sheet` / `Drawer` | 居中的 `Dialog` |
+| 已知列表里的单选 | `Select` | 手搓 listbox |
+| 需要搜索/模糊匹配的单选 | `Command` + `Popover` | `Select`（不能搜） |
+| 多选 + 搜索 | `Command` + `Popover` + `CommandItem` 多选态 | 见下方缺口清单 |
+| 瞬时确认（"已保存"） | `sonner` toast | `Dialog`、内联横幅 |
+| 常驻状态（"3 个错误"） | 内联文字 + `Badge` | toast（会消失） |
+
+如果发现自己在绕着 primitive 改样式（把 `Popover` 打扮成 `Dialog`），停下来重新选——两者的焦点管理语义不同，后来的维护者会被误导。
+
+## Tooltip
+
+Tooltip 用来**给控件命名**，不是用来教学、说服或警告——用户需要边操作边读的内容属于可见 UI。
+
+- **该用**：图标按钮、紧凑 chip 需要标签时。工具栏图标、缩写徽标、被截断的路径。
+- **不该用**：控件已有可见文字、内容可交互（链接、按钮）、信息是关键性的（错误、阻塞性警告走内联）。
+- **挂载**：`<TooltipProvider>` 放 app 根。`@innate/ui` 的 `TooltipProvider` 默认 `delay={0}`（orca 用的是 400ms）。**密集工具栏用 `<TooltipProvider delay={400}>` 包一层**，避免鼠标扫过就闪。
+- **触发**：Base UI 用 `render` prop，不是 `asChild`：
+  ```tsx
+  <Tooltip>
+    <TooltipTrigger render={<Button variant="ghost" size="icon-sm" onClick={openSettings} />}>
       <Settings />
-    </Button>
-  </TooltipTrigger>
-  <TooltipContent side="top" sideOffset={4}>
-    Settings
-  </TooltipContent>
-</Tooltip>
-```
+    </TooltipTrigger>
+    <TooltipContent side="top" sideOffset={4}>
+      Settings
+    </TooltipContent>
+  </Tooltip>
+  ```
+- **位置**：默认 `side="top" sideOffset={4}`。只有默认会被视口裁掉时才换边。
+- **Tooltip 里的快捷键 chip**：追加 `<Kbd>`（`TooltipContent` 已针对 `data-[slot=kbd]` 做过 padding 与层级处理）。不要把按键写进文案字符串。
 
-## Icons
+## 图标
 
-Icons come from **`lucide-react`**. Don't import a second icon library.
+只用 `lucide-react`。**不要引入第二个图标库。**
 
-- **Default size:** `size-4`. `Button` auto-applies this to any `<svg>` it contains via `[&_svg:not([class*='size-'])]:size-4`, so most call sites don't need to set a size on the icon.
-- **`size-3` / `size-3.5`:** for metadata, captions, and dense list rows where `size-4` is too loud.
-- **`size-7`+:** for featured/empty-state hero icons only.
-- **Stroke width:** lucide's default. Don't override per-icon.
-- **Color:** inherit from surrounding text — `text-muted-foreground` for secondary, `text-destructive` for destructive, etc. Don't apply a token to the SVG directly when the parent already carries the right color.
-- **Spinner:** the canonical loading icon is `<Loader2 className="size-4 animate-spin" />`. For 3s+ multi-step work, prefer a label that names the stage ("Cloning…" → "Installing…") over an unlabeled spinner. See [in-flight feedback](./ux-rules.md#1-match-in-flight-feedback-to-perceived-duration).
+- **默认尺寸**：`@innate/ui` 的 `Button` 会把内部 `<svg>` 压到 `size-3`（`[&_svg:not([class*='size-'])]:size-3`），多数调用点不用自己写。内容区图标要 16px 时显式 `size-4`。
+- **`size-3` / `size-3.5`**：元信息、说明、密集列表行。
+- **`size-7`+**：只用于空态 / hero 图标。
+- **描边粗细**：lucide 默认，不逐个覆盖。
+- **颜色**：继承外层文字色（`text-muted-foreground` 等）。父级已经带颜色时不要再给 SVG 单独上 token。
+- **加载态**：用 `@innate/ui` 的 `<Spinner />`（内置 `role="status"` + `aria-label="Loading"` + `size-4 animate-spin`）。它比裸 `<Loader2>` 多了无障碍语义。超过 3 秒的多步任务优先用阶段文案（"克隆中…" → "安装中…"）而不是无标签 spinner。
 
-## Keyboard shortcut chips
+## 快捷键 chip
 
-Use **`<ShortcutKeyCombo />`** from `src/renderer/src/components/ShortcutKeyCombo.tsx`. It renders a consistent key-cap style and inserts a `+` separator on Windows/Linux (Mac shows adjacent glyphs, no separator). It does **not** transform key strings — the _caller_ picks the platform-appropriate labels and passes them in:
+用 **`@innate/ui` 的 `Kbd`**（`h-5 min-w-5 rounded border bg-muted px-1 font-mono text-[11px] text-muted-foreground`）。菜单里的右键 chip 用 `DropdownMenuShortcut` / `CommandShortcut`。
+
+`Kbd` **只渲染键帽**，不转换按键字符串——**平台字形由调用方给**：
 
 ```tsx
-const isMac = navigator.userAgent.includes('Mac')
-const mod = isMac ? '⌘' : 'Ctrl'
-const shift = isMac ? '⇧' : 'Shift'
-<ShortcutKeyCombo keys={[mod, shift, 'N']} />
+const isMac = navigator.userAgent.includes("Mac")
+const mod = isMac ? "⌘" : "Ctrl"
+const shift = isMac ? "⇧" : "Shift"
+<Kbd>{mod}</Kbd>
 ```
 
-See `Landing.tsx` for the canonical pattern. Don't roll a one-off `<kbd>` — kbd chips drift in shape and color across the app fast if everyone styles their own.
+orca 的 `ShortcutKeyCombo` 会在 Win/Linux 键之间插 `+`；`Kbd` 不做这个分隔，多个键要各自渲染：
 
-Where shortcuts surface in the UI:
+```tsx
+<span className="inline-flex items-center gap-0.5">
+  <Kbd>{mod}</Kbd>
+  <Kbd>{shift}</Kbd>
+  <Kbd>N</Kbd>
+</span>
+```
 
-- **Tooltips on icon buttons** — append the chip after the label, trailing.
-- **Dropdown / context-menu items** — use `<DropdownMenuShortcut>` (or its context-menu equivalent) for the right-aligned chip; don't position one yourself.
-- **Never on Cancel, Dismiss, or `link`-variant inline actions** — see [the back-out path](./ux-rules.md#3-dont-overload-the-back-out-path).
+**不要自造 `<kbd>`**——各人自己写样式，键帽的形状和颜色很快就会漂。
 
-**The label MUST match the actual binding for the platform.** If the keyboard handler reads `metaKey` on Mac and `ctrlKey` elsewhere, the chip must show `⌘` on Mac and `Ctrl` elsewhere. Mismatched chips are worse than no chip.
+出现在哪里：
 
-## Form anatomy
+- **图标按钮的 tooltip** —— 追加在标签后面（trailing）。
+- **下拉 / 右键菜单项** —— 用 `DropdownMenuShortcut`，不要自己定位。
+- **绝不**用在 Cancel、Dismiss、`link` 变体的内联动作上（见 [ux-rules.md](./ux-rules.md)）。
 
-The pattern in `src/renderer/src/components/settings/SettingsFormControls.tsx` is the house style for any label + control + helper text. Match it for new forms:
+**标签必须与真实绑定一致。** 处理函数在 Mac 读 `metaKey`、其它平台读 `ctrlKey`，chip 就必须 Mac 显示 `⌘`、其它平台显示 `Ctrl`。对不上的 chip 比没有 chip 更糟。
 
-- **Outer stack:** `space-y-3` for full-section forms (`ThemePicker`); `space-y-2` for compact single-control fields (`ColorField`, `NumberField`). Pick by density, not preference.
-- **Label group:** `space-y-1` containing `<Label>` and a description in `text-xs text-muted-foreground`.
-- **Control:** the shadcn primitive (`<Input>`, `<Select>`, etc.). Errors surface via `aria-invalid`; the input primitive already maps that to a destructive ring — don't paint your own.
-- **Trailing metadata:** `text-2xs text-muted-foreground` below the control (e.g., "Current: 14px · Default: 13px"), not next to the label.
+## 表单
 
-## Scrollbars
+用 `@innate/ui` 的 `Field` / `Label` / `Control`（或 `Form` + `react-hook-form`）：
 
-Three scrollbar classes are defined globally in `main.css`. Apply one of these to overflow containers; don't write a fourth style.
+- **标签组**：`Field` 里放 `Label` + `text-xs text-muted-foreground` 的说明。
+- **控件**：`Input`、`Textarea`、`Select`、`Checkbox` 等 primitive。错误靠 `aria-invalid`——primitive 已经把它映射成 destructive 描边，不要自己画 ring。
+- **尾部元信息**：`text-2xs text-muted-foreground` 放在控件**下方**（例如 "当前 14px · 默认 13px"），不放在标签旁边。
+- **密度**：整节表单 `space-y-3`，紧凑单控件字段 `space-y-2`。按密度选，不按偏好。
 
-- **`.scrollbar-sleek`** — the default thin, neutral scrollbar for sidebars, lists, popovers. Pair with `.scrollbar-sleek-parent` on a hover-target ancestor if you want the thumb to fade in only on parent hover.
-- **`.scrollbar-editor`** — slightly heavier, used inside Monaco-adjacent surfaces.
-- **`.worktree-sidebar-scrollbar`** — no reserved gutter: paired with `overflow-y-auto`, the scrollbar (and its width) exists only while content actually overflows, so a short list stays flush with the fixed header controls and classic-scrollbar Windows shows no arrow buttons on empty lists. The thumb stays invisible until the parent (`.scrollbar-sleek-parent`) is hovered. Used only in the worktree sidebar.
+## 滚动条
+
+三种滚动条类定义在本仓 `packages/theme/src/shell.css`（orca 原样迁入）。给溢出容器用其中一种，**不要写第四种**：
+
+- **`.scrollbar-sleek`** —— 默认细滚动条，给侧栏、列表、浮层。配 `.scrollbar-sleek-parent` 在 hover 目标祖先上，可让滑块只在父级 hover 时淡入。
+- **`.scrollbar-editor`** —— 稍重，给 Monaco 周边面板。
+- **`.worktree-sidebar-scrollbar`** —— 不预留槽位：配 `overflow-y-auto`，滚动条只在真的溢出时存在，短列表与固定表头齐平；滑块在 `.scrollbar-sleek-parent` hover 前不可见。只用在工作树侧栏。
+
+## orca 专属能力与本仓缺口
+
+orca 有一部分能力 `@innate/ui` 还没有。**逐项给出方案**，不要因为"基础仓没有"就在本仓自建 primitive。
+
+| orca 能力 | `@innate/ui` 现状 | 方案 |
+| --- | --- | --- |
+| `SecuritySurface` / `DialogContent surface="security"` —— 安全确认面 | `DialogContent` **没有** `surface` prop（见 `dialog.tsx`） | **两步走**：① 过渡方案——在 `packages/theme/src/tokens.css` 里加 `--security-*` token 家族（照 orca 的 `--orca-security-*` 改名，明暗成对），在 `DialogContent` 上用 `className` 挂 `data-surface="security"` 的样式；② 正式方案——向基础仓提 `ui:add`，给 `DialogContent` 加 `surface` 变体，做完回本仓 `pnpm ui:sync:bump`。**红线**：要求用户信任、批准、执行或移除代码的对话框必须走安全面，不得用普通 `Dialog` 顶替。 |
+| `ShortcutKeyCombo` | 有 `Kbd`，但没有 Win/Linux 的 `+` 分隔与平台字形转换 | 用 `Kbd` + 调用方按平台给字形（见上）。若需要分隔符，向基础仓提 `ui:add`（`ShortcutKeyCombo`）。 |
+| `repo-multi-combobox`（多选 + 搜索） | 有 `command`（cmdk）+ `popover` + `checkbox`，没有组合好的多选 combobox | 用 `Command` in `Popover` + `CommandItem` 自管多选状态（`aria-selected` / `data-selected`）实现；**不要**在 `Select` 上硬加搜索。需要现成件时向基础仓提 `ui:add`。 |
+| `.jump-palette-item[data-selected='true']` 选中配方 | 无 | 已迁到本仓 `packages/theme/src/shell.css`（`color-mix` + inset ring），配合 `data-selected="true"`。这是**壳 chrome 层**，不是 primitive，留在本仓是正确归属。 |
+| 三种滚动条类 | 无（在 `@innate/ui` 之外） | 已迁到本仓 `packages/theme/src/shell.css`。 |
+| `pane-title` / `pane-title-close` 按钮变体 | 无 | 不迁移成 primitive。面板标题栏是壳 chrome，用本仓 `shell.css` 的类名 + `Button` 的 `className` 实现。 |
+| orca 自建 `components/ui/*`（38 个） | `@innate/ui` 已提供 58 个，覆盖绝大多数 | 缺件向基础仓提 `ui:add`；**不要**在本仓建 `components/ui/`。 |
+| orca 的 `--chat-*` / `--terminal-pane-title-on-*` token | 无 | 随对应功能一起实现；实现前先在产品层加 token（明暗成对）。 |
+
+## 补件流程
+
+缺组件或要改组件时：
+
+1. 去基础仓 `framework/innate-fe`，用它的 `.agents/skills/fe-ui` 技能（`pnpm ui:add` / `pnpm ui:update`）。
+2. 基础仓改完、发布新版本后，回本仓 `pnpm ui:sync:bump` 重装（脚本见 `tools/ui-sync.mjs`）。
+3. 本仓 `packages/theme` 的测试会重新校验 token 成对声明；`pnpm verify` 通过再提交。
+
+`pnpm ui:sync` 会把 `@innate/*` 发布到私有 registry、写入本仓 `.npmrc`、把 `workspace:` 依赖改写成 `^version`、然后 `pnpm install`。基础仓路径由 `--root` > `INNATE_FE_ROOT` > `.innate-fe-cli.json` 决定。

@@ -1,11 +1,26 @@
 {
   "name": "innate-desktop",
+  "version": "0.1.0",
   "private": true,
+  "description": "innate-desktop 产品 monorepo：共享底座 + 轻应用平台。UI 基座来自 innate-fe（@innate/ui），以私有 npm registry 源码包方式消费，不做源码并入。",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "ui:sync": "bun D:/innate-workspace/framework/innate-fe/innate-fe-cli/src/index.ts install --dir . --root D:/innate-workspace/framework/innate-fe",
-    "ui:sync:bump": "bun D:/innate-workspace/framework/innate-fe/innate-fe-cli/src/index.ts install --dir . --root D:/innate-workspace/framework/innate-fe --bump patch"
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "verify": "pnpm typecheck && pnpm test",
+    "ui:sync": "node tools/ui-sync.mjs",
+    "ui:sync:bump": "node tools/ui-sync.mjs --bump patch",
+    "ui:sync:dry-run": "node tools/ui-sync.mjs --dry-run"
   },
   "dependencies": {
-    "@innate/ui": "^0.1.1"
+    "@innate/ui": "^0.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
   }
 }

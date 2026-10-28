@@ -5,3 +5,6 @@ dist/
 .vite/
 .task-canvas/
 __pycache__/
+
+# innate-fe 基础仓定位配置（机器本地路径，不入库；见 tools/ui-sync.mjs）
+.innate-fe-cli.json

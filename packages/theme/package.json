@@ -1,0 +1,30 @@
+{
+  "name": "@innate-desktop/theme",
+  "version": "0.1.0",
+  "private": true,
+  "description": "innate-desktop 产品 token 层与壳 chrome 层：建立在 @innate/ui 之上",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.css",
+    "./index.css": "./src/index.css",
+    "./tokens.css": "./src/tokens.css",
+    "./shell.css": "./src/shell.css",
+    "./theme": "./src/theme.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "node -e \"console.log('@innate-desktop/theme 是纯 CSS 包，无构建步骤')\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@innate/ui": "^0.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.6"
+  }
+}

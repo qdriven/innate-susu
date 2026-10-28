@@ -82,13 +82,15 @@ DoD:全量门禁绿 + 任务卡「如何验证」逐条通过 + 证据入 `docs/
 | 问题 | 去哪里 |
 | --- | --- |
 | Issue/PR、需求文件或本地任务的分析、验证证据与 Canvas | [task-workflow](../.agents/skills/task-workflow/SKILL.md)；事实源为 `docs/sprints/task-*-*.md` |
+| **仓库现状的 build-path 记录**（任务驱动基线、monorepo 骨架与 UI 基座接入） | [build-path/0-setup/](./build-path/0-setup/README.md)、[build-path/1-monorepo-init/](./build-path/1-monorepo-init/README.md) |
+| orca ↔ innate-fe 的对齐结论与差异处置 | [build-path/1-monorepo-init/style-guide-alignment.md](./build-path/1-monorepo-init/style-guide-alignment.md) |
 | **当前迁移执行计划(唯一执行源)** | [susu/plan2/](./susu/plan2/README.md)；看板投影 [susu/plan2/canvas/](./susu/plan2/canvas/docs/sprints/README.md) |
 | 已合并归档的旧迁移计划(plan1)与评审 | [susu/archive/plan1/](./susu/archive/plan1/README.md)(含 reviews/) |
 | 并发会话画布预览产物(非事实源) | [susu/archive/project-canvas-preview/](./susu/archive/project-canvas-preview/) |
 | 平台化方向总纲(P 系列 backlog) | [original/innate-dogic/CONTEXT.md](./original/innate-dogic/CONTEXT.md) |
 | 新架构总览(分层/契约) | [original/innate-dogic/architecture/overview.md](./original/innate-dogic/architecture/overview.md) |
 | 目标模块图与迁移映射 | [original/innate-dogic/architecture/module-map.md](./original/innate-dogic/architecture/module-map.md) |
-| 视觉与交互规范 | `.agents/skills/susu-overview/STYLEGUIDE.md`(orca 副本+替换表);`original/innate-dogic/architecture/style-guide.md` 为过时草案不执行 |
+| 视觉与交互规范 | `.agents/skills/susu-overview/STYLEGUIDE.md`(已按本仓基座重写) + `styleguide/` 深文(`color` / `components` / `toolbar` / `native-chat` / `ux-rules` / `ux-review-rubric`);`original/innate-dogic/architecture/style-guide.md` 为过时草案不执行 |
 | P 系列里程碑与决策总纲(backlog) | [original/innate-dogic/plans/README.md](./original/innate-dogic/plans/README.md) |
 | 构建矩阵、命令、门禁、分发 | [original/innate-dogic/build-path/README.md](./original/innate-dogic/build-path/README.md) |
 | 旧全局 Context(M0–M2 基线) | [CONTEXT.md](./CONTEXT.md) |

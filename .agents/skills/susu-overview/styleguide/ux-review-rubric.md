@@ -1,6 +1,6 @@
 # Screen UX review rubric
 
-Use this rubric when reviewing any Orca IDE screen, screenshot, or prototype, and when polishing a whole screen or flow. Core rules: [`docs/STYLEGUIDE.md`](../STYLEGUIDE.md#ux-rules). A good review names the highest-impact friction first, then gives concrete changes the implementer can make.
+Use this rubric when reviewing any innate-desktop screen, screenshot, or prototype, and when polishing a whole screen or flow. Core rules: [`../STYLEGUIDE.md`](../STYLEGUIDE.md#ux-rules). A good review names the highest-impact friction first, then gives concrete changes the implementer can make.
 
 ## Review output format
 
@@ -27,5 +27,5 @@ Use this rubric when reviewing any Orca IDE screen, screenshot, or prototype, an
 - **Layout density:** avoid jamming controls together. Preserve breathing room around the primary workflow, reduce competing buttons, and keep toolbar groups visually distinct. Dense screens are acceptable only when grouping, alignment, and hierarchy make scanning faster.
 - **Cards and containers:** cards must be visually distinct from their parent surface through the existing `card`/`border` treatment. Avoid nesting cards inside cards. If a section is not a repeated item, modal, or framed tool, consider an unframed layout or full-width band instead.
 - **Side-by-side layouts:** default to row-by-row layouts for complex workflows because they are easier to align and scan. Use side-by-side layouts only when space is constrained or comparison is the point, then polish column widths, baselines, and wrapping states carefully.
-- **Animation:** use subtle animation to soften expanding/collapsing content and prevent jumpy layout changes. Animation should clarify continuity, not decorate. Respect reduced motion element by element: turn movement off with `motion-reduce:` (slides, rotations, size changes); give spinners, pulses and progress indicators a still state that still says "working" (`LoadingSpinner` does this for spinners) instead of freezing them; short opacity fades can stay. Scripted scrolls ignore CSS, so pass them through `motionSafeScrollBehavior()`.
+- **Animation:** use subtle animation to soften expanding/collapsing content and prevent jumpy layout changes. Animation should clarify continuity, not decorate. Respect reduced motion element by element: turn movement off with `motion-reduce:` (slides, rotations, size changes); give spinners, pulses and progress indicators a still state that still says "working" (`@innate/ui`'s `Spinner` does this for spinners) instead of freezing them; short opacity fades can stay. Scripted scrolls ignore CSS, so pass them through `motionSafeScrollBehavior()`.
 - **SSH and latency:** assume actions may run remotely. Disable submit controls immediately, delay visible loading feedback when appropriate, and keep focus stable while remote data arrives.
