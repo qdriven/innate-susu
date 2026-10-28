@@ -1,6 +1,7 @@
 node_modules/
 out/
 dist-package/
+*.exe.new
 dist/
 *.tsbuildinfo
 .verdaccio/
