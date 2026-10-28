@@ -52,6 +52,24 @@ PluginManifest v1（原型已验证）
 | 5 skill/workflow 绑定 | manifest `skills[]` 段 + 热加载 | 插件生命周期钩子（P3 加载器扩展：install/enable/disable/uninstall + renderer 隔离） |
 | 6 云/周边 + widget/toolbar | 多形态挂载（画布/右栏/toolbar）+ 通信协议 + P7 分发 | §3 的 4 条 ❌；**不需要桌面级宿主协议**（已否决） |
 
+## 4bis. 统一打开方式模型（handler registry，2026-10-28 补）
+
+用户洞察确立：**dsh 本身就是一种打开方式**——它同时是 Surface provider（呈现侧）与 agent:tools 能力 handler（执行侧）。据此把原三个独立协议收敛为同一注册表的键空间：
+
+```text
+统一「打开方式注册表」（handler registry）
+├─ 内容键：文件类型/URI → 打开方式（open-with；Markdown→预览器、pptx→转换展示…）
+├─ 能力键：capability → 执行器（Q3.2；process:execute→pty、agent:tools→dsh、navigate→browser）
+├─ 目的键：purpose → 轻应用（P4 目的网关）
+└─ 呈现端：Surface provider（W1c；结果在中栏/画布/右栏打开）
+```
+
+共享机制（一次设计、四键共用）：注册、同键多 handler 并列/默认选择、审批挂钩（带 permissions 的 handler 过审批）、热插（轻应用 handler 随插件装卸——即「绑定和替换」的机制底座）。
+
+**与 §6.1 Provider 层决策的关系**：handler 层（用什么打开，宿主可插拔注册）≠ provider 层（模型从哪来，magpie 独占）。dsh 是宿主的一个 handler，其模型侧内部走 magpie；未来 zcode-cli/ACP 接入 = 新增 handler 记录，不动宿主。
+
+**对 §4/§5 的影响**：open-with 从「文件专属协议」改为 handler registry 的内容键空间首案例；Q3.2/W1c/P4 各为一个键空间的首次落地；第三层新增协议从三个收敛为**一个 registry 机制 + 三个键空间首案例**。
+
 ## 5. 协议就绪度分层
 
 - **第一层（W/Q 主线内闭环，无需新设计）**：Surface provider（W1c）、IPC 通道表收敛+命名规范+错误形状（W1c.2）、事件推送规范、capability 注册表（W4.2）、网关状态机（W2）、workspace root 单源（W3）、process:execute（W4）。
