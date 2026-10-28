@@ -16,7 +16,7 @@ innate-desktop/
 │  └─ bin/magpie.exe
 ├─ innate-project-canvas/         快照、审计、derive、展示生成器
 ├─ tools/                         桌面冒烟、overlay、打包与工程检查
-└─ docs/susu/plan2/               本轮迁移计划与证据
+└─ docs/susu/plan/               本轮迁移计划与证据
 ```
 
 依赖方向：
@@ -189,7 +189,7 @@ WorkspaceContext（workspaceId/root 引用，权限由服务端重查）
 - 当前 `readSnapshot` 只做部分结构检查，不能代替对 Agent 输出的完整 JSON Schema 校验。
 - `validateSnapshot` 是语义审计，也不会自动证明证据内容真实。
 - 当前 Schema 的 Sprint id 只接受 `S<数字>`，task id 只接受特定 `T…<数字>` 形式；W/Q 编号不能直接当作快照 id。
-- 本计划的机读投影在 `docs/susu/plan2/canvas/`（自包含根，自带 `docs/sprints/README.md`，与旧文档目录互不冲突）：S0=W0、S1–S3=W1a/W1b/W1c、S4=W2、S5=W3、S6=W4、S7=W5、S8=R1、S9–S11=Q1–Q3；任务 id 用 T<段号>.<序号>，展示层保留 W/Q 别名（写在标题里）。
+- 本计划的机读投影在 `docs/susu/plan/canvas/`（自包含根，自带 `docs/sprints/README.md`，与旧文档目录互不冲突）：S0=W0、S1–S3=W1a/W1b/W1c、S4=W2、S5=W3、S6=W4、S7=W5、S8=R1、S9–S11=Q1–Q3；任务 id 用 T<段号>.<序号>，展示层保留 W/Q 别名（写在标题里）。
 
 ### 7.3 数据归属
 
