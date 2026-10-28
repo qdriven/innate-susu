@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: sprint-w1a
 title: W1a UI 基座与窗口 titlebar
 createdAt: 2026-10-28T08:42:54.090962Z
-updatedAt: 2026-10-28T09:36:50.171981Z
-status: analyzed
+updatedAt: 2026-10-28T10:40:38.139761Z
+status: done
 repository: 
 sourceKind: file
 sourcePath: docs/susu/plan/phases/W1-shell.md
@@ -110,12 +110,14 @@ W0 行为先由测试固定，renderer 经唯一产品主题入口消费 @innate
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — 对应 W1 阶段任务卡；实施完成后登记实际行为与证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1a.1–W1a.3 完成记录与证据链接已登记。
 - S2 [none/-] docs/CONTEXT.md — 全局 Context 已定义模式门控、壳 IPC 与 Surface 安全约束，本任务按既有边界实施。
 
 ## 交付记录
 
-- W1a 已拆解为 3 个子 task；W0 未全绿，实施阻塞
+- W1a.1–W1a.3 全部 done；全仓 build/typecheck 通过，21 个测试文件 132/132，desktop 22/22。
+- 行为、主题和顶栏真机证据见 docs/susu/plan/evidence/W1a/。
+- W1a.1-W1a.3 全绿，全仓 132/132，证据见 docs/susu/plan/evidence/W1a/
 
 ## 来源原文
 

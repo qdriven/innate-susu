@@ -5,8 +5,8 @@
 > 改任务卡后：canvas_audit → canvas_sync → canvas_board（root 传本 canvas/ 目录），不手改 out/。
 
 | [S0](./S0-w0-baseline.md) | W0 基线迁入 | 源基线+工程门禁可运行，源头修复日志脱敏 | 2–3 人日 | 已完成（2026-10-28） |
-| [S1](./S1-w1a-base.md) | W1a UI 基座+titlebar | 字体决策、Tailwind+token、只换顶栏留状态槽 | 1–2 人日 | 待执行 |
-| [S2](./S2-w1b-shell.md) | W1b 壳组合 | @innate/ui Sidebar/ContentArea、拆 App | 1–2 人日 | 待执行 |
+| [S1](./S1-w1a-base.md) | W1a UI 基座+titlebar | 字体决策、Tailwind+token、只换顶栏留状态槽 | 1–2 人日 | 已完成（2026-10-28） |
+| [S2](./S2-w1b-shell.md) | W1b 壳组合 | @innate/ui Sidebar/ContentArea、拆 App | 1–2 人日 | 已完成（2026-10-28） |
 | [S3](./S3-w1c-tabs.md) | W1c 中栏多标签 | Surface 标签模型+接入统一槽+降级+回归 | 2–3 人日 | 待执行 |
 | [S4](./S4-w2-gateway.md) | W2 网关收口 | sidecar/CLI/console/状态/网关真实链路 | 3–4 人日 | 待执行 |
 | [S5](./S5-w3-workspace.md) | W3 工作区 | 右栏 Panel+中栏文档+WorkspaceContext | 3–5 人日 | 待执行 |

@@ -31,28 +31,16 @@ body {
 
 .app { display: flex; flex-direction: column; height: 100vh; }
 
-/* 顶栏：orca 式左簇菜单 + 右簇窗口控制，中间空白可拖拽 */
-.titlebar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 38px;
-  padding-left: 10px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-  -webkit-app-region: drag;
-  flex-shrink: 0;
-}
-.titlebar-left, .titlebar-right { display: flex; align-items: center; height: 100%; min-width: 0; }
-.titlebar-left { gap: 6px; }
+/* W1a 顶栏组合；尺寸与窗口控件 chrome 由 packages/theme/src/shell.css 提供。 */
+.titlebar-strip { --window-controls-width: 138px; flex-shrink: 0; }
+.titlebar-strip .titlebar-left { gap: 6px; padding-left: 10px; }
 .titlebar .logo { color: var(--text); font-size: var(--font-title); }
 .titlebar button { -webkit-app-region: no-drag; }
-.titlebar-icon-button {
-  width: 26px; height: 24px; padding: 0; border: none; border-radius: 5px;
-  background: transparent; color: var(--dim); font-size: 14px; line-height: 1;
-  letter-spacing: 1px;
-}
-.titlebar-icon-button:hover { background: var(--panel-2); color: var(--text); }
+.titlebar .window-controls-btn { width: 46px; height: 36px; padding: 0; border-radius: 0; }
+.titlebar-tabs { flex: 1; align-self: stretch; min-width: 0; }
+.titlebar-right { display: flex; align-items: center; height: 100%; min-width: 0; gap: 8px; -webkit-app-region: no-drag; }
+.titlebar-status-slot:empty { width: 0; }
+.titlebar-right-panel-slot { width: 24px; height: 24px; flex-shrink: 0; }
 .app-menu { position: relative; }
 .app-menu-popover {
   position: absolute; z-index: 1000; top: 29px; left: -30px; width: 190px;
@@ -70,16 +58,6 @@ body {
 .titlebar-app-name { font-size: var(--font-title); font-weight: 600; }
 .titlebar-page { color: var(--dim); font-size: var(--font-xs); }
 .titlebar-page::before { content: '/'; margin-right: 7px; color: var(--border); }
-.titlebar-right { gap: 8px; -webkit-app-region: no-drag; }
-.titlebar-status { display: flex; align-items: center; gap: 5px; padding-right: 4px; }
-.window-controls { display: flex; align-self: stretch; }
-.window-controls-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 42px; height: 100%; padding: 0; border: none; border-radius: 0;
-  background: transparent; color: var(--text);
-}
-.window-controls-btn:hover { background: var(--panel-2); }
-.window-controls-close:hover { background: var(--window-control-close-hover); color: var(--window-control-close-foreground); }
 
 .pill {
   font-size: var(--font-2xs); font-weight: 400; padding: 1px 8px; border-radius: 999px;

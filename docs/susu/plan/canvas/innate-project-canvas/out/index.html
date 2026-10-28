@@ -11,11 +11,11 @@ body .workspace,body .view,body .panel,body .overview-grid>*{min-width:0}body .n
 .sidebar{display:none}.workspace{margin-left:0}.top-tab-bar{position:sticky;top:58px;z-index:19;display:flex;gap:4px;padding:0 24px;height:43px;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);overflow-x:auto}.top-tab{position:relative;flex:0 0 auto;padding:0 14px;border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}.top-tab:hover{color:var(--text)}.top-tab[aria-current=page]{color:var(--text);font-weight:650}.top-tab[aria-current=page]:after{content:"";position:absolute;right:12px;bottom:-1px;left:12px;height:2px;background:var(--accent)}.layout-switch{display:flex;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}.layout-switch button{padding:3px 7px;border:0;border-radius:4px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer}.layout-switch button[aria-pressed=true]{background:var(--panel-subtle);color:var(--text);font-weight:600}.sidebar-enabled .sidebar{display:flex}.sidebar-enabled .workspace{margin-left:var(--sidebar-width)}.sidebar-enabled .top-tab-bar{display:none}.sidebar-enabled #sidebar-trigger{display:grid}#sidebar-trigger{display:none}.task-actions{display:flex;gap:6px;padding:12px 0 0}.task-action{padding:4px 8px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--muted);font-size:11px;cursor:pointer}.task-action:hover{border-color:var(--accent);color:var(--accent)}.badge.edited{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.task-card-top>code{margin-right:auto}.draft-content{margin-top:12px}.markdown-section{margin-bottom:9px;padding:11px;border:1px solid var(--line);border-radius:7px;background:var(--panel-subtle)}.markdown-section:last-child{margin-bottom:0}.markdown-section h2,.markdown-section h3{margin:0 0 7px;font-size:12px}.markdown-section h2{color:var(--text)}.markdown-section p{margin:0 0 7px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.markdown-section p:last-child{margin-bottom:0}.markdown-section ul{margin:0;padding-left:17px;color:var(--muted);font-size:12px}.markdown-section li{margin:3px 0;overflow-wrap:anywhere}.markdown-section code{padding:1px 3px;border-radius:3px;background:var(--panel)}.markdown-section pre{margin:0;padding:9px;overflow:auto;border-radius:5px;background:var(--panel)}.markdown-section pre code{padding:0}.markdown-section strong{color:var(--text)}.task-editor{width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);box-shadow:0 24px 80px rgba(0,0,0,.22)}.task-editor::backdrop{background:rgba(15,18,24,.48);backdrop-filter:blur(3px)}.editor-form{display:flex;flex-direction:column;max-height:calc(100vh - 50px)}.editor-header{display:flex;align-items:center;gap:9px;padding:15px 18px;border-bottom:1px solid var(--line)}.editor-header h2{margin:0;font-size:16px}.editor-header code{color:var(--muted)}.editor-close{margin-left:auto;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}.editor-close:hover{background:var(--panel-subtle);color:var(--text)}.editor-body{padding:16px 18px;overflow-y:auto}.editor-field{display:block;margin-bottom:13px}.editor-field>span{display:block;margin-bottom:6px;font-size:12px;font-weight:600}.editor-title{width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font-size:14px}.editor-tabs{display:flex;gap:3px;margin-bottom:7px;border-bottom:1px solid var(--line)}.editor-tabs button{padding:6px 11px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.editor-tabs button[aria-pressed=true]{border-bottom-color:var(--accent);color:var(--text);font-weight:600}.editor-markdown{display:block;width:100%;min-height:330px;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.editor-markdown:focus{border-color:var(--accent)}.editor-preview{min-height:330px;padding:1px 0}.editor-preview-empty{padding:24px;border:1px dashed var(--line);border-radius:7px;color:var(--muted);text-align:center}.editor-note{margin:10px 0 0;color:var(--muted);font-size:11px}.editor-error{min-height:18px;margin:7px 0 0;color:var(--bad);font-size:12px}.editor-footer{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}.editor-footer .muted{margin-right:auto;font-size:11px}.editor-button{padding:6px 13px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:12px;cursor:pointer}.editor-button.primary{border-color:var(--accent);background:var(--accent);color:var(--panel)}.editor-button:hover{filter:brightness(.97)}.editor-reset{margin-right:4px;color:var(--bad)}.copy-toast{position:fixed;right:20px;bottom:20px;z-index:60;padding:9px 13px;border:1px solid var(--line);border-radius:7px;background:var(--text);color:var(--bg);font-size:12px;box-shadow:var(--shadow)}
 .markdown-toolbar{display:flex;gap:7px;margin:0 0 8px;padding:5px;overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel-subtle);scrollbar-width:thin}.markdown-toolbar[hidden]{display:none}.markdown-toolbar-group{display:flex;flex:0 0 auto;gap:2px;padding-right:7px;border-right:1px solid var(--line)}.markdown-toolbar-group:last-child{padding-right:0;border-right:0}.markdown-toolbar button{min-width:27px;height:26px;padding:0 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--muted);font-size:12px;line-height:1;white-space:nowrap;cursor:pointer}.markdown-toolbar button:hover,.markdown-toolbar button:focus-visible{border-color:var(--line);background:var(--panel);color:var(--text);outline:none}.markdown-toolbar button:active{background:var(--accent-soft);color:var(--accent)}.markdown-section blockquote{margin:7px 0;padding:6px 10px;border-left:2px solid var(--accent);background:var(--panel);color:var(--muted)}.markdown-section blockquote p{margin:0}.markdown-section a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}.markdown-section li.task-item{list-style:none}.markdown-section li.task-item input{margin:0 6px 0 0;vertical-align:middle}.markdown-section del{color:var(--muted)}
 @media(max-width:800px){.top-tab-bar{padding:0 10px;height:41px}.top-tab{padding:0 11px}.sidebar-enabled .workspace{margin-left:0}.layout-switch{display:none}.task-editor{width:calc(100vw - 20px);max-height:calc(100vh - 20px)}.editor-form{max-height:calc(100vh - 22px)}.editor-header,.editor-body,.editor-footer{padding-right:13px;padding-left:13px}.editor-footer{flex-wrap:wrap}.editor-footer .muted{flex-basis:100%}.editor-markdown,.editor-preview{min-height:280px}}
-</style></head><body data-active-view="overview" data-project="innate-labs"><aside class="sidebar" aria-label="项目导航"><div class="brand"><span class="brand-mark">I</span><div class="brand-text"><strong>Innate Project Canvas</strong><span>项目计划与架构工作台</span></div></div><div class="sidebar-scroll"><div class="nav-label">工作区</div><button class="nav-item" data-view-target="overview" aria-current="page"><span class="nav-icon">01</span><span class="nav-text">项目总览</span></button><button class="nav-item" data-view-target="tasks"><span class="nav-icon">02</span><span class="nav-text">Sprint 任务</span><span class="nav-count">71</span></button><button class="nav-item" data-view-target="modules"><span class="nav-icon">03</span><span class="nav-text">模块交互</span><span class="nav-count">0</span></button><button class="nav-item" data-view-target="audit"><span class="nav-icon">04</span><span class="nav-text">审计与漂移</span></button><div class="nav-label">Sprints</div><button class="sprint-nav" data-sprint-target="S0"><span>S0</span><span>W0 基线迁入</span></button><button class="sprint-nav" data-sprint-target="S1"><span>S1</span><span>W1a UI 基座+titlebar</span></button><button class="sprint-nav" data-sprint-target="S2"><span>S2</span><span>W1b 壳组合</span></button><button class="sprint-nav" data-sprint-target="S3"><span>S3</span><span>W1c 中栏多标签</span></button><button class="sprint-nav" data-sprint-target="S4"><span>S4</span><span>W2 网关收口</span></button><button class="sprint-nav" data-sprint-target="S5"><span>S5</span><span>W3 工作区</span></button><button class="sprint-nav" data-sprint-target="S6"><span>S6</span><span>W4 terminal</span></button><button class="sprint-nav" data-sprint-target="S7"><span>S7</span><span>W5 browser</span></button><button class="sprint-nav" data-sprint-target="S8"><span>S8</span><span>R1 Harness 收敛</span></button><button class="sprint-nav" data-sprint-target="S9"><span>S9</span><span>Q1 计划生成</span></button><button class="sprint-nav" data-sprint-target="S10"><span>S10</span><span>Q2 项目看板</span></button><button class="sprint-nav" data-sprint-target="S11"><span>S11</span><span>Q3 单任务执行</span></button></div><div class="sidebar-footer"><code>eeb1715b604491b8</code><span>2026-10-28 · 结构化快照</span></div></aside><button class="sidebar-overlay" id="sidebar-overlay" aria-label="关闭导航"></button><div class="workspace"><header class="topbar"><button class="icon-button" id="sidebar-trigger" aria-label="折叠或展开导航" title="折叠导航 · Ctrl/⌘ B">☰</button><div class="breadcrumb"><span>innate-labs</span><span>/</span><strong id="view-title">项目总览</strong></div><div class="topbar-actions"><div class="layout-switch" aria-label="导航布局"><button type="button" data-layout="tabs" aria-pressed="true">Tabs</button><button type="button" data-layout="sidebar" aria-pressed="false">Sidebar</button></div><span class="system-badge"><span class="system-dot"></span>跟随系统</span></div></header><nav class="top-tab-bar" aria-label="项目视图"><button class="top-tab" data-view-target="overview" aria-current="page">项目总览</button><button class="top-tab" data-view-target="tasks">Sprint 任务</button><button class="top-tab" data-view-target="modules">模块交互</button><button class="top-tab" data-view-target="audit">审计与漂移</button></nav><main><section class="view" id="view-overview" data-view><div class="overview-hero"><div><span class="eyebrow">Evidence-gated project workspace</span><h1>innate-labs</h1><p>把计划、执行状态和模块关系放进同一个工作界面。所有数字都来自当前快照，目标架构不会被误认为已实现。</p></div><span class="snapshot-pill">快照 eeb1715b6044</span></div>
-    <section class="metrics" aria-label="项目摘要"><div><strong>12</strong><span>Sprint</span></div><div><strong>71</strong><span>任务卡</span></div><div><strong>2</strong><span>当前可执行</span></div><div><strong>0</strong><span>当前 + 目标模块</span></div><div class=""><strong>0</strong><span>审计错误</span></div></section>
-    <div class="overview-grid"><section class="panel next-panel"><div class="section-heading"><div><span class="eyebrow">Execution frontier</span><h2>当前推进面</h2></div><button class="text-button" data-view-target="tasks">全部任务 →</button></div><div class="next-task"><span class="badge next">下一项</span><code>T1.0</code><h3>W1a.0 字体决策（决策门）</h3><p>二选一拍板：(a) innate-fe 的 --font-sans 由 Inter 改 Geist（orca STYLEGUIDE 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 Inter」为正式决定。产品代码禁止另写 font-family。</p></div><div class="ready-list"><button data-open-task="T1.0"><code>T1.0</code><span>W1a.0 字体决策（决策门）</span><span>→</span></button><button data-open-task="T3.1"><code>T3.1</code><span>W1c.1 provider 中立的 Surface 标签模型</span><span>→</span></button></div></section>
+</style></head><body data-active-view="overview" data-project="innate-labs"><aside class="sidebar" aria-label="项目导航"><div class="brand"><span class="brand-mark">I</span><div class="brand-text"><strong>Innate Project Canvas</strong><span>项目计划与架构工作台</span></div></div><div class="sidebar-scroll"><div class="nav-label">工作区</div><button class="nav-item" data-view-target="overview" aria-current="page"><span class="nav-icon">01</span><span class="nav-text">项目总览</span></button><button class="nav-item" data-view-target="tasks"><span class="nav-icon">02</span><span class="nav-text">Sprint 任务</span><span class="nav-count">71</span></button><button class="nav-item" data-view-target="modules"><span class="nav-icon">03</span><span class="nav-text">模块交互</span><span class="nav-count">0</span></button><button class="nav-item" data-view-target="audit"><span class="nav-icon">04</span><span class="nav-text">审计与漂移</span></button><div class="nav-label">Sprints</div><button class="sprint-nav" data-sprint-target="S0"><span>S0</span><span>W0 基线迁入</span></button><button class="sprint-nav" data-sprint-target="S1"><span>S1</span><span>W1a UI 基座+titlebar</span></button><button class="sprint-nav" data-sprint-target="S2"><span>S2</span><span>W1b 壳组合</span></button><button class="sprint-nav" data-sprint-target="S3"><span>S3</span><span>W1c 中栏多标签</span></button><button class="sprint-nav" data-sprint-target="S4"><span>S4</span><span>W2 网关收口</span></button><button class="sprint-nav" data-sprint-target="S5"><span>S5</span><span>W3 工作区</span></button><button class="sprint-nav" data-sprint-target="S6"><span>S6</span><span>W4 terminal</span></button><button class="sprint-nav" data-sprint-target="S7"><span>S7</span><span>W5 browser</span></button><button class="sprint-nav" data-sprint-target="S8"><span>S8</span><span>R1 Harness 收敛</span></button><button class="sprint-nav" data-sprint-target="S9"><span>S9</span><span>Q1 计划生成</span></button><button class="sprint-nav" data-sprint-target="S10"><span>S10</span><span>Q2 项目看板</span></button><button class="sprint-nav" data-sprint-target="S11"><span>S11</span><span>Q3 单任务执行</span></button></div><div class="sidebar-footer"><code>1fd29a5de4b660e7</code><span>2026-10-28 · 结构化快照</span></div></aside><button class="sidebar-overlay" id="sidebar-overlay" aria-label="关闭导航"></button><div class="workspace"><header class="topbar"><button class="icon-button" id="sidebar-trigger" aria-label="折叠或展开导航" title="折叠导航 · Ctrl/⌘ B">☰</button><div class="breadcrumb"><span>innate-labs</span><span>/</span><strong id="view-title">项目总览</strong></div><div class="topbar-actions"><div class="layout-switch" aria-label="导航布局"><button type="button" data-layout="tabs" aria-pressed="true">Tabs</button><button type="button" data-layout="sidebar" aria-pressed="false">Sidebar</button></div><span class="system-badge"><span class="system-dot"></span>跟随系统</span></div></header><nav class="top-tab-bar" aria-label="项目视图"><button class="top-tab" data-view-target="overview" aria-current="page">项目总览</button><button class="top-tab" data-view-target="tasks">Sprint 任务</button><button class="top-tab" data-view-target="modules">模块交互</button><button class="top-tab" data-view-target="audit">审计与漂移</button></nav><main><section class="view" id="view-overview" data-view><div class="overview-hero"><div><span class="eyebrow">Evidence-gated project workspace</span><h1>innate-labs</h1><p>把计划、执行状态和模块关系放进同一个工作界面。所有数字都来自当前快照，目标架构不会被误认为已实现。</p></div><span class="snapshot-pill">快照 1fd29a5de4b6</span></div>
+    <section class="metrics" aria-label="项目摘要"><div><strong>12</strong><span>Sprint</span></div><div><strong>71</strong><span>任务卡</span></div><div><strong>1</strong><span>当前可执行</span></div><div><strong>0</strong><span>当前 + 目标模块</span></div><div class=""><strong>0</strong><span>审计错误</span></div></section>
+    <div class="overview-grid"><section class="panel next-panel"><div class="section-heading"><div><span class="eyebrow">Execution frontier</span><h2>当前推进面</h2></div><button class="text-button" data-view-target="tasks">全部任务 →</button></div><div class="next-task"><span class="badge next">下一项</span><code>T3.1</code><h3>W1c.1 provider 中立的 Surface 标签模型</h3><p>core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；SurfaceTabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webContents/ChildProcess 不进标签状态。</p></div><div class="ready-list"><button data-open-task="T3.1"><code>T3.1</code><span>W1c.1 provider 中立的 Surface 标签模型</span><span>→</span></button></div></section>
     <section class="panel audit-summary"><div class="section-heading"><div><span class="eyebrow">Audit</span><h2>发布门禁</h2></div><button class="text-button" data-view-target="audit">查看审计 →</button></div><div class="audit-callout clean"><strong>结构、依赖和证据检查通过</strong><p>当前快照满足发布门禁。</p></div><dl class="audit-numbers"><div><dt>警告</dt><dd>0</dd></div><div><dt>语义漂移</dt><dd>0</dd></div></dl></section></div>
-    <section class="section-block"><div class="section-heading"><div><span class="eyebrow">Sprints</span><h2>按执行阶段查看</h2></div></div><div class="sprint-cards"><button class="sprint-card" type="button" data-sprint-target="S0"><span class="sprint-card-top"><code>S0</code><span>8/8</span></span><strong>W0 基线迁入</strong><span class="progress"><span style="width:100%"></span></span><span class="muted">已完成（2026-10-28） · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S1"><span class="sprint-card-top"><code>S1</code><span>0/4</span></span><strong>W1a UI 基座+titlebar</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 1–2 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S2"><span class="sprint-card-top"><code>S2</code><span>1/1</span></span><strong>W1b 壳组合</strong><span class="progress"><span style="width:100%"></span></span><span class="muted">待执行 · 1–2 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S3"><span class="sprint-card-top"><code>S3</code><span>0/4</span></span><strong>W1c 中栏多标签</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S4"><span class="sprint-card-top"><code>S4</code><span>0/7</span></span><strong>W2 网关收口</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–4 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S5"><span class="sprint-card-top"><code>S5</code><span>0/7</span></span><strong>W3 工作区</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S6"><span class="sprint-card-top"><code>S6</code><span>0/7</span></span><strong>W4 terminal</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 4–6 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S7"><span class="sprint-card-top"><code>S7</code><span>0/7</span></span><strong>W5 browser</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S8"><span class="sprint-card-top"><code>S8</code><span>0/4</span></span><strong>R1 Harness 收敛</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S9"><span class="sprint-card-top"><code>S9</code><span>0/7</span></span><strong>Q1 计划生成</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S10"><span class="sprint-card-top"><code>S10</code><span>0/7</span></span><strong>Q2 项目看板</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–4 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S11"><span class="sprint-card-top"><code>S11</code><span>0/8</span></span><strong>Q3 单任务执行</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 5–7 人日</span></button></div></section></section><section class="view" id="view-tasks" data-view hidden><div class="page-heading"><div><span class="eyebrow">Execution board</span><h1>Sprint 任务</h1><p>从依赖图派生可执行状态。筛选只改变视图，不回写任务状态；展开卡片可查看验收、来源和证据，双击卡片可直接编辑。</p></div></div><div class="filters"><div class="filter-buttons" aria-label="任务状态筛选"><button data-task-filter="all" aria-pressed="true">全部</button><button data-task-filter="action" aria-pressed="false">可推进</button><button data-task-filter="blocked" aria-pressed="false">被阻塞</button><button data-task-filter="done" aria-pressed="false">已完成</button><button data-task-filter="optional" aria-pressed="false">可选与债务</button></div><div class="filter-controls"><select id="sprint-filter" aria-label="按 Sprint 筛选"><option value="all">全部 Sprint</option><option value="S0">S0 · W0 基线迁入</option><option value="S1">S1 · W1a UI 基座+titlebar</option><option value="S2">S2 · W1b 壳组合</option><option value="S3">S3 · W1c 中栏多标签</option><option value="S4">S4 · W2 网关收口</option><option value="S5">S5 · W3 工作区</option><option value="S6">S6 · W4 terminal</option><option value="S7">S7 · W5 browser</option><option value="S8">S8 · R1 Harness 收敛</option><option value="S9">S9 · Q1 计划生成</option><option value="S10">S10 · Q2 项目看板</option><option value="S11">S11 · Q3 单任务执行</option></select><input id="task-search" type="search" placeholder="搜索任务 · /" aria-label="搜索任务"></div></div><p class="result-count" id="task-count" aria-live="polite">显示 71 / 71 张任务卡</p><section class="sprint-block" data-sprint-block="S0">
+    <section class="section-block"><div class="section-heading"><div><span class="eyebrow">Sprints</span><h2>按执行阶段查看</h2></div></div><div class="sprint-cards"><button class="sprint-card" type="button" data-sprint-target="S0"><span class="sprint-card-top"><code>S0</code><span>8/8</span></span><strong>W0 基线迁入</strong><span class="progress"><span style="width:100%"></span></span><span class="muted">已完成（2026-10-28） · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S1"><span class="sprint-card-top"><code>S1</code><span>4/4</span></span><strong>W1a UI 基座+titlebar</strong><span class="progress"><span style="width:100%"></span></span><span class="muted">已完成（2026-10-28） · 1–2 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S2"><span class="sprint-card-top"><code>S2</code><span>1/1</span></span><strong>W1b 壳组合</strong><span class="progress"><span style="width:100%"></span></span><span class="muted">已完成（2026-10-28） · 1–2 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S3"><span class="sprint-card-top"><code>S3</code><span>0/4</span></span><strong>W1c 中栏多标签</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S4"><span class="sprint-card-top"><code>S4</code><span>0/7</span></span><strong>W2 网关收口</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–4 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S5"><span class="sprint-card-top"><code>S5</code><span>0/7</span></span><strong>W3 工作区</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S6"><span class="sprint-card-top"><code>S6</code><span>0/7</span></span><strong>W4 terminal</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 4–6 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S7"><span class="sprint-card-top"><code>S7</code><span>0/7</span></span><strong>W5 browser</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S8"><span class="sprint-card-top"><code>S8</code><span>0/4</span></span><strong>R1 Harness 收敛</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 2–3 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S9"><span class="sprint-card-top"><code>S9</code><span>0/7</span></span><strong>Q1 计划生成</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–5 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S10"><span class="sprint-card-top"><code>S10</code><span>0/7</span></span><strong>Q2 项目看板</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 3–4 人日</span></button><button class="sprint-card" type="button" data-sprint-target="S11"><span class="sprint-card-top"><code>S11</code><span>0/8</span></span><strong>Q3 单任务执行</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">待执行 · 5–7 人日</span></button></div></section></section><section class="view" id="view-tasks" data-view hidden><div class="page-heading"><div><span class="eyebrow">Execution board</span><h1>Sprint 任务</h1><p>从依赖图派生可执行状态。筛选只改变视图，不回写任务状态；展开卡片可查看验收、来源和证据，双击卡片可直接编辑。</p></div></div><div class="filters"><div class="filter-buttons" aria-label="任务状态筛选"><button data-task-filter="all" aria-pressed="true">全部</button><button data-task-filter="action" aria-pressed="false">可推进</button><button data-task-filter="blocked" aria-pressed="false">被阻塞</button><button data-task-filter="done" aria-pressed="false">已完成</button><button data-task-filter="optional" aria-pressed="false">可选与债务</button></div><div class="filter-controls"><select id="sprint-filter" aria-label="按 Sprint 筛选"><option value="all">全部 Sprint</option><option value="S0">S0 · W0 基线迁入</option><option value="S1">S1 · W1a UI 基座+titlebar</option><option value="S2">S2 · W1b 壳组合</option><option value="S3">S3 · W1c 中栏多标签</option><option value="S4">S4 · W2 网关收口</option><option value="S5">S5 · W3 工作区</option><option value="S6">S6 · W4 terminal</option><option value="S7">S7 · W5 browser</option><option value="S8">S8 · R1 Harness 收敛</option><option value="S9">S9 · Q1 计划生成</option><option value="S10">S10 · Q2 项目看板</option><option value="S11">S11 · Q3 单任务执行</option></select><input id="task-search" type="search" placeholder="搜索任务 · /" aria-label="搜索任务"></div></div><p class="result-count" id="task-count" aria-live="polite">显示 71 / 71 张任务卡</p><section class="sprint-block" data-sprint-block="S0">
       <header class="sprint-heading"><div><span class="sprint-id">S0</span><h3>W0 基线迁入</h3></div><div class="sprint-meta"><span>8/8 完成</span><span>2–3 人日</span><span>已完成（2026-10-28）</span></div></header>
       <div class="task-grid"><details class="task-card " data-task data-filter="done" data-sprint="S0" data-search="t0.1 w0.1 冻结源基线并建立迁移清单 记录 labs 与本仓 commit/工作区/版本；在 labs 实测 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop 并记录实测测试数；列迁移白名单（innate-dogic、tools、innate-project-canvas、根配置）与排除项；magpie.exe 记录版本与哈希。 白名单每个包映射到目标路径；排除项不进清单；证据 `docs/susu/plan/evidence/w0/` 与 `docs/susu/plan/evidence/w0/commands.md`。" data-original-title="W0.1 冻结源基线并建立迁移清单" data-original-body="## 任务说明
 
@@ -316,30 +316,32 @@ docs/sprints/S0-w0-baseline.md:52" data-summary="标记 plan 为唯一执行源�
     </div>
   </details></div>
     </section><section class="sprint-block" data-sprint-block="S1">
-      <header class="sprint-heading"><div><span class="sprint-id">S1</span><h3>W1a UI 基座+titlebar</h3></div><div class="sprint-meta"><span>0/4 完成</span><span>1–2 人日</span><span>待执行</span></div></header>
-      <div class="task-grid"><details class="task-card next" data-task data-filter="action" data-sprint="S1" data-search="t1.0 w1a.0 字体决策（决策门） 二选一拍板：(a) innate-fe 的 --font-sans 由 inter 改 geist（orca styleguide 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 inter」为正式决定。产品代码禁止另写 font-family。 决策记录入证据；选 (a) 则基础仓发版本仓消费成功。" data-original-title="W1a.0 字体决策（决策门）" data-original-body="## 任务说明
+      <header class="sprint-heading"><div><span class="sprint-id">S1</span><h3>W1a UI 基座+titlebar</h3></div><div class="sprint-meta"><span>4/4 完成</span><span>1–2 人日</span><span>已完成（2026-10-28）</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="done" data-sprint="S1" data-search="t1.0 w1a.0 字体决策（决策门） 二选一拍板：(a) innate-fe 的 --font-sans 由 inter 改 geist（orca styleguide 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 inter」为正式决定。产品代码禁止另写 font-family。 决策记录入证据；选 (a) 则基础仓发版本仓消费成功。
+- **证据**：`docs/susu/plan/evidence/w1a/readme.md`" data-original-title="W1a.0 字体决策（决策门）" data-original-body="## 任务说明
 
 二选一拍板：(a) innate-fe 的 --font-sans 由 Inter 改 Geist（orca STYLEGUIDE 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 Inter」为正式决定。产品代码禁止另写 font-family。
 
 ## 验收标准
 
 决策记录入证据；选 (a) 则基础仓发版本仓消费成功。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`
 
 ## 执行信息
 
-- 状态：下一项
+- 状态：已完成
 - 前置：S0
 - 预估：0.25 天
 
 ## 证据
 
-- 未登记证据路径
+- docs/susu/plan/evidence/W1a/README.md（verified）
 
 ## 来源
 
 docs/sprints/S1-w1a-base.md:3" data-summary="二选一拍板：(a) innate-fe 的 --font-sans 由 Inter 改 Geist（orca STYLEGUIDE 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 Inter」为正式决定。产品代码禁止另写 font-family。" id="task-T1.0">
     <summary>
-      <span class="task-card-top"><code>T1.0</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge next">下一项</span></span>
+      <span class="task-card-top"><code>T1.0</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge done">已完成</span></span>
       <span class="task-title">W1a.0 字体决策（决策门）</span>
       <span class="task-summary">二选一拍板：(a) innate-fe 的 --font-sans 由 Inter 改 Geist（orca STYLEGUIDE 要求，技能当前记录做法），改完 ui:sync --bump patch；(b) 技能替换表写「桌面例外、沿用 Inter」为正式决定。产品代码禁止另写 font-family。</span>
       <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
@@ -349,34 +351,37 @@ docs/sprints/S1-w1a-base.md:3" data-summary="二选一拍板：(a) innate-fe 的
       <article class="draft-content" data-draft-content hidden></article>
       <div data-original-content>
         <dl><dt>前置</dt><dd>S0</dd><dt>预估</dt><dd>0.25 天</dd></dl>
-        <div class="verification"><strong>如何验证</strong><p>决策记录入证据；选 (a) 则基础仓发版本仓消费成功。</p></div>
-        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <div class="verification"><strong>如何验证</strong><p>决策记录入证据；选 (a) 则基础仓发版本仓消费成功。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`</p></div>
+        <h4>证据</h4><ul class="evidence"><li><code>docs/susu/plan/evidence/W1a/README.md</code><span class="evidence-verified">verified</span></li></ul>
         <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:3</code></p>
       </div>
     </div>
-  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.1 w1a.1 固定页面与 surface 行为基线 为 simple/dev 页面集、默认页、模式切换、harness 启动状态补回归断言；记录 harness 与控制台 show/hide/bounds/close 现行为；加「url 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。 测试在 w0 实现上通过。" data-original-title="W1a.1 固定页面与 Surface 行为基线" data-original-body="## 任务说明
+  </details><details class="task-card " data-task data-filter="done" data-sprint="S1" data-search="t1.1 w1a.1 固定页面与 surface 行为基线 为 simple/dev 页面集、默认页、模式切换、harness 启动状态补回归断言；记录 harness 与控制台 show/hide/bounds/close 现行为；加「url 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。 测试在 w0 实现上通过。
+- **证据**：`docs/susu/plan/evidence/w1a/readme.md`" data-original-title="W1a.1 固定页面与 Surface 行为基线" data-original-body="## 任务说明
 
 为 simple/dev 页面集、默认页、模式切换、Harness 启动状态补回归断言；记录 Harness 与控制台 show/hide/bounds/close 现行为；加「URL 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。
 
 ## 验收标准
 
 测试在 W0 实现上通过。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`
 
 ## 执行信息
 
-- 状态：被阻塞
+- 状态：已完成
 - 前置：T1.0
 - 预估：0.5 天
 
 ## 证据
 
-- 未登记证据路径
+- docs/susu/plan/evidence/W1a/README.md（verified）
 
 ## 来源
 
-docs/sprints/S1-w1a-base.md:10" data-summary="为 simple/dev 页面集、默认页、模式切换、Harness 启动状态补回归断言；记录 Harness 与控制台 show/hide/bounds/close 现行为；加「URL 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。" id="task-T1.1">
+docs/sprints/S1-w1a-base.md:11" data-summary="为 simple/dev 页面集、默认页、模式切换、Harness 启动状态补回归断言；记录 Harness 与控制台 show/hide/bounds/close 现行为；加「URL 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。" id="task-T1.1">
     <summary>
-      <span class="task-card-top"><code>T1.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-card-top"><code>T1.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge done">已完成</span></span>
       <span class="task-title">W1a.1 固定页面与 Surface 行为基线</span>
       <span class="task-summary">为 simple/dev 页面集、默认页、模式切换、Harness 启动状态补回归断言；记录 Harness 与控制台 show/hide/bounds/close 现行为；加「URL 未变不 reload」「显式停止才 close」测试；保存窗口与 bounds 证据。</span>
       <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
@@ -386,34 +391,37 @@ docs/sprints/S1-w1a-base.md:10" data-summary="为 simple/dev 页面集、默认�
       <article class="draft-content" data-draft-content hidden></article>
       <div data-original-content>
         <dl><dt>前置</dt><dd>T1.0</dd><dt>预估</dt><dd>0.5 天</dd></dl>
-        <div class="verification"><strong>如何验证</strong><p>测试在 W0 实现上通过。</p></div>
-        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
-        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:10</code></p>
+        <div class="verification"><strong>如何验证</strong><p>测试在 W0 实现上通过。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`</p></div>
+        <h4>证据</h4><ul class="evidence"><li><code>docs/susu/plan/evidence/W1a/README.md</code><span class="evidence-verified">verified</span></li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:11</code></p>
       </div>
     </div>
-  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.2 w1a.2 接入 tailwind + token + themeprovider renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devdeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；themeprovider 明暗只走 .dark class；旧 css 桥接到语义 token；禁深引内部路径、禁复制 primitive。 明暗截图各一张；构建与 typecheck 过；代表页无裸样式；simple/dev 不变。" data-original-title="W1a.2 接入 Tailwind + token + ThemeProvider" data-original-body="## 任务说明
+  </details><details class="task-card " data-task data-filter="done" data-sprint="S1" data-search="t1.2 w1a.2 接入 tailwind + token + themeprovider renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devdeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；themeprovider 明暗只走 .dark class；旧 css 桥接到语义 token；禁深引内部路径、禁复制 primitive。 明暗截图各一张；构建与 typecheck 过；代表页无裸样式；simple/dev 不变。
+- **证据**：`docs/susu/plan/evidence/w1a/readme.md`" data-original-title="W1a.2 接入 Tailwind + token + ThemeProvider" data-original-body="## 任务说明
 
 renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devDeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；ThemeProvider 明暗只走 .dark class；旧 CSS 桥接到语义 token；禁深引内部路径、禁复制 primitive。
 
 ## 验收标准
 
 明暗截图各一张；构建与 typecheck 过；代表页无裸样式；simple/dev 不变。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`
 
 ## 执行信息
 
-- 状态：被阻塞
+- 状态：已完成
 - 前置：T1.1
 - 预估：0.5 天
 
 ## 证据
 
-- 未登记证据路径
+- docs/susu/plan/evidence/W1a/README.md（verified）
 
 ## 来源
 
-docs/sprints/S1-w1a-base.md:17" data-summary="renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devDeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；ThemeProvider 明暗只走 .dark class；旧 CSS 桥接到语义 token；禁深引内部路径、禁复制 primitive。" id="task-T1.2">
+docs/sprints/S1-w1a-base.md:19" data-summary="renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devDeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；ThemeProvider 明暗只走 .dark class；旧 CSS 桥接到语义 token；禁深引内部路径、禁复制 primitive。" id="task-T1.2">
     <summary>
-      <span class="task-card-top"><code>T1.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-card-top"><code>T1.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge done">已完成</span></span>
       <span class="task-title">W1a.2 接入 Tailwind + token + ThemeProvider</span>
       <span class="task-summary">renderer 加 @innate/ui、tailwindcss、@tailwindcss/vite（app devDeps，只挂 renderer 配置）；globals.css 按已验证模式（两条 @import + 两条 @source，@source 在 import 后）；ThemeProvider 明暗只走 .dark class；旧 CSS 桥接到语义 token；禁深引内部路径、禁复制 primitive。</span>
       <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
@@ -423,34 +431,37 @@ docs/sprints/S1-w1a-base.md:17" data-summary="renderer 加 @innate/ui、tailwind
       <article class="draft-content" data-draft-content hidden></article>
       <div data-original-content>
         <dl><dt>前置</dt><dd>T1.1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
-        <div class="verification"><strong>如何验证</strong><p>明暗截图各一张；构建与 typecheck 过；代表页无裸样式；simple/dev 不变。</p></div>
-        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
-        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:17</code></p>
+        <div class="verification"><strong>如何验证</strong><p>明暗截图各一张；构建与 typecheck 过；代表页无裸样式；simple/dev 不变。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`</p></div>
+        <h4>证据</h4><ul class="evidence"><li><code>docs/susu/plan/evidence/W1a/README.md</code><span class="evidence-verified">verified</span></li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:19</code></p>
       </div>
     </div>
-  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.3 w1a.3 只换窗口 titlebar，状态槽留空 按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui button outline/ghost，不拷 orca 裸 class、不造 toolbar 原语；右侧留空状态槽（w2 pill 挂点）；窗口拖拽行为保持。 dom 断言三区+状态槽；窗口控制不回退；明暗视觉截图。" data-original-title="W1a.3 只换窗口 titlebar，状态槽留空" data-original-body="## 任务说明
+  </details><details class="task-card " data-task data-filter="done" data-sprint="S1" data-search="t1.3 w1a.3 只换窗口 titlebar，状态槽留空 按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui button outline/ghost，不拷 orca 裸 class、不造 toolbar 原语；右侧留空状态槽（w2 pill 挂点）；窗口拖拽行为保持。 dom 断言三区+状态槽；窗口控制不回退；明暗视觉截图。
+- **证据**：`docs/susu/plan/evidence/w1a/readme.md`" data-original-title="W1a.3 只换窗口 titlebar，状态槽留空" data-original-body="## 任务说明
 
 按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui Button outline/ghost，不拷 orca 裸 class、不造 Toolbar 原语；右侧留空状态槽（W2 pill 挂点）；窗口拖拽行为保持。
 
 ## 验收标准
 
 DOM 断言三区+状态槽；窗口控制不回退；明暗视觉截图。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`
 
 ## 执行信息
 
-- 状态：被阻塞
+- 状态：已完成
 - 前置：T1.2
 - 预估：0.5 天
 
 ## 证据
 
-- 未登记证据路径
+- docs/susu/plan/evidence/W1a/README.md（verified）
 
 ## 来源
 
-docs/sprints/S1-w1a-base.md:24" data-summary="按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui Button outline/ghost，不拷 orca 裸 class、不造 Toolbar 原语；右侧留空状态槽（W2 pill 挂点）；窗口拖拽行为保持。" id="task-T1.3">
+docs/sprints/S1-w1a-base.md:27" data-summary="按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui Button outline/ghost，不拷 orca 裸 class、不造 Toolbar 原语；右侧留空状态槽（W2 pill 挂点）；窗口拖拽行为保持。" id="task-T1.3">
     <summary>
-      <span class="task-card-top"><code>T1.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-card-top"><code>T1.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge done">已完成</span></span>
       <span class="task-title">W1a.3 只换窗口 titlebar，状态槽留空</span>
       <span class="task-summary">按 orca 窗口铬面重组顶栏（左品牌、中 titlebar-tabs 空槽、右窗口控制与右栏开关位，背景 --card 系）；控件按规范用 @innate/ui Button outline/ghost，不拷 orca 裸 class、不造 Toolbar 原语；右侧留空状态槽（W2 pill 挂点）；窗口拖拽行为保持。</span>
       <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
@@ -460,14 +471,15 @@ docs/sprints/S1-w1a-base.md:24" data-summary="按 orca 窗口铬面重组顶栏�
       <article class="draft-content" data-draft-content hidden></article>
       <div data-original-content>
         <dl><dt>前置</dt><dd>T1.2</dd><dt>预估</dt><dd>0.5 天</dd></dl>
-        <div class="verification"><strong>如何验证</strong><p>DOM 断言三区+状态槽；窗口控制不回退；明暗视觉截图。</p></div>
-        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
-        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:24</code></p>
+        <div class="verification"><strong>如何验证</strong><p>DOM 断言三区+状态槽；窗口控制不回退；明暗视觉截图。
+- **证据**：`docs/susu/plan/evidence/W1a/README.md`</p></div>
+        <h4>证据</h4><ul class="evidence"><li><code>docs/susu/plan/evidence/W1a/README.md</code><span class="evidence-verified">verified</span></li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1a-base.md:27</code></p>
       </div>
     </div>
   </details></div>
     </section><section class="sprint-block" data-sprint-block="S2">
-      <header class="sprint-heading"><div><span class="sprint-id">S2</span><h3>W1b 壳组合</h3></div><div class="sprint-meta"><span>1/1 完成</span><span>1–2 人日</span><span>待执行</span></div></header>
+      <header class="sprint-heading"><div><span class="sprint-id">S2</span><h3>W1b 壳组合</h3></div><div class="sprint-meta"><span>1/1 完成</span><span>1–2 人日</span><span>已完成（2026-10-28）</span></div></header>
       <div class="task-grid"><details class="task-card " data-task data-filter="done" data-sprint="S2" data-search="t2.1 w1b.1 sidebar/contentarea 抽取与 app 拆分 sidebar 直接消费 @innate/ui 的 sidebar primitive（不重写），承载导航注册与底部状态位；contentarea 承载页面；右栏放可拆卸空容器（w3 填充）；app 只留组合与顶层状态；pages.ts 注册表扩展 slot/mode 元数据、id 与门控不变；simple 隐藏开发入口；组合只用 @innate/ui primitive 与语义 token。 导航/模式切换/窗口控制/状态轮询与旧行为一致；删一个可选页面注册壳仍启动（负路径）；w0 冒烟全绿。；证据 `docs/susu/plan/evidence/w1b/smoke/`。" data-original-title="W1b.1 Sidebar/ContentArea 抽取与 App 拆分" data-original-body="## 任务说明
 
 Sidebar 直接消费 @innate/ui 的 Sidebar primitive（不重写），承载导航注册与底部状态位；ContentArea 承载页面；右栏放可拆卸空容器（W3 填充）；App 只留组合与顶层状态；pages.ts 注册表扩展 slot/mode 元数据、id 与门控不变；simple 隐藏开发入口；组合只用 @innate/ui primitive 与语义 token。
@@ -508,7 +520,7 @@ docs/sprints/S2-w1b-shell.md:3" data-summary="Sidebar 直接消费 @innate/ui �
   </details></div>
     </section><section class="sprint-block" data-sprint-block="S3">
       <header class="sprint-heading"><div><span class="sprint-id">S3</span><h3>W1c 中栏多标签</h3></div><div class="sprint-meta"><span>0/4 完成</span><span>2–3 人日</span><span>待执行</span></div></header>
-      <div class="task-grid"><details class="task-card " data-task data-filter="action" data-sprint="S3" data-search="t3.1 w1c.1 provider 中立的 surface 标签模型 core/surface 定义 renderer 标签状态（id/kind/providerid/title/workspaceid/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；surfacetabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webcontents/childprocess 不进标签状态。 多 surface 开关/切换/activeid 恢复/重复 id/非法 descriptor/旧快照兼容单测。" data-original-title="W1c.1 provider 中立的 Surface 标签模型" data-original-body="## 任务说明
+      <div class="task-grid"><details class="task-card next" data-task data-filter="action" data-sprint="S3" data-search="t3.1 w1c.1 provider 中立的 surface 标签模型 core/surface 定义 renderer 标签状态（id/kind/providerid/title/workspaceid/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；surfacetabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webcontents/childprocess 不进标签状态。 多 surface 开关/切换/activeid 恢复/重复 id/非法 descriptor/旧快照兼容单测。" data-original-title="W1c.1 provider 中立的 Surface 标签模型" data-original-body="## 任务说明
 
 core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；SurfaceTabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webContents/ChildProcess 不进标签状态。
 
@@ -518,7 +530,7 @@ core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId
 
 ## 执行信息
 
-- 状态：可执行
+- 状态：下一项
 - 前置：S2
 - 预估：1 天
 
@@ -530,7 +542,7 @@ core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId
 
 docs/sprints/S3-w1c-tabs.md:3" data-summary="core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；SurfaceTabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webContents/ChildProcess 不进标签状态。" id="task-T3.1">
     <summary>
-      <span class="task-card-top"><code>T3.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge action">可执行</span></span>
+      <span class="task-card-top"><code>T3.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge next">下一项</span></span>
       <span class="task-title">W1c.1 provider 中立的 Surface 标签模型</span>
       <span class="task-summary">core/surface 定义 renderer 标签状态（id/kind/providerId/title/workspaceId/capabilities）；provider 注册接口容纳 webcontents 与 renderer document/panel 两类；SurfaceTabs open/activate/deactivate/close，激活项持久化安全 id；snapshot v1 可读、新字段可选、非法版本回退；token/webContents/ChildProcess 不进标签状态。</span>
       <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>

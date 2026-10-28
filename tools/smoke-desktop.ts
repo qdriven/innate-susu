@@ -227,6 +227,28 @@ try {
   await shot('app-menu')
   await evaluate('document.dispatchEvent(new KeyboardEvent(\'keydown\', { key: \'Escape\', bubbles: true }))')
   console.log('[smoke] Orca 顶栏菜单与窗口控制通过')
+  const titlebar = await evaluate<{
+    tabs: boolean; statusEmpty: boolean; rightPanelSlot: boolean; noPill: boolean; controlSizes: number[][]
+  }>(`(() => ({
+    tabs: Boolean(document.querySelector('#titlebar-tabs')),
+    statusEmpty: document.querySelector('#titlebar-status-slot')?.childNodes.length === 0,
+    rightPanelSlot: Boolean(document.querySelector('#titlebar-right-panel-slot')),
+    noPill: !document.querySelector('.titlebar .pill'),
+    controlSizes: [...document.querySelectorAll('.window-controls-btn')].map((button) => {
+      const r = button.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]
+    })
+  }))()`)
+  if (!titlebar?.tabs || !titlebar.statusEmpty || !titlebar.rightPanelSlot || !titlebar.noPill ||
+      titlebar.controlSizes.length !== 3 || titlebar.controlSizes.some(([w, h]) => w !== 46 || h !== 36)) {
+    throw new Error(`TitlebarStrip 三区/空槽/窗口控件尺寸不符合契约: ${JSON.stringify(titlebar)}`)
+  }
+  await evaluate('document.querySelector(\'[aria-label="最大化"]\')?.click()')
+  await sleep(500)
+  if (!await evaluate<boolean>("Boolean(document.querySelector('[aria-label=\"还原\"]'))")) throw new Error('最大化窗口控制未生效')
+  await evaluate("document.querySelector('#titlebar-tabs')?.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))")
+  await sleep(500)
+  if (!await evaluate<boolean>("Boolean(document.querySelector('[aria-label=\"最大化\"]'))")) throw new Error('双击标签槽未还原窗口')
+  console.log('[smoke] TitlebarStrip 空槽、3×46 控件、最大化与双击还原通过')
   console.log('[smoke] nav:', await evaluate('[...document.querySelectorAll(\'.nav-item\')].map(b=>b.textContent)'))
 
   const themeEvidence: Record<string, unknown> = {}

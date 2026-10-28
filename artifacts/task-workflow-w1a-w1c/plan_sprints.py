@@ -112,7 +112,7 @@ W1A_DATA = {
                 ("离开对话再返回且 URL 未变时不 reload，显式停止才 close", "用 WebContents 生命周期测试记录 reload/close 调用")]),
                          ft("F2", "控制台与窗口基线", "固定 show/hide/bounds/close 和 resize 行为", [
                 ("控制台 show/hide/bounds/close 与窗口 resize 行为有真实证据", "运行桌面测试与 smoke，保存窗口尺寸和 bounds 摘要")])],
-            "modules": [md("innate-dogic/apps/desktop/src/", "新增 W0 行为基线测试"), md("tools/smoke-desktop/", "保存窗口与 Surface 真机基线", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/src/", "新增 W0 行为基线测试"), md("tools/smoke-desktop.ts", "保存窗口与 Surface 真机基线", mid="M2")],
         },
         "task-local-w1a-theme-foundation": {
             "context": tc("renderer 需要消费统一 UI 基座，同时保持已固定的 simple/dev 行为。",
@@ -128,7 +128,7 @@ W1A_DATA = {
                 ("ThemeProvider 通过 .dark 切换明暗，代表页面无裸样式", "运行主题测试并保存明暗截图")]),
                          ft("F2", "旧行为保持", "主题接入不改变公开行为", [
                 ("T1 simple/dev、默认页与 Harness 基线全部保持通过", "重跑 T1 同一组断言，不修改旧断言口径")])],
-            "modules": [md("innate-dogic/apps/desktop/package.json", "声明 UI、产品主题和 Tailwind 依赖"), md("innate-dogic/apps/desktop/src/renderer/", "接入入口 CSS、ThemeProvider 与语义 token", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/package.json", "声明 UI、产品主题和 Tailwind 依赖"), md("innate-dogic/apps/desktop/src/renderer/src/", "接入入口 CSS、ThemeProvider 与语义 token", mid="M2")],
         },
         "task-local-w1a-titlebar": {
             "context": tc("UI 基座就位后，需要只替换窗口 titlebar，而不带入 W1b/W2 范围。",
@@ -145,7 +145,7 @@ W1A_DATA = {
                          ft("F2", "窗口行为与视觉回归", "替换顶栏不改变现有行为", [
                 ("拖拽、双击最大化及窗口控制行为不回退", "运行窗口控制测试与真实 Electron 冒烟"),
                 ("明暗截图和 T1/T2 行为基线均通过", "保存截图并重跑全部 W1a 基线")])],
-            "modules": [md("innate-dogic/apps/desktop/src/renderer/shell/TitlebarStrip.tsx", "新增三区顶栏组合", "add"), md("innate-dogic/apps/desktop/src/renderer/Titlebar.tsx", "收敛到 TitlebarStrip，保留现有窗口 API", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/src/renderer/src/shell/TitlebarStrip.tsx", "新增三区顶栏组合", "add"), md("innate-dogic/apps/desktop/src/renderer/src/Titlebar.tsx", "收敛到 TitlebarStrip，保留现有窗口 API", mid="M2")],
         },
     },
 }
@@ -176,7 +176,7 @@ W1C_DATA = {
             "features": [ft("F1", "安全标签状态机", "统一 Surface 生命周期且保持快照安全", [
                 ("open/activate/deactivate/close、activeId 恢复和重复 ID 行为正确", "运行 surface 状态单测覆盖全部转换"),
                 ("旧快照可读，非法 descriptor/版本安全回退，token 与私有对象不进入状态", "运行兼容、安全负路径单测并检查快照字段")])],
-            "modules": [md("packages/core/src/surface.ts", "复用并扩展安全 Surface 契约"), md("innate-dogic/apps/desktop/src/renderer/surfaces/", "实现 provider 中立标签状态和注册接口", "add", "M2")],
+            "modules": [md("packages/core/src/surface.ts", "复用并扩展安全 Surface 契约"), md("innate-dogic/apps/desktop/src/renderer/src/surfaces/", "实现 provider 中立标签状态和注册接口", "add", "M2")],
         },
         "task-local-w1c-surface-ipc": {
             "context": tc("专用 Harness/console IPC 导致重复状态与生命周期逻辑，需要统一窄接口。",
@@ -190,7 +190,7 @@ W1C_DATA = {
             "features": [ft("F1", "统一 Surface IPC", "两个 WebContents 客人共用同一中栏槽", [
                 ("交替切换不 reload，resize/maximize bounds 正确，关闭一个不影响另一个", "运行真实 Electron CDP 生命周期与 bounds 断言"),
                 ("伪造 providerId 被拒绝，通用 renderer 请求不含认证 URL/token", "运行 main/preload 安全负路径测试并检查日志快照")])],
-            "modules": [md("innate-dogic/apps/desktop/src/main/", "实现统一 Surface host/IPC 并保持 provider 私有解析"), md("innate-dogic/apps/desktop/src/preload/", "暴露窄安全 API", mid="M2"), md("innate-dogic/apps/desktop/src/renderer/", "迁移 Harness/Console 到统一标签槽", mid="M3")],
+            "modules": [md("innate-dogic/apps/desktop/src/main/", "实现统一 Surface host/IPC 并保持 provider 私有解析"), md("innate-dogic/apps/desktop/src/preload/", "暴露窄安全 API", mid="M2"), md("innate-dogic/apps/desktop/src/renderer/src/", "迁移 Harness/Console 到统一标签槽", mid="M3")],
         },
         "task-local-w1c-runtime-degradation": {
             "context": tc("外部 DSH 或控制台 provider 失败不能拖垮整个桌面壳。",
@@ -204,7 +204,7 @@ W1C_DATA = {
             "features": [ft("F1", "运行时故障隔离", "单个 provider 失败不破坏壳", [
                 ("模拟 DSH 缺失/未启动/注册失败时壳、导航和其他页面仍可用", "运行三类故障注入测试并断言错误与重试动作"),
                 ("禁用控制台只移除其标签和贡献，不停止 Harness；dispose 不影响其他 provider", "运行 provider 隔离与 dispose 测试")])],
-            "modules": [md("innate-dogic/apps/desktop/src/renderer/", "实现 provider 错误页、重试与可摘除组合")],
+            "modules": [md("innate-dogic/apps/desktop/src/renderer/src/", "实现 provider 错误页、重试与可摘除组合")],
         },
         "task-local-w1c-shell-regression": {
             "context": tc("W1c 出口必须证明真实桌面与便携形态下行为、安全和旧功能均未回退。",

@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1a-titlebar
 title: W1a.3 替换窗口 titlebar 并保留状态空槽
 createdAt: 2026-10-28T08:42:58.087378Z
-updatedAt: 2026-10-28T10:21:58.154339Z
-status: in_progress
+updatedAt: 2026-10-28T10:34:52.392356Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -113,12 +113,12 @@ W0 Titlebar 提供窗口控制和拖拽行为。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] DOM 包含品牌、#titlebar-tabs、窗口控制、右栏开关位和空状态槽
+- F1-V1 [passed] DOM 包含品牌、#titlebar-tabs、窗口控制、右栏开关位和空状态槽
   - 方法：运行 TitlebarStrip DOM 断言
-  - 证据：-
-- F1-V2 [pending] 控件只消费 @innate/ui Button 与语义 token
+  - 证据：docs/susu/plan/evidence/W1a/titlebar.md：3 文件 10 测试；真机三区、空槽和 3×46 控件通过
+- F1-V2 [passed] 控件只消费 @innate/ui Button 与语义 token
   - 方法：静态检查 import、class 和 token 使用
-  - 证据：-
+  - 证据：TitlebarStrip.tsx 仅从 @innate/ui 引入 Button；语义 token，无深引、无 W2 pill
 
 ### F2 · 窗口行为与视觉回归
 
@@ -126,27 +126,28 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] 拖拽、双击最大化及窗口控制行为不回退
+- F2-V1 [passed] 拖拽、双击最大化及窗口控制行为不回退
   - 方法：运行窗口控制测试与真实 Electron 冒烟
-  - 证据：-
-- F2-V2 [pending] 明暗截图和 T1/T2 行为基线均通过
+  - 证据：docs/susu/plan/evidence/W1a/titlebar.md：窗口 DOM 测试及真机最大化、双击还原通过
+- F2-V2 [passed] 明暗截图和 T1/T2 行为基线均通过
   - 方法：保存截图并重跑全部 W1a 基线
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W1a/titlebar-smoke/theme-light.png 与 theme-dark.png；完整 W1a 真机冒烟通过
 
 ## 涉及模块
 
-- M1 [add] innate-dogic/apps/desktop/src/renderer/shell/TitlebarStrip.tsx — 新增三区顶栏组合
-- M2 [modify] innate-dogic/apps/desktop/src/renderer/Titlebar.tsx — 收敛到 TitlebarStrip，保留现有窗口 API
+- M1 [add] innate-dogic/apps/desktop/src/renderer/src/shell/TitlebarStrip.tsx — 新增三区顶栏组合
+- M2 [modify] innate-dogic/apps/desktop/src/renderer/src/Titlebar.tsx — 收敛到 TitlebarStrip，保留现有窗口 API
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — 对应 W1 阶段任务卡；实施完成后登记实际行为与证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — 已登记 W1a.3 实际行为、验证结果与证据链接。
 - S2 [none/-] docs/CONTEXT.md — 全局 Context 已定义模式门控、壳 IPC 与 Surface 安全约束，本任务按既有边界实施。
 
 ## 交付记录
 
 - 计划已完成；等待 W0 全绿后按依赖实施
 - W1a.2 构建、类型、基线与明暗真机全绿，开始替换顶栏
+- 3 文件 10 测试、桌面 build/typecheck 与完整真机冒烟通过
 
 ## 来源原文
 

@@ -134,7 +134,7 @@ Spec：S1
 ## 涉及模块
 
 - M1 [modify] innate-dogic/apps/desktop/package.json — 声明 UI、产品主题和 Tailwind 依赖
-- M2 [modify] innate-dogic/apps/desktop/src/renderer/ — 接入入口 CSS、ThemeProvider 与语义 token
+- M2 [modify] innate-dogic/apps/desktop/src/renderer/src/ — 接入入口 CSS、ThemeProvider 与语义 token
 
 ## Spec 关联
 

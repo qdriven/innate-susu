@@ -43,6 +43,7 @@
 - **验证**：桌面明暗截图各一张；构建与 typecheck 通过；代表页面无裸样式；旧 simple/dev 行为不变。
 - **完成标准**：桌面 renderer 可消费 UI 基座，主题和 token 有唯一来源。
 - **回退**：摘除 renderer 的 Tailwind 插件与入口 import，恢复 W0 样式。
+- **完成记录（2026-10-28）**：私有源同步与依赖安装成功；renderer 仅经产品主题入口消费 Tailwind、token 与 ThemeProvider，旧 CSS 已桥接语义 token，明暗只经 `.dark`。构建、完整 typecheck、7 条基线测试和真机全量冒烟通过，明暗证据见 `docs/susu/plan/evidence/W1a/theme.md` 与 `theme-smoke/`。
 
 ### W1a.3 只换窗口 titlebar，状态槽留空
 
@@ -55,6 +56,7 @@
 - **验证**：DOM 断言三区结构 + 状态槽存在；窗口控制行为不回退；明暗下顶栏视觉截图。
 - **完成标准**：titlebar 是唯一被替换的壳件；Sidebar/页面原样。
 - **回退**：恢复 W0 `Titlebar.tsx`。
+- **完成记录（2026-10-28）**：新增 `shell/TitlebarStrip.tsx`，原 `Titlebar.tsx` 只保留 props 适配；三区、空 tabs/status 槽与 3×46 窗口控件就位，未接 W2 状态。3 个测试文件、10 条测试通过，桌面完整 build/typecheck 通过；真机复验拖拽、双击还原、窗口控制、simple/dev、控制台、Harness 与 resize 全绿。证据：`docs/susu/plan/evidence/W1a/titlebar.md` 与 `titlebar-smoke/`。
 
 ## W1b：Sidebar / ContentArea 与 App 拆分
 
