@@ -4,7 +4,7 @@
 
 将现有工作区从单一 dev 页面拆成右栏常驻文件/Git Panel 与中栏文档标签，保留全部只读安全边界，并提供 WorkspaceContext 供 W4 terminal 使用。
 
-**前置**：W1 全绿。可与 W2 并行，但不得改 Harness/magpie 实现。
+**前置**：W1c 全绿。可与 W2 并行，但不得改 Harness/magpie 实现。
 
 ## W3.1 固定 WorkspaceService 安全与行为契约
 

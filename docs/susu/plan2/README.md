@@ -1,44 +1,79 @@
-# Plan2：从 innate-labs 迁移到 innate-desktop
+# 迁移与产品化计划（唯一执行源）
 
 > 状态：待执行。本文档集只完成分析与计划，不代表任何迁移任务已经完成。
 >
-> 范围：以 `innate-labs` 的 M0–M2 可运行桌面基线为源，以当前 `innate-desktop` 为唯一前向目标仓，按 W0–W5、Q1–Q3 逐段迁移。
+> 版本：v2.0（合并版）· 2026-10-28。本目录由三方合并而成：原 plan2 全文为基座；吸收 plan1 的模块量化基线、harness 单测前置与 canvas 状态板机制；采纳 [`archive/plan1/reviews/2026-10-28-plan-review.md`](../archive/plan1/reviews/2026-10-28-plan-review.md) 的全部修改（W1 拆分、视觉规范指向、组件来源、字体决策门）。plan1 已归档，不再维护。
+>
+> 范围：以 `innate-labs` 的 M0–M2 可运行桌面基线为源，以本仓 `innate-desktop` 为唯一前向目标仓，按 W0 → W1a/W1b/W1c →（W2∥W3）→ W4 → W5 → R1 → Q1 → Q2 → Q3 逐段迁移。
 >
 > 原则：先恢复行为，再调整结构；每个阶段都有真实桌面验收；不 fork orca，不把旧 P 系列平台扩建混入基线迁移。
 
 ## 1. 阅读顺序
 
 1. [项目分析](./01-project-analysis.md)：两个仓库的真实现状、差距、冲突和迁移判断。
-2. [模块分析](./02-module-analysis.md)：模块职责、依赖、重复实现、风险与逐项迁移策略。
+2. [模块分析](./02-module-analysis.md)：模块职责、依赖、规模基线、重复实现、风险与逐项迁移策略。
 3. [迁移总计划](./03-migration-plan.md)：目标结构、阶段依赖、统一门禁、证据和回退规则。
-4. 按依赖顺序阅读并执行阶段任务卡。
+4. 按依赖顺序阅读并执行阶段任务卡；执行进度看 §4 状态板与 [canvas/](./canvas/) 投影看板。
 
 ## 2. 阶段任务卡
 
 | 顺序 | 阶段 | 目标 | 前置 | 任务卡 |
 | --- | --- | --- | --- | --- |
-| 0 | W0 | 原样恢复可运行基线，统一目标仓工程门禁 | — | [W0 基线迁入](./phases/W0-baseline.md) |
-| 1 | W1 | 三栏壳与中栏 Surface 槽，切换不销毁会话 | W0 | [W1 桌面壳](./phases/W1-shell.md) |
-| 2 | W2 | magpie 与 DSH 运行链路收口，状态和错误可见 | W1 | [W2 运行时与模型网关](./phases/W2-runtime.md) |
-| 3 | W3 | 只读工作区成为右栏 Panel，文档进入中栏 | W1 | [W3 工作区](./phases/W3-workspace.md) |
+| 0 | W0 | 原样恢复可运行基线，统一目标仓工程门禁，源头修复日志脱敏 | — | [W0 基线迁入](./phases/W0-baseline.md) |
+| 1a | W1a | UI 基座接入（Tailwind + `@innate/ui` token + ThemeProvider），只换窗口 titlebar，状态槽留空 | W0 | [W1a 壳第一段](./phases/W1-shell.md) |
+| 1b | W1b | `@innate/ui` Sidebar / ContentArea、拆 App.tsx；不改 Surface 语义 | W1a | [W1b 壳第二段](./phases/W1-shell.md) |
+| 1c | W1c | 中栏多 Surface 标签（detach 不销毁）+ 降级 + overlay 回归 | W1b | [W1c 壳第三段](./phases/W1-shell.md) |
+| 2 | W2 | magpie 生命周期/控制台/接线/状态收口（网关侧） | W1c | [W2 运行时与模型网关](./phases/W2-runtime.md) |
+| 3 | W3 | 只读工作区成为右栏 Panel，文档进入中栏 | W1c | [W3 工作区](./phases/W3-workspace.md) |
 | 4 | W4 | 主进程 PTY terminal，共享工作区 cwd | W2、W3 | [W4 Terminal](./phases/W4-terminal.md) |
 | 5 | W5 | 独立 browser Surface 与安全导航、下载 | W4 | [W5 Browser](./phases/W5-browser.md) |
+| r | R1 | 两套 Harness 收敛 + DSH 真实集成链（boot→wire→chat） | W2 | [R1 Harness 收敛](./phases/R1-harness.md) |
 | 6 | Q1 | 一句话生成经审计的本地项目快照 | W5 | [Q1 计划生成](./phases/Q1-plan.md) |
 | 7 | Q2 | project-canvas 成为给人看的项目中栏 Surface | Q1 | [Q2 项目看板](./phases/Q2-canvas.md) |
-| 8 | Q3 | 一次执行一条任务，按 capability 路由并回写证据 | Q2 | [Q3 单任务执行](./phases/Q3-task.md) |
+| 8 | Q3 | 一次执行一条任务，按 capability 路由并回写证据 | Q2、R1 | [Q3 单任务执行](./phases/Q3-task.md) |
 
-W2 与 W3 在 W1 完成后可以并行；合流后才能进入 W4。其余阶段不跨越未通过的前置门禁。
+W2 与 W3 在 W1c 完成后可以并行；合流后才能进入 W4。R1 只依赖 W2，可与 Q1/Q2 并行推进（不动工作台 UI），但 Q3 开工前必须全绿。其余阶段不跨越未通过的前置门禁。
+
+```mermaid
+flowchart LR
+  W0[W0 基线] --> W1a[W1a UI基座+titlebar]
+  W1a --> W1b[W1b 壳组合]
+  W1b --> W1c[W1c 多标签]
+  W1c --> W2[W2 网关收口]
+  W1c --> W3[W3 工作区]
+  W2 --> W4[W4 terminal]
+  W3 --> W4
+  W2 --> R1[R1 Harness收敛+集成链]
+  W4 --> W5[W5 browser]
+  W5 --> Q1[Q1 快照]
+  Q1 --> Q2[Q2 看板]
+  R1 --> Q3[Q3 单任务执行]
+  Q2 --> Q3
+```
 
 ## 3. 本计划解决的问题
 
-- 源仓已有完整 Electron 桌面实现；目标仓的旧 `@susu/web` 验证应用已废弃删除，当前按 Plan2 重新实现桌面，不把“文档里的目标架构”当成已存在代码。
+- 源仓已有完整 Electron 桌面实现；目标仓的旧 `@susu/web` 验证应用已废弃删除，当前按本计划重新实现桌面，不把“文档里的目标架构”当成已存在代码。
 - 目标仓根工程已统一为 `innate-desktop`，后续保持工程名、脚本和新产品描述一致。
-- 源仓桌面私有 Harness 与壳无关 Harness 服务并存，必须经真实行为对照后收敛，不能直接指定其中一套然后删除另一套。
-- 当前 UI 必须消费外部 `@innate/ui`，不能在目标仓复制 primitive 或重新维护一套 token。
-- 旧文档同时存在 P 系列平台计划与 W/Q 迁移计划。本目录只负责 W/Q 迁移；P3–P5、方向 B、MCP Apps、轻应用市场等保留为后续 backlog。
+- 源仓桌面私有 Harness 与壳无关 Harness 服务并存，必须经真实行为对照后收敛（R1），不能直接指定其中一套然后删除另一套。
+- 当前 UI 必须消费外部 `@innate/ui`，不能在目标仓复制 primitive 或重新维护一套 token；**视觉规范以 `.agents/skills/susu-overview/STYLEGUIDE.md`（orca 副本）+ 技能替换表为执行标准**，`docs/original/innate-dogic/architecture/style-guide.md` 是过时草案不执行，`styleguide/native-chat.md` 不执行（对话 UI 是 DSH）。
+- 旧文档同时存在 P 系列平台计划与 W/Q 迁移计划。本目录只负责 W/Q 迁移；P3–P5、方向 B、MCP Apps、轻应用市场等保留为后续 backlog（见 `docs/original/`）。
 - project-canvas 的 JSON 快照、派生状态与 HTML 展示必须分离；HTML 永不成为任务事实源。
 
-## 4. 统一任务规则
+## 4. 状态板
+
+阶段完成时在此回写状态与证据链接；机读投影在 [canvas/](./canvas/docs/sprints/README.md)（改任务卡后按 canvas 纪律 audit → sync → board，不手改 `out/`）。
+
+| 阶段 | 状态 | 证据 |
+| --- | --- | --- |
+| W0 | 待执行 | — |
+| W1a / W1b / W1c | 待执行 | — |
+| W2 / W3 | 待执行 | — |
+| W4 / W5 | 待执行 | — |
+| R1 | 待执行 | — |
+| Q1 / Q2 / Q3 | 待执行 | — |
+
+## 5. 统一任务规则
 
 每张任务卡中的任务均使用以下字段：
 
@@ -53,14 +88,23 @@ W2 与 W3 在 W1 完成后可以并行；合流后才能进入 W4。其余阶段
 1. 产品、工具与测试代码保持 strict TypeScript。
 2. 真实 magpie 只跑只读命令；wire/default/unwire 使用 mock 或隔离临时 `DSH_HOME`。
 3. 认证 URL、token、key 不进入日志、快照、测试夹具或证据截图。
-4. 新 UI primitive 只从 `@innate/ui` 单入口导入；颜色、间距、字号使用语义 token；明暗使用 `.dark` class。
+4. 新 UI primitive 只从 `@innate/ui` 单入口导入；颜色、间距、字号使用语义 token；明暗使用 `.dark` class。组件来源三分法见 [01 §5](./01-project-analysis.md)。
 5. 每个阶段结束保存命令结果、测试数、截图和已知限制到 `docs/susu/plan2/evidence/<PHASE>/`。
 6. 一个阶段未全绿，不开始依赖它的下一阶段；修复不得通过删除旧测试或降低安全断言完成。
+7. 并发会话纪律：动手前重读目标文件与状态板；同一文件不双头修改。
 
-## 5. 非本轮范围
+## 6. 非本轮范围
 
 - fork orca 或复制其 per-agent 账号、模型、用量体系。
 - 新建空 `innate-backend`、通用动态插件加载器或万能 Cordis 兼容层。
 - 文件写入、Git stage/commit、并行多 Agent、GitHub 作为内部任务数据库。
 - DSH 作为唯一执行内核，或在 DSH 内递归嵌入完整 Innate 桌面。
 - 轻应用市场、Kimi Widget 钉卡、MCP Apps 全量兼容、NSIS 大包装、手机隧道和自动更新。
+
+## 7. 与被合并材料的关系
+
+| 来源 | 处置 |
+| --- | --- |
+| plan1 正文（2026-10-28 上午） | 归档至 `docs/susu/archive/plan1/`；其模块量化表并入本计划 02，harness 单测前置并入 W0/R1，canvas 状态板机制由本目录 canvas/ 承接 |
+| plan1 review（2026-10-28） | 全部采纳：W1 拆 a/b/c、视觉规范指向技能副本、组件来源三分法、字体决策门（W1a.0）、native-chat 不执行、docs/README 执行源修正 |
+| `.project-canvas/`（并发会话预览产物） | 归档至 `docs/susu/archive/project-canvas-preview/`，非事实源；机读投影以本目录 canvas/ 为准 |

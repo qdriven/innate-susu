@@ -15,16 +15,19 @@
 | 阶段 | 主要交付 | 依赖 | 预估人日 | 阶段出口 |
 | --- | --- | --- | --- | --- |
 | W0 | 源基线、目标 Web、工程门禁均可运行 | — | 2–3 | M0–M2 行为与 labs 基线一致，安全日志不泄 token |
-| W1 | 三栏壳、中栏多 Surface 槽、统一生命周期 | W0 | 3–5 | 切页不重载；禁用 DSH 壳仍起；simple/dev 不回退 |
-| W2 | magpie 状态/控制台/接线与唯一 DSH 运行链 | W1 | 4–6 | 干净隔离环境完成 gateway→wire→chat，断网/断网关有提示 |
-| W3 | 右栏只读文件/Git、中央文档、WorkspaceContext | W1 | 3–5 | 选根、预览、diff、恢复快照、安全负路径通过 |
+| W1a | Tailwind + `@innate/ui` token + ThemeProvider；只换窗口 titlebar，状态槽留空 | W0 | 1–2 | 明暗可切；titlebar 按规范；字体决策已拍板；simple/dev 不回退 |
+| W1b | `@innate/ui` Sidebar / ContentArea、拆 `App.tsx`；`pages.ts` 不动 | W1a | 1–2 | 三栏可运行；空注册表负路径；W0 冒烟全绿 |
+| W1c | Surface 标签模型 + Harness/控制台接入统一槽 + 降级 | W1b | 2–3 | 切页不重载；禁用 DSH 壳仍起；overlay 7/7 |
+| W2 | magpie sidecar/CLI/console/状态收口（网关侧）+ 网关真实链路 | W1c | 3–4 | 隔离环境 gateway 起动→模型列表→直连调用；断网关有提示 |
+| W3 | 右栏只读文件/Git、中央文档、WorkspaceContext | W1c | 3–5 | 选根、预览、diff、恢复快照、安全负路径通过 |
 | W4 | PTY terminal 与受控 process capability | W2+W3 | 4–6 | 真命令、resize、cwd、关闭回收、伪造调用拒绝、便携可跑 |
 | W5 | browser Surface 与安全导航/下载 | W4 | 3–5 | 独立分区、默认拒权、外链系统浏览器、下载选路径 |
+| R1 | 两套 Harness 行为矩阵收敛 + DSH 真实集成链（boot→wire→chat） | W2 | 2–3 | 单一 Harness 实现；隔离环境完成一次真实对话；可与 Q1/Q2 并行 |
 | Q1 | 一句话到经 Schema+audit 的本地快照 | W5 | 3–5 | 成功可落盘；坏 JSON/坏依赖/越界路径均不落盘 |
 | Q2 | 项目中栏看板与 frontier/证据视图 | Q1 | 3–4 | 快照驱动，重载恢复，草稿不污染正式状态 |
-| Q3 | 单任务调度、capability 路由、证据回写 | Q2 | 5–7 | 三类执行各有一条真实链路，失败 fail closed，不并行 |
+| Q3 | 单任务调度、capability 路由、证据回写 | Q2+R1 | 5–7 | 三类执行各有一条真实链路，失败 fail closed，不并行 |
 
-预估用于排期，不是完成承诺。W2 与 W3 可并行；其他阶段严格按门禁推进。
+预估用于排期，不是完成承诺。W2 与 W3 可并行；R1 只依赖 W2，可与 Q1/Q2 并行（不动工作台 UI）；其余阶段严格按门禁推进。
 
 ## 3. 每阶段共同工作包
 
@@ -145,10 +148,13 @@ pnpm package:portable
 ## 7. 变更与文档治理
 
 - 每个变更关联 W/Q 任务编号，例如 `W2.3`。
-- 阶段完成后更新对应任务状态、证据链接和已知限制。
+- 阶段完成后更新 [README §4 状态板](./README.md)、对应任务状态、证据链接和已知限制。
+- 机读投影纪律：任务卡变更后对 [canvas/](./canvas/) 依次 `canvas_audit → canvas_sync → canvas_board`（root 传 canvas/ 目录），不手改 `out/`；快照是唯一数据源。
 - 旧 P 系列只保留 backlog；若重启平台化，应在 W/Q 迁移完成后另做依赖评审。
-- 修改公共契约、目录职责或安全规则时，同步 Plan2 的模块分析和相关阶段卡。
+- 修改公共契约、目录职责或安全规则时，同步本计划的模块分析和相关阶段卡。
 - 若实际源码与本文分析不同，先更新事实分析和迁移映射，再执行代码任务。
+- UI 纪律双轨：`.agents/skills/susu-overview` 管 AI 行为（含 STYLEGUIDE 副本与替换表）；机器执法（oxlint design-system 规则，禁止硬编码色值与深引内部路径）在 W1b 后穿插排期。
+- 2026-10-28 合并记录：采纳 plan1 review 全部修改（W1 拆 a/b/c、视觉规范指向技能副本、组件来源三分法、字体决策门）；W2 瘦身为网关侧收口，Harness 收敛与 DSH 集成链拆至 R1；plan1 归档至 `../archive/plan1/`。
 
 ## 8. 最终发布候选门槛
 

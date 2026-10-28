@@ -95,7 +95,23 @@ innate-labs/
 
 **决策**：W0 在拷贝前增加日志脱敏基线修复与测试；W2 收敛进程实现时验证 Windows 进程树回收。不能把已知安全问题原样带入目标仓。
 
-## 5. 产品架构判断
+## 5. 组件来源与视觉规范（review 采纳，2026-10-28）
+
+**视觉规范执行标准**：`.agents/skills/susu-overview/STYLEGUIDE.md`（orca `docs/STYLEGUIDE.md` 原样副本）+ 技能内替换表；深文按需读 `styleguide/`（color / components / ux-rules / ux-review-rubric）。token 名角色是 `background` / `card` / `sidebar*`，明暗是 `:root` 与 `.dark`。`docs/original/innate-dogic/architecture/style-guide.md`（`--surface-base`、`prefers-color-scheme`）是过时草案，不执行；`styleguide/native-chat.md` 不执行（对话 UI 是 DSH）。
+
+**组件来源三分法**（消除“先在本仓 L2 落地”与“先去基础仓补”的矛盾，以技能硬规则 1 与 orca“先用已有 primitive”为准）：
+
+| 层 | 落点 | 例子 |
+| --- | --- | --- |
+| primitive | innate-fe `@innate/ui`。缺了去基础仓 `pnpm ui:add`，改完 `pnpm ui:sync` | Button、Tooltip、DropdownMenu、Separator、Badge、**Sidebar**、Tabs、ThemeProvider |
+| 壳组合 | 本仓 desktop renderer | 顶栏怎么排、窗口拖拽、模式 pill 行为、页面注册表、右栏容器 |
+| 平台五原语 | 本仓，P 系列后置，不回灌 innate-fe | PurposeBar、WidgetCard、ApprovalModal、PluginCard、PageDefinition |
+
+注意：`@innate/ui` 已有 Sidebar，W1b 直接消费，不在 `shell/` 重写一个；`@innate/ui` 与 orca 都没有 Toolbar 原语，不为这个名字去基础仓加组件，也不在本仓自绘一套按钮（顶栏控件按规范用 Button `outline` / 图标 `ghost`，不拷 orca 的裸 class）。
+
+**字体决策（W1a.0 拍板，开工前完成）**：orca STYLEGUIDE 规定无衬线只用 Geist；innate-fe `packages/ui/src/tokens.css` 的 `--font-sans` 当前是 Inter（2026-10-28 实测）。产品代码禁止另写 `font-family`。二选一：(a) 在 innate-fe 把正文字体改成 Geist（技能替换表当前记录的做法）；(b) 在技能替换表把「桌面例外、沿用 Inter」写成正式产品决定。默认按 (a) 执行，未拍板不开 W1a.2。
+
+## 6. 产品架构判断
 
 Plan2 维持以下分工，不在迁移中重新争论：
 
@@ -107,17 +123,18 @@ Plan2 维持以下分工，不在迁移中重新争论：
 
 中栏不是“万能插件容器”。React Panel、DSH WebContents、terminal、browser、project-canvas 是不同 provider，只共享必要的生命周期与安全描述。
 
-## 6. 迁移策略
+## 7. 迁移策略
 
 采用“基线复制 + 垂直切片收敛”而非 Big Bang 重写：
 
 1. W0 保留 `innate-dogic/` 子树与包名，先把可运行行为带过来。
-2. W1 只改壳和 Surface 组合，不改模型或 DSH 协议。
-3. W2、W3 分别收敛运行时和工作区，允许并行但不得互相修改对方模块。
+2. W1 拆 a/b/c 三门推进：先基座与 titlebar（W1a），再壳组合（W1b），最后多标签与降级（W1c）；只改组合与生命周期，不改模型或 DSH 协议。
+3. W2（网关侧收口）、W3（工作区）分别收敛，允许并行但不得互相修改对方模块。
 4. W4/W5 新增高权限 Surface，各自独立契约、权限和回收测试。
-5. Q1/Q2/Q3 在稳定工作台之上增加项目闭环，不把规划、展示、执行混为一个 Agent UI。
+5. R1 在 W2 后收敛两套 Harness 并跑通 DSH 真实集成链，可与 Q1/Q2 并行，Q3 前必须完成。
+6. Q1/Q2/Q3 在稳定工作台之上增加项目闭环，不把规划、展示、执行混为一个 Agent UI。
 
-## 7. 主要风险
+## 8. 主要风险
 
 | 风险 | 影响 | 计划内控制 |
 | --- | --- | --- |
@@ -132,7 +149,7 @@ Plan2 维持以下分工，不在迁移中重新争论：
 | 看板草稿被当成事实 | UI 与真实任务状态分叉 | Q2 草稿和正式快照分离，状态只由证据或人确认改变 |
 | 多任务并发导致权限失控 | 重复执行、证据错写 | Q3 单运行调度器、runId 去重、终态后拒绝事件 |
 
-## 8. 迁移完成的整体定义
+## 9. 迁移完成的整体定义
 
 只有同时满足以下条件，才可宣布本轮迁移完成：
 

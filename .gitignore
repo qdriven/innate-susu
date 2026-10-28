@@ -3,3 +3,5 @@ dist/
 *.tsbuildinfo
 .verdaccio/
 .vite/
+.task-canvas/
+__pycache__/

@@ -31,7 +31,27 @@ main/preload → 完整 Node 入口
 
 `@innate/ui` 是外部 UI 基座，不纳入 `@dogic/*` 依赖方向，也不被 `packages/core`、services 或 main 进程依赖。
 
-## 2. 应用模块
+## 2. 规模与测试基线（2026-10-28 对源仓实测）
+
+| 包名 | 类型 | 职责 | 行数(ts/tsx) | 测试(文件/用例) | workspace 依赖 |
+| --- | --- | --- | --- | --- | --- |
+| `@dogic/desktop` | app | Electron 桌面宿主：拉起 dsh web + magpie 集成 | 1539 | 0 / 0 | core, kernel, plugin-workspace |
+| `@dogic/shell` | app | HTTP workbench 宿主（垂直切片遗产） | 196 | 0 / 0 | kernel, sdk, plugin-model-gateway |
+| `@dogic/core` | package | 网关/dsh/mode/verify/Surface 共享逻辑 | 852 | 3 / 16 | 无 |
+| `@dogic/kernel` | package | DI 容器/插件生命周期/插槽/注册表 | 1152 | 4 / 28 | sdk |
+| `@dogic/sdk` | package | ModelGateway 契约 + mock + 契约测试 | 360 | 1 / 9 | 无 |
+| `@dogic/syntax-highlighting` | package | Shiki 高亮（Light+/Dark+ 安全 HTML） | 125 | 1 / 3 | 无 |
+| `@dogic/plugin-model-gateway` | plugin | magpie 探测/托管/CLI 封装/直连降级 | 1194 | 2 / 22 | kernel, sdk |
+| `@dogic/plugin-workspace` | plugin | 只读 fs/git 服务 + 文件树/预览/Git UI | 874 | 1 / 5 | core, kernel, syntax-highlighting |
+| `@dogic/harness-runtime` | service | dsh Harness Node 托管运行时 | 223 | 0 / 0 | service-model-gateway |
+| `@dogic/service-model-gateway` | service | magpie sidecar：托管/健康/重启/接线 | 116 | 0 / 0 | 无 |
+| `innate-project-canvas` | tool | 快照/审计/derive/看板生成 | ≈1534 | 1 / 4 | 无 |
+| `tools/`（5 个脚本） | tool | 门禁/冒烟/overlay/便携打包/一键启动 | — | — | — |
+| `bin/magpie.exe` | 二进制 | 开发/集成 magpie | 45MB | — | — |
+
+要点：产品树合计约 6.6k 行；83 用例（2026-10-26）全部在 packages/plugins 层，**apps 与 services 零测试**；`main/harness.ts`（214 行）是零测试且风险最高的文件——W0.2 脱敏修复带首批测试，R1 收敛前补齐关键路径单测（stdout 解析/就绪探针/停止路径，注入 fakeChild）。
+
+## 3. 应用模块
 
 ### 2.1 旧 Web 验证应用（已删除）
 
@@ -53,7 +73,7 @@ main/preload → 完整 Node 入口
 - **迁移动作**：W0 保持可构建和测试；本轮不增加新页面，不让它阻塞桌面垂直切片。
 - **安全**：继续只监听 `127.0.0.1`；测试中的 wire/unwire 必须 mock 或隔离。
 
-## 3. 共享 packages
+## 4. 共享 packages
 
 ### 3.1 `@dogic/core`
 
@@ -87,7 +107,7 @@ main/preload → 完整 Node 入口
 - **迁移动作**：W0 原样带入；W3 将主题输入映射到宿主 `.dark` 状态和语义 token。
 - **禁止**：把 React 页面、文件系统或 Git 依赖放进该包。
 
-## 4. 插件模块
+## 5. 插件模块
 
 ### 4.1 `@dogic/plugin-workspace`
 
@@ -114,7 +134,7 @@ main/preload → 完整 Node 入口
 - browser：W5，独立 WebContents provider，导航/下载/权限分开审核。
 - project-canvas：Q2，消费已审计快照，React 展示与 HTML 生成器分离。
 
-## 5. services 与桌面私有运行时
+## 6. services 与桌面私有运行时
 
 ### 5.1 `services/model-gateway`
 
@@ -137,7 +157,7 @@ main/preload → 完整 Node 入口
 - **问题**：与服务重复；stdout 原行日志可能包含 token；启动/停止行为需与共享实现对照。
 - **W2 收敛顺序**：先定义行为矩阵和脱敏 → 抽共享实现并保留桌面适配 → 全量对照 → 最后删除私有重复代码。
 
-## 6. Surface 模块
+## 7. Surface 模块
 
 `SurfaceRegistry` 已支持 open/activate/deactivate/close/list/snapshot/restore；`SurfaceHost` 已用 Map 保存多个 WebContentsView，detach 时不销毁。
 
@@ -154,7 +174,7 @@ WorkspaceContext（workspaceId/root 引用，权限由服务端重查）
 
 不要抽象“所有内容都是 WebContents”。Document、React Panel、terminal、browser 和 canvas 可以有不同 provider。
 
-## 7. project-canvas 模块
+## 8. project-canvas 模块
 
 ### 7.1 可复用能力
 
@@ -169,7 +189,7 @@ WorkspaceContext（workspaceId/root 引用，权限由服务端重查）
 - 当前 `readSnapshot` 只做部分结构检查，不能代替对 Agent 输出的完整 JSON Schema 校验。
 - `validateSnapshot` 是语义审计，也不会自动证明证据内容真实。
 - 当前 Schema 的 Sprint id 只接受 `S<数字>`，task id 只接受特定 `T…<数字>` 形式；W/Q 编号不能直接当作快照 id。
-- Q1 若导入 Plan2，应使用显式映射：W0–W5 → S10–S15，Q1–Q3 → S21–S23；任务可使用 T10.x–T15.x、T21.x–T23.x，展示仍保留 W/Q 别名。
+- 本计划的机读投影在 `docs/susu/plan2/canvas/`（自包含根，自带 `docs/sprints/README.md`，与旧文档目录互不冲突）：S0=W0、S1–S3=W1a/W1b/W1c、S4=W2、S5=W3、S6=W4、S7=W5、S8=R1、S9–S11=Q1–Q3；任务 id 用 T<段号>.<序号>，展示层保留 W/Q 别名（写在标题里）。
 
 ### 7.3 数据归属
 
@@ -179,7 +199,7 @@ WorkspaceContext（workspaceId/root 引用，权限由服务端重查）
 - HTML/localStorage：展示与草稿，不是任务执行事实源。
 - Q3 RunResult/证据：运行事实；只有验证通过或人确认后才改变正式任务状态。
 
-## 8. 工具、二进制与不迁移目录
+## 9. 工具、二进制与不迁移目录
 
 | 对象 | 动作 | 原因 |
 | --- | --- | --- |
@@ -192,16 +212,16 @@ WorkspaceContext（workspaceId/root 引用，权限由服务端重查）
 | 旧 docs 全树 | 保留目标现有归档，不重复覆盖 | 只把 Plan2 作为本轮执行源 |
 | orca 源码 | 不迁 | 只借鉴布局/token/模块边界 |
 
-## 9. 模块到阶段的责任矩阵
+## 10. 模块到阶段的责任矩阵
 
-| 模块 | W0 | W1 | W2 | W3 | W4 | W5 | Q1 | Q2 | Q3 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| desktop 壳 | 迁入 | 主改 | 状态接入 | Panel 组合 | Surface 组合 | Surface 组合 | — | Surface 组合 | 运行状态 |
-| core/kernel/sdk | 迁入 | 契约小改 | 网关契约 | WorkspaceContext | capability 引用 | capability 引用 | Schema 复用 | 快照类型 | 最小任务契约 |
-| model-gateway | 迁入 | — | 主改 | — | 无依赖 | — | 可选 Agent | — | Agent 可选 |
-| harness-runtime | 迁入 | 不改 | 收敛 | — | — | — | 规划适配 | — | Agent 执行 |
-| workspace | 迁入 | 保持可跑 | — | 主改 | cwd 消费 | — | 项目上下文 | — | 证据路径 |
-| terminal | 不建 | 不建 | 不建 | 不建 | 新增 | 复用 Surface | — | — | process 执行 |
-| browser | 不建 | 不建 | 不建 | 不建 | 不建 | 新增 | — | — | network 执行 |
-| project-canvas | 迁入 | — | — | — | — | — | 生成/审计 | 主改 | frontier/证据 |
-| tools | 迁入适配 | 冒烟 | 集成验收 | 安全验收 | PTY 打包 | browser 验收 | 负路径 | 恢复快照 | 端到端 |
+| 模块 | W0 | W1a | W1b | W1c | W2 | W3 | W4 | W5 | R1 | Q1 | Q2 | Q3 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| desktop 壳 | 迁入 | titlebar/基座 | 壳组合 | 多标签 | 状态接入 | Panel 组合 | Surface 组合 | Surface 组合 | 运行接入 | — | Surface 组合 | 运行状态 |
+| core/kernel/sdk | 迁入 | — | — | 契约小改 | 网关契约 | WorkspaceContext | capability 引用 | capability 引用 | Harness 收敛 | Schema 复用 | 快照类型 | 最小任务契约 |
+| model-gateway | 迁入 | — | — | — | **主改** | — | 无依赖 | — | — | 可选 Agent | — | Agent 可选 |
+| harness-runtime | 迁入 | 不改 | 不改 | 不改 | 不改(矩阵) | — | — | — | **主改(收敛)** | 规划适配 | — | Agent 执行 |
+| workspace | 迁入 | 保持可跑 | 保持可跑 | 保持可跑 | — | **主改** | cwd 消费 | — | — | 项目上下文 | — | 证据路径 |
+| terminal | 不建 | 不建 | 不建 | 不建 | 不建 | 不建 | 新增 | 复用 Surface | — | — | — | process 执行 |
+| browser | 不建 | 不建 | 不建 | 不建 | 不建 | 不建 | 新增 | — | — | — | — | network 执行 |
+| project-canvas | 迁入 | — | — | — | — | — | — | — | — | 生成/审计 | 主改 | frontier/证据 |
+| tools | 迁入适配 | 基线断言 | 冒烟 | 多标签断言 | 集成验收(网关) | 安全验收 | PTY 打包 | browser 验收 | 集成链冒烟 | 负路径 | 恢复快照 | 端到端 |

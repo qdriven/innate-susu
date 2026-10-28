@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-10-28T04:10:22.631Z",
+  "snapshotHash": "25eec2c460d8e7c77dbf053c0885c112adac93b1534b3141c3eb7f95aad12d45",
+  "summary": {
+    "sprints": 12,
+    "tasks": 71,
+    "modules": 0,
+    "errors": 0,
+    "warnings": 0,
+    "driftChanges": 0
+  },
+  "issues": [],
+  "drift": []
+}

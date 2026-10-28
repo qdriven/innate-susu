@@ -4,7 +4,7 @@
 
 从经审计快照的 derive frontier 选择一条任务，按 capabilities 路由到受控 process、可选 DSH Agent 或 browser 执行器，收集运行事实和证据后回写。任何时刻最多一个活跃项目任务，失败或取消不自动推进。
 
-**前置**：Q2 全绿。
+**前置**：Q2 与 R1 均全绿（agent:tools 路径以收敛后的单一 Harness 实现为前提）。
 
 **边界**：不并行 N 个 Agent，不自动开 GitHub issue，不把模型声明当授权，不开放文件写入或 Git 变更的通用能力。
 

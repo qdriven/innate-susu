@@ -1,6 +1,6 @@
 ---
 name: susu-overview
-description: innate-desktop 产品 monorepo 总控技能:锁 UI 基座来源(@innate/ui 私有源消费)、token 纪律、明暗机制、平台原语边界与基座升级命令。本仓任何 UI / 页面 / 样式 / 组件任务,以及接入或升级 UI 基座时触发;组件库本身的增改必须转交基础仓 innate-fe 的 fe-ui 技能。
+description: innate-desktop 产品 monorepo 总控技能:锁 UI 基座来源(@innate/ui 私有源消费)、token 纪律、明暗机制、orca Style Guide 与平台原语边界。本仓任何 UI / 页面 / 样式 / 组件 / toolbar / titlebar 任务,以及接入或升级 UI 基座时触发;组件库本身的增改必须转交基础仓 innate-fe 的 fe-ui 技能。
 ---
 
 # susu-overview — innate-desktop 总控约束
@@ -23,6 +23,22 @@ description: innate-desktop 产品 monorepo 总控技能:锁 UI 基座来源(@in
 6. **平台五原语**(PurposeBar / WidgetCard / ApprovalModal / PluginCard / PageDefinition)是建在 `@innate/ui` 之上的 **L2 组合件**,落在本仓 `packages/` 或 `apps/` 内,不回灌基础仓。
 7. **审批红线**(继承自平台规范):审批永不自动通过;错误必须显式可达,不允许静默 skip;外部链接一律外跳系统浏览器。
 
+## Style guide
+
+视觉规则的执行副本是本目录 [STYLEGUIDE.md](STYLEGUIDE.md),从 `innate-labs/references/orca/docs/STYLEGUIDE.md` 原样复制(2026-10-28)。深文在 `styleguide/`,只在任务碰到该主题时读。副本正文不改;下面的替换表覆盖副本里的 orca 路径。
+
+| 副本里的说法 | 在本仓怎么执行 |
+| --- | --- |
+| `main.css`、新 token 写进 `:root` 与 `.dark` | 值只进 innate-fe `packages/ui/src/tokens.css`。本仓经 `@innate/ui/tokens.css` 消费,不在产品代码加 token |
+| `src/renderer/src/components/ui/` | `@innate/ui` 单入口。缺组件去 innate-fe `pnpm ui:add`,禁止把 orca 的 ui 目录拷进本仓 |
+| 相邻组件、`ShortcutKeyCombo`、`SecuritySurface`、三条 scrollbar class、`repo-multi-combobox` | 本仓没有就不现造。先找 `@innate/ui` 里对应 primitive;没有则问用户,或去基础仓补 |
+| `styleguide/native-chat.md` | 不执行。对话 UI 是 DSH,不是 orca native-chat |
+| 字号 14 / 13 / 12 / 11 / 10 | 用已有 Tailwind 档(`text-sm`、`text-xs`、`text-2xs`、`text-3xs`)。缺档去基础仓补,禁止 `text-[11px]` 这类任意值 |
+| 顶栏、`titlebar-traffic-light-pad` | 壳布局对齐 orca titlebar(36px 高、左控件、中槽、窗口控制占位)。控件用 `@innate/ui` 的 Button(`outline` 给 toolbar,`ghost` 给图标)、Tooltip、DropdownMenu。不复制 `.titlebar-icon-button`,不在本仓新做 Toolbar 原语 |
+| Sans 只用 Geist、禁止 Inter | 基础仓 `:root` 给出默认栈（当前是 Inter，因为基础仓加载了这套字体）。使用方在自己的 `globals.css` 里、`@import "@innate/ui/tokens.css"` 之后覆盖 `--font-sans` / `--font-mono`，并自行加载字体文件；第一个名字必须和 `@font-face` 的 `font-family` 一致。本仓桌面壳覆盖为 Geist / Geist Mono。组件禁止写 `font-family`。选中带字体的 `data-theme` 时，主题比使用方的 `:root` 更具体 |
+
+角色与交互(单色铬面、surface/foreground 成对、按钮变体、tooltip 只给无名控件、Cancel 用 ghost)以副本为准。组件落在哪、token 写在哪,以硬规则 1–2 为准。
+
 ## 基座接入与升级命令
 
 ```bash
@@ -40,7 +56,8 @@ pnpm ui:sync -- --dry-run       # 预演,不落盘
 | 新增/更新 primitive、采纳主题 | 基础仓 `innate-fe`,fe-ui 技能(唯一入口),改完回本仓 `ui:sync` |
 | 页面、功能、L2 组合件 | 本仓 `apps/*`、`packages/*`,只消费 `@innate/ui` 单入口导出 |
 | UI 基座接入故障(404/版本不匹配) | 先 `registry status`,再 `ui:sync -- --bump patch`;仍失败查 `.npmrc` 作用域行 |
-| 设计原则完整背景 | `docs/README.md`(总纲);`docs/innate-dogic/architecture/style-guide.md` 为历史参考,冲突以本技能为准 |
+| 视觉规则(颜色角色、按钮、tooltip、图标、顶栏、UX) | 本技能 [STYLEGUIDE.md](STYLEGUIDE.md);深文按需打开 `styleguide/`。路径以 Style guide 替换表为准 |
+| 设计原则完整背景 | `docs/README.md`(总纲)。`docs/original/innate-dogic/architecture/style-guide.md` 是过时草案,不执行 |
 
 ## 执法(规划中)
 

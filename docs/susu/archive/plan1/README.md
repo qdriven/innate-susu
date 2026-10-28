@@ -1,4 +1,12 @@
-# plan1 · 从 innate-labs 到 innate-desktop 的迁移与产品化计划
+# plan1（已归档）
+
+> **2026-10-28 起本计划已合并入 docs/susu/plan2/ 并停止维护。**
+> 合并采纳了本目录 reviews/2026-10-28-plan-review.md 的全部修改（W1 拆 a/b/c、视觉规范指向 susu-overview STYLEGUIDE 副本、组件来源三分法、字体决策门）。
+> 以下正文写作于 susu-web 删除前，部分事实（双轨 dev、改名坏点清单）已过时，仅作历史参考。
+
+<!-- ARCHIVED-BANNER -->
+
+---
 
 > 版本：v1.0 · 2026-10-28。**本目录是当前唯一执行源。**
 > 前身：`innate-labs/docs/plans/susu-migration.md`（2026-10-27 决策，本计划是其展开与细化）。
@@ -67,7 +75,8 @@ flowchart LR
 | 看板视图（project-canvas 投影，S0–S8 = W0–Q3） | [canvas/](./canvas/)（`canvas_board` 时 root 传本目录；改 plan1 后先 audit 再 sync 再 board） |
 | 旧 P 系列平台计划（后置参考） | `docs/innate-dogic/plans/README.md`、`docs/innate-dogic/sprints/README.md` |
 | M0–M2 基线证据与旧全局上下文 | `docs/CONTEXT.md`、`docs/plans/innate-dogic-dsh/` |
-| UI 纪律（token/明暗/基座来源） | `.agents/skills/susu-overview/SKILL.md` |
+| UI 纪律（token/明暗/基座来源、orca Style Guide 副本） | `.agents/skills/susu-overview/SKILL.md` |
+| 对 v1.0 计划的评审建议（未并入状态板） | [reviews/2026-10-28-plan-review.md](./reviews/2026-10-28-plan-review.md) |
 
 ## 5. 每段通用 DoD
 

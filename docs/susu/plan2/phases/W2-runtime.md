@@ -1,21 +1,23 @@
-# W2：magpie 与 DSH 运行链路收口
+# W2：magpie 运行链路收口（网关侧）
+
+> 2026-10-28 合并调整：本段瘦身为**网关侧收口**——magpie 生命周期、CLI/模型/接线、控制台、壳状态与网关真实链路。两套 Harness 的收敛与 DSH 集成链拆至 [R1](./R1-harness.md)（依赖本段产出的行为矩阵），避免收敛风险阻塞 W4/W5。
 
 ## 阶段目标
 
-让桌面通过明确契约管理 magpie 生命周期、控制台、状态和接线提示，并对照收敛两套 Harness 实现。保留现有 DSH/magpie 协议，不复制 per-agent 账号或模型配置体系。
+让桌面通过明确契约管理 magpie 生命周期、控制台、状态和接线提示。保留现有 DSH/magpie 协议，不复制 per-agent 账号或模型配置体系。
 
-**前置**：W1 全绿。W2 与 W3 可并行，但不得修改工作区 UI。
+**前置**：W1c 全绿。W2 与 W3 可并行，但不得修改工作区 UI。
 
 ## W2.1 建立运行链路和行为对照矩阵
 
 - **改动位置**：runtime 测试与 `evidence/W2/behavior-matrix.md`。
 - **实施**：
   1. 列出 desktop launcher/core、`plugins/model-gateway`、`services/model-gateway` 的职责重叠与独有行为。
-  2. 列出 desktop `main/harness.ts` 与 `services/harness-runtime` 在 DSH_HOME、首次 profile、patch、Node 解析、端口、状态、日志、停止上的差异。
-  3. 固定目标链：gateway ensureRunning → 必要时裸 boot profile → 隔离环境 wire → Harness launch → Surface show。
+  2. 列出 desktop `main/harness.ts` 与 `services/harness-runtime` 在 DSH_HOME、首次 profile、patch、Node 解析、端口、状态、日志、停止上的差异（**本段只记录并定收敛方案，实施在 R1**）。
+  3. 固定目标链（网关侧）：gateway ensureRunning → 模型目录 → 接线操作 → 状态事件；DSH 段留给 R1。
   4. 明确 console 与 gateway 是两个进程/认证域，不共享猜测的 key。
-- **验证**：每个差异都有保留、收敛或删除决定及对应测试。
-- **完成标准**：没有“直接换实现但未覆盖差异”的未决项。
+- **验证**：每个差异都有保留、收敛（R1 执行）或删除决定及对应测试。
+- **完成标准**：没有“直接换实现但未覆盖差异”的未决项；矩阵文档是 R1 的直接输入。
 
 ## W2.2 统一 magpie sidecar 生命周期
 
@@ -47,54 +49,40 @@
 - **实施**：
   1. 控制台继续使用独立回环端口与稳定受管 key，stdout `magpie web on <url?k=>` 只在 main 解析。
   2. key 文件仅存 userData，权限与损坏重生成行为有测试；日志和快照只保留脱敏地址。
-  3. console Surface 使用 W1 通用生命周期，启动失败只影响控制台。
+  3. console Surface 使用 W1c 通用生命周期，启动失败只影响控制台。
   4. stop/dispose 回收自己启动的进程，不终止非本应用拥有的已有实例。
 - **验证**：重复 show 不重复 spawn、URL 不变不 reload、认证链接缺失报错、进程退出状态可见、关闭无孤儿。
 - **完成标准**：控制台内嵌和外跳行为与基线一致，key 不泄漏。
 
-## W2.5 收敛 Harness 共享实现并保留桌面语义
+## W2.5 将运行状态接入壳状态区
 
-- **改动位置**：`services/harness-runtime`、desktop `main/harness.ts` 与 runtime adapter。
+- **改动位置**：W1a 预留的 titlebar 状态槽、Titlebar/Sidebar 状态、overview/models/chat 页面、事件契约。
 - **实施**：
-  1. 将系统 Node 解析、端口分配、stdout URL 捕获、就绪探测、脱敏日志、状态事件和停止放入壳无关实现。
-  2. 配置项显式覆盖 DSH_HOME、patchPaths、userData/log、启动超时；桌面继续默认真实用户 DSH_HOME，测试必须注入隔离目录。
-  3. 保持 simple 模式 `--profile web --patch` 与 dev `web` 参数语义。
-  4. 保留首次 DSH_HOME 先裸 boot 再 wire 的顺序；不得把 bootBackend 的具体默认模型静默带入桌面。
-  5. Windows 使用进程树回收；非 Windows 使用明确信号并等待退出。
-  6. 新实现通过对照后，desktop 删除私有重复逻辑，仅保留状态/IPC/Surface adapter。
-- **验证**：Node shim、ELECTRON_RUN_AS_NODE 清理、首次/非首次启动、patch、重复 launch、60s/120s 超时配置、异常退出、停止进程树、日志脱敏。
-- **完成标准**：只有一套 Harness 进程实现；桌面状态、overlay 和真实对话与 W1 基线一致。
-
-## W2.6 将运行状态接入壳状态区
-
-- **改动位置**：Titlebar/Sidebar 状态、overview/models/chat 页面、事件契约。
-- **实施**：
-  1. 状态区区分 gateway、console、Harness，不用单个“在线”掩盖部分失败。
+  1. 网关状态 pill 挂入 W1a.3 留出的状态槽；状态区区分 gateway 与 console，不用单个“在线”掩盖部分失败（Harness 状态位留给 R1）。
   2. 用事件更新运行状态，必要时低频 reconciling，移除无意义重复轮询。
   3. 对未安装、未接线、网关断开、模型为空、启动超时给出具体下一步。
   4. simple 只显示用户可理解的状态和设置入口，dev 可查看诊断细节。
 - **验证**：各状态转换 UI 测试；断开 gateway 后提示出现且恢复后可重试；无明文 token。
-- **完成标准**：用户能从壳判断当前阻塞在哪一层，不需查看原始进程日志。
+- **完成标准**：用户能从壳判断网关阻塞在哪一层，不需查看原始进程日志。
 
-## W2.7 隔离环境完成真实集成链
+## W2.6 隔离环境完成网关真实链路
 
 - **改动位置**：集成测试脚本与证据，不写真实用户配置。
 - **实施**：
   1. 创建临时 DSH_HOME/userData/magpie 配置和空闲回环端口。
-  2. 启动 magpie，裸 boot DSH 生成 profile，在隔离环境选择测试模型并 wire。
-  3. 启动 Harness，嵌入对话 Surface，完成一次最小真实会话。
-  4. 执行 unwire/default 和停止，验证临时配置恢复与进程回收。
-  5. 另跑无 magpie、无 DSH 的降级冒烟，纯壳功能仍可使用。
-- **验证**：真实链路和降级链路分别通过；证据不含 key/token，临时目录清理。
-- **完成标准**：gateway→wire→chat 全链路真实通过，失败路径显式可诊断。
+  2. 启动 magpie，验证模型目录拉取、健康检查与**直连网关的一次最小 LLM 调用**（Q1 规划链路的网关前提）。
+  3. 验证 wire/unwire 在隔离环境可用且恢复原状；DSH boot→wire→chat 的完整链路归 R1。
+  4. 另跑无 magpie 的降级冒烟，纯壳功能仍可使用。
+- **验证**：真实网关链路和降级链路分别通过；证据不含 key/token，临时目录清理。
+- **完成标准**：gateway 起动→模型→直连调用全链路真实通过，失败路径显式可诊断。
 
-## W2.8 全量回归与运行时交接
+## W2.7 全量回归与交接
 
 - **改动位置**：文档、工具、证据。
-- **实施**：运行总门禁、overlay、便携冒烟；更新模块图和 IPC 清单；记录唯一 Harness 入口与 gateway facade。
-- **验证**：W0/W1 行为不回退，W2.1 矩阵每项有结果。
-- **完成标准**：W2.1–W2.8 全绿后与 W3 合流，再开始 W4。
+- **实施**：运行总门禁、overlay、便携冒烟；更新模块图和 IPC 清单；把 W2.1 矩阵中 Harness 差异部分移交 R1 输入。
+- **验证**：W0/W1 行为不回退，W2.1 矩阵网关侧每项有结果。
+- **完成标准**：W2.1–W2.6 全绿后与 W3 合流开 W4；R1 可开工（可与 Q1/Q2 并行）。
 
 ## 阶段回退
 
-若共享 Harness 或 gateway 未达行为矩阵，恢复 W1 的桌面 adapter 和旧运行时调用；新 service 可保留用于测试，但不得宣称桌面已收敛，也不得开始 W4。
+若共享 gateway 未达行为矩阵，恢复 W1c 的桌面 adapter 和旧运行时调用；新 service 可保留用于测试，但不得宣称桌面已收敛，也不得开始 W4。Harness 收敛的回退见 R1。
