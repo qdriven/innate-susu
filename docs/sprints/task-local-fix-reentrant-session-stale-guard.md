@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-fix-reentrant-session-stale-guard
 title: 修复会话重入提交的 stale 误报
 createdAt: 2026-10-28T06:49:12.229639Z
-updatedAt: 2026-10-28T06:49:12.229639Z
-status: analyzed
+updatedAt: 2026-10-28T06:54:52.626384Z
+status: in_review
 branch: 
 repository: 
 sourceKind: local
@@ -56,7 +56,6 @@ Skill 工具完成后触发会话内重入提交时，`SessionRunGateService.beg
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -97,11 +96,10 @@ Skill 工具完成后触发会话内重入提交时，`SessionRunGateService.beg
 
 ### 决策
 
-在调用 `hold` 前记录 `wasHeld`；重入时返回，首次进入时保留原有全 Agent wire 检查。
+- 在调用 `hold` 前记录 `wasHeld`；重入时返回，首次进入时保留原有全 Agent wire 检查。
 
 ### 风险
 
-活动会话期间的外部文件变化将延后到下一次首次进入检查；会话锁已阻止其他客户端合法并发运行，因此该取舍符合现有并发边界。
 
 ### 全局影响
 
@@ -118,9 +116,9 @@ Spec：S1
 - F1-V1 [passed] 原始 bundle 能复现重入失败，同时首次进入保护测试通过。
   - 方法：对原始 bundle 运行三项回归测试，确认前两项通过、第三项抛出 session.stale。
   - 证据：原始 bundle 测试输出 fresh accept=ok、fresh reject=ok，reentrant submission 抛出 session.stale
-- F1-V2 [pending] 补丁后三项回归测试全部通过。
+- F1-V2 [passed] 补丁后三项回归测试全部通过。
   - 方法：对工作区补丁 bundle 运行同一测试脚本。
-  - 证据：-
+  - 证据：补丁 bundle：fresh accept、fresh reject、reentrant accept 三项测试全部通过
 
 ### F2 · 验证并部署最小运行补丁
 
@@ -128,12 +126,12 @@ Spec：S1
 模块：M1, M3
 Spec：S1
 
-- F2-V1 [pending] 补丁 bundle 通过 Node.js 语法检查。
+- F2-V1 [passed] 补丁 bundle 通过 Node.js 语法检查。
   - 方法：运行 `node --check`。
-  - 证据：-
-- F2-V2 [pending] 当前安装 bundle 与工作区补丁逐字节一致，原始文件保留备份。
+  - 证据：node --check artifacts/session-stale-guard/kernel-bundle.patched.mjs 通过
+- F2-V2 [passed] 当前安装 bundle 与工作区补丁逐字节一致，原始文件保留备份。
   - 方法：部署后运行二进制比较，并检查原始备份存在。
-  - 证据：-
+  - 证据：安装 bundle 与工作区补丁 cmp 一致；原始备份存在；安装路径 node --check 与三项回归测试通过
 
 ## 涉及模块
 
@@ -150,12 +148,10 @@ Spec：S1
 ## 交付记录
 
 - 已定位到 SessionRunGateService.begin，并在原始 bundle 上复现重入 stale；未关联 Issue/PR。
+- 原始内核重入误报已复现，最小补丁三项回归测试通过
+- 补丁已部署；当前进程需重载客户端后使用新门禁
 
 ## 来源原文
-
-### 本地输入
-
-> Session "conv-720627e7ae4e6ae0051e966e" was updated by another client; reload it before continuing，经常会有这个错误，请修复这个问题，是否因为 plugin canvas 有 widget 提交、检查等动作造成的，请修复。
 
 ### Issue
 

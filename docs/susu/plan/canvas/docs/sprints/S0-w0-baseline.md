@@ -1,7 +1,7 @@
 # S0 · W0 基线迁入（源编号 W0.1–W0.8）
 
 ## T0.1 W0.1 冻结源基线并建立迁移清单
-- **状态**：todo
+- **状态**：已完成
 - **做什么**：记录 labs 与本仓 commit/工作区/版本；在 labs 实测 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop 并记录实测测试数；列迁移白名单（innate-dogic、tools、innate-project-canvas、根配置）与排除项；magpie.exe 记录版本与哈希。
 - **功能**：迁移源可复现，范围无歧义。
 - **如何验证**：白名单每个包映射到目标路径；排除项不进清单。

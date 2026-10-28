@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "isolated-rehearsal",
+  "startedBy": "用户要求测试 W1b issue-driven workflow 并记录全过程",
+  "createdAt": "2026-10-28T07:18:50.365152Z",
+  "project": "D:\\innate-workspace\\framework\\innate-desktop",
+  "runtime": "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+  "taskId": "task-900001-w1b-sidebar-contentarea-app",
+  "issueFixture": 900001,
+  "realGithubWrites": false,
+  "productCodeChanges": false,
+  "formalTaskChanges": false,
+  "canvasHostChanges": false,
+  "skillsTriggered": [
+    "task-workflow",
+    "susu-overview"
+  ],
+  "observations": {
+    "formalW1bTaskExists": false,
+    "ghAvailable": false,
+    "w1aStatus": "待执行",
+    "productSourcePresent": false,
+    "recommendedFormalStatus": "blocked"
+  },
+  "records": [
+    {
+      "step": 1,
+      "name": "从隔离 Issue 快照创建 task（不访问 GitHub）",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "create",
+        "--issue",
+        "900001",
+        "--source-json",
+        "issue-fixture.json",
+        "--repository",
+        "fixture/rehearsal-only",
+        "--title",
+        "W1b Sidebar ContentArea App 拆分（隔离预演）"
+      ],
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "stdout": "{\n  \"task\": \"docs/sprints/task-900001-w1b-sidebar-contentarea-app.md\",\n  \"id\": \"task-900001-w1b-sidebar-contentarea-app\",\n  \"source\": \"issue\",\n  \"next\": \"阅读输入与代码，填写分析后运行 validate --phase analysis\"\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 2,
+      "name": "空白分析必须被 analysis 门禁拒绝",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "validate",
+        "docs/sprints/task-900001-w1b-sidebar-contentarea-app.md",
+        "--phase",
+        "analysis"
+      ],
+      "expectedExitCode": 2,
+      "actualExitCode": 2,
+      "stdout": "{\n  \"task\": \"docs/sprints/task-900001-w1b-sidebar-contentarea-app.md\",\n  \"phase\": \"analysis\",\n  \"ok\": false,\n  \"errors\": [\n    \"taskContext.problem 必须是非空字符串\",\n    \"taskContext.goal 必须是非空字符串\",\n    \"taskContext.scope 至少一项\",\n    \"globalContext.summary 必须是非空字符串\",\n    \"features 至少一项\",\n    \"modules 至少一项\",\n    \"specs 至少一项；无变化也要记录依据\"\n  ],\n  \"warnings\": []\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 3,
+      "name": "无 gh 时 sync 显式降级且不回写",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "sync",
+        "task-900001-w1b-sidebar-contentarea-app"
+      ],
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "stdout": "",
+      "stderr": "{\n  \"ok\": false,\n  \"error\": \"未安装 gh；可离线维护 task，或安装并登录 GitHub CLI 后重试\"\n}\n",
+      "passed": true
+    },
+    {
+      "step": 4,
+      "name": "模型填写 Context、功能验证、模块、设计影响与 Spec",
+      "passed": true,
+      "task": "docs/sprints/task-900001-w1b-sidebar-contentarea-app.md"
+    },
+    {
+      "step": 5,
+      "name": "完整分析通过 analysis 门禁",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "validate",
+        "docs/sprints/task-900001-w1b-sidebar-contentarea-app.md",
+        "--phase",
+        "analysis"
+      ],
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "stdout": "{\n  \"task\": \"docs/sprints/task-900001-w1b-sidebar-contentarea-app.md\",\n  \"phase\": \"analysis\",\n  \"ok\": true,\n  \"errors\": [],\n  \"warnings\": [\n    \"modules[0].path 当前不存在：innate-dogic/apps/desktop/src/renderer/App.tsx\",\n    \"modules[2].path 当前不存在：innate-dogic/apps/desktop/src/renderer/pages.ts\"\n  ]\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 6,
+      "name": "passed 无证据必须被 record 拒绝",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "record",
+        "task-900001-w1b-sidebar-contentarea-app",
+        "F1-V1",
+        "passed"
+      ],
+      "expectedExitCode": 1,
+      "actualExitCode": 1,
+      "stdout": "",
+      "stderr": "{\n  \"ok\": false,\n  \"error\": \"passed 必须至少提供一项 --evidence\"\n}\n",
+      "passed": true
+    },
+    {
+      "step": 7,
+      "name": "Issue 任务未完成且未关联 PR 时 done 门禁拒绝",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "validate",
+        "docs/sprints/task-900001-w1b-sidebar-contentarea-app.md",
+        "--phase",
+        "done"
+      ],
+      "expectedExitCode": 2,
+      "actualExitCode": 2,
+      "stdout": "{\n  \"task\": \"docs/sprints/task-900001-w1b-sidebar-contentarea-app.md\",\n  \"phase\": \"done\",\n  \"ok\": false,\n  \"errors\": [\n    \"specs[0] 要求的 Spec 更新尚未完成\",\n    \"仍有未完成验证：F1-V1, F1-V2, F2-V1, F3-V1\",\n    \"完成门禁要求 execution.status=done\",\n    \"GitHub Issue 任务的完成门禁要求关联 PR；纯本地任务不要求 PR\"\n  ],\n  \"warnings\": [\n    \"modules[0].path 当前不存在：innate-dogic/apps/desktop/src/renderer/App.tsx\",\n    \"modules[2].path 当前不存在：innate-dogic/apps/desktop/src/renderer/pages.ts\"\n  ]\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 8,
+      "name": "依赖未满足，状态记录为 blocked 而非 in_progress",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "status",
+        "task-900001-w1b-sidebar-contentarea-app",
+        "blocked",
+        "--note",
+        "预演：W1a 未全绿且 W0 产品源码尚未迁入，停止在实施前"
+      ],
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"id\": \"task-900001-w1b-sidebar-contentarea-app\",\n  \"status\": \"blocked\"\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 9,
+      "name": "生成单任务四个静态 Canvas 视图",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "render",
+        "task-900001-w1b-sidebar-contentarea-app"
+      ],
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"manifest\": \".task-canvas/task-900001-w1b-sidebar-contentarea-app/canvas.json\",\n  \"widgets\": 4,\n  \"warnings\": []\n}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "step": 10,
+      "name": "生成跨任务总览",
+      "command": [
+        "C:\\Users\\anyda\\AppData\\Roaming\\kimi-desktop\\daimon-share\\daimon\\runtime\\python\\.venv\\Scripts\\python.exe",
+        "D:\\innate-workspace\\framework\\innate-desktop\\.agents\\skills\\task-workflow\\scripts\\task.py",
+        "--root",
+        "D:\\innate-workspace\\framework\\innate-desktop\\artifacts\\task-workflow-w1b-rehearsal\\runtime",
+        "overview"
+      ],
+      "expectedExitCode": 0,
+      "actualExitCode": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"tasks\": 1,\n  \"overview\": \".task-canvas/tasks-overview.html\"\n}\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

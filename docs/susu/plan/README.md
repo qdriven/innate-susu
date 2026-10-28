@@ -66,7 +66,7 @@ flowchart LR
 
 | 阶段 | 状态 | 证据 |
 | --- | --- | --- |
-| W0 | 待执行 | — |
+| W0 | 进行中：W0.1 done（六门禁全绿/83 实测/清单复核），W0.2–W0.8 已拆解为 sprint（docs/sprints/w0/）待执行 | [evidence/W0/](./evidence/W0/) |
 | W1a / W1b / W1c | 待执行 | — |
 | W2 / W3 | 待执行 | — |
 | W4 / W5 | 待执行 | — |

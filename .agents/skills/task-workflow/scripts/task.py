@@ -75,12 +75,28 @@ def task_path(root: Path, ref: str) -> Path:
         if path.suffix == ".json":
             path = path.with_suffix(".md")
     else:
-        path = root / TASK_DIR / f"{ref}.md"
+        matches = [path for path in (root / TASK_DIR).rglob(TASK_GLOB) if path.stem == ref]
+        if len(matches) > 1:
+            raise ValueError(f"task id 不唯一：{ref}；请使用完整路径")
+        path = matches[0] if matches else root / TASK_DIR / f"{ref}.md"
     path = path.resolve()
     try:
         path.relative_to(root.resolve())
     except ValueError as exc:
         raise ValueError("task 文件必须位于当前项目内") from exc
+    return path
+
+
+def sprint_path(root: Path, ref: str) -> Path:
+    candidate = Path(ref)
+    if candidate.name == "README.md":
+        candidate = candidate.parent
+    path = candidate if candidate.is_absolute() else (root / candidate if len(candidate.parts) > 1 else root / TASK_DIR / candidate)
+    path = (path / "README.md").resolve()
+    try:
+        path.relative_to((root / TASK_DIR).resolve())
+    except ValueError as exc:
+        raise ValueError("Sprint 目录必须位于 docs/sprints 内") from exc
     return path
 
 
@@ -453,6 +469,185 @@ def load_task(path: Path) -> tuple[dict, list[str]]:
     return parse_task_markdown(path.read_text(encoding="utf-8"), path)
 
 
+# ---------------------------------------------------------------- sprint storage
+
+def sprint_template() -> dict:
+    base = template()
+    return {
+        "schemaVersion": SCHEMA_VERSION,
+        "id": "",
+        "title": "",
+        "createdAt": "",
+        "updatedAt": "",
+        "source": {"kind": "local", "path": None, "content": None},
+        "github": {"repository": None, "issue": None},
+        "taskContext": base["taskContext"],
+        "globalContext": base["globalContext"],
+        "designAnalysis": base["designAnalysis"],
+        "tasks": [],
+        "specs": [],
+        "execution": {"status": "draft", "notes": []},
+    }
+
+
+def sprint_markdown(sprint: dict) -> str:
+    source = sprint.get("source", {})
+    github = sprint.get("github", {})
+    issue = github.get("issue") or {}
+    context, glob = sprint.get("taskContext", {}), sprint.get("globalContext", {})
+    design, execution = sprint.get("designAnalysis", {}), sprint.get("execution", {})
+    front = {
+        "schemaVersion": sprint.get("schemaVersion", SCHEMA_VERSION),
+        "id": sprint.get("id", ""), "title": sprint.get("title", ""),
+        "createdAt": sprint.get("createdAt", ""), "updatedAt": sprint.get("updatedAt", ""),
+        "status": execution.get("status", "draft"), "repository": github.get("repository"),
+        "sourceKind": source.get("kind", "local"), "sourcePath": source.get("path"),
+        "issueNumber": issue.get("number"), "issueUrl": issue.get("url"),
+        "issueState": issue.get("state"), "issueTitle": issue.get("title"),
+        "issueUpdatedAt": issue.get("updatedAt"),
+    }
+    lines = ["---"]
+    for key, value in front.items():
+        lines.append(f"{key}: {inline(value)}" if value is not None else f"{key}: ")
+    lines += ["---", "", "## 任务上下文", "", "### 问题", ""]
+    _write_scalar(lines, context.get("problem"))
+    lines += ["", "### 目标", ""]
+    _write_scalar(lines, context.get("goal"))
+    for key, label in (("scope", "范围"), ("nonGoals", "非目标"), ("dependencies", "依赖"), ("assumptions", "假设"), ("openQuestions", "未决问题")):
+        lines += ["", f"### {label}", ""]
+        _write_list(lines, context.get(key, []))
+    lines += ["", "## 全局上下文", "", "### 摘要", ""]
+    _write_scalar(lines, glob.get("summary"))
+    lines += ["", "### 来源", ""]
+    _write_list(lines, glob.get("sourceRefs", []))
+    lines += ["", "### 约束", ""]
+    _write_list(lines, glob.get("constraints", []))
+    lines += ["", "### 全局更新", "", f"- 需要：{'是' if glob.get('updateRequired') else '否'}", f"- 计划：{inline(glob.get('updatePlan')) or '无'}"]
+    lines += ["", "## 设计影响", "", "### 是否受影响", "", "是" if design.get("affected") else "否", "", "### 现状行为", ""]
+    _write_scalar(lines, design.get("currentBehavior"))
+    lines += ["", "### 目标行为", ""]
+    _write_scalar(lines, design.get("proposedBehavior"))
+    lines += ["", "### 决策", ""]
+    _write_list(lines, design.get("decisions", []))
+    lines += ["", "### 风险", ""]
+    _write_list(lines, design.get("risks", []))
+    lines += ["", "### 全局影响", ""]
+    _write_scalar(lines, design.get("globalContextImpact"))
+    lines += ["", "## 分解任务", ""]
+    for item in sprint.get("tasks", []):
+        lines.append(f"- {inline(item.get('ref'))} {inline(item.get('path'))} — {inline(item.get('title'))}")
+    lines += ["", "## Spec 关联", ""]
+    for spec in sprint.get("specs", []):
+        update = spec.get("updateStatus", "pending") if spec.get("change", "none") != "none" else "-"
+        lines.append(f"- {inline(spec.get('id'))} [{spec.get('change', 'none')}/{update}] {inline(spec.get('path'))} — {inline(spec.get('relevance'))}")
+    lines += ["", "## 交付记录", ""]
+    _write_list(lines, execution.get("notes", []))
+    lines += ["", "## 来源原文", ""]
+    if source.get("path") or source.get("content"):
+        lines += [f"### 本地文件：{inline(source.get('path')) or '未命名'}", ""]
+        body = inline(source.get("content"))
+        lines += [f"> {body}" if body else "> （未读取）", ""]
+    lines += [f"### Issue #{issue.get('number')}" if issue.get("number") else "### Issue", ""]
+    body = inline(issue.get("body"))
+    lines += [f"> {body}" if body else "> （未同步）", ""]
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def parse_sprint_markdown(text: str, source: Path) -> tuple[dict, list[str]]:
+    warnings: list[str] = []
+    if not text.startswith("---\n"):
+        raise ValueError(f"缺少 frontmatter：{source}")
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        raise ValueError(f"frontmatter 未闭合：{source}")
+    front: dict[str, str] = {}
+    for line in text[4:end].split("\n"):
+        if line.strip() and ":" in line:
+            key, _, value = line.partition(":")
+            front[key.strip()] = value.strip()
+    sprint = sprint_template()
+    for key in ("id", "title", "createdAt", "updatedAt"):
+        sprint[key] = front.get(key, "")
+    sprint["source"] = {"kind": front.get("sourceKind") or "local", "path": front.get("sourcePath") or None, "content": None}
+    sprint["github"]["repository"] = front.get("repository") or None
+    if front.get("issueNumber"):
+        sprint["github"]["issue"] = {"number": int(front["issueNumber"]), "url": front.get("issueUrl") or None, "title": front.get("issueTitle") or None, "state": front.get("issueState") or "unknown", "body": None, "updatedAt": front.get("issueUpdatedAt") or None}
+    sprint["execution"]["status"] = front.get("status") or "draft"
+    sections = _split_sections(text[end + 5:].split("\n"))
+
+    def block_of(section: str, sub: str) -> list[str]:
+        for name, blocks in sections.items():
+            if name != section:
+                continue
+            for sub_name, block in blocks:
+                if sub_name == sub:
+                    return block
+        return []
+
+    context = sprint["taskContext"]
+    context["problem"] = _text(block_of("任务上下文", "问题"))
+    context["goal"] = _text(block_of("任务上下文", "目标"))
+    for key, label in (("scope", "范围"), ("nonGoals", "非目标"), ("dependencies", "依赖"), ("assumptions", "假设"), ("openQuestions", "未决问题")):
+        context[key] = _items(block_of("任务上下文", label))
+    glob = sprint["globalContext"]
+    glob["summary"] = _text(block_of("全局上下文", "摘要"))
+    glob["sourceRefs"] = _items(block_of("全局上下文", "来源"))
+    glob["constraints"] = _items(block_of("全局上下文", "约束"))
+    for item in _items(block_of("全局上下文", "全局更新")):
+        if item.startswith("需要："):
+            glob["updateRequired"] = item[3:].strip() == "是"
+        elif item.startswith("计划："):
+            glob["updatePlan"] = item[3:].strip() or "无"
+    design = sprint["designAnalysis"]
+    design["affected"] = _text(block_of("设计影响", "是否受影响")) == "是"
+    design["currentBehavior"] = _text(block_of("设计影响", "现状行为"))
+    design["proposedBehavior"] = _text(block_of("设计影响", "目标行为"))
+    design["decisions"] = _items(block_of("设计影响", "决策"))
+    design["risks"] = _items(block_of("设计影响", "风险"))
+    design["globalContextImpact"] = _text(block_of("设计影响", "全局影响"))
+    tasks = []
+    for name, blocks in sections.items():
+        if name != "分解任务":
+            continue
+        for _, block in blocks:
+            for line in block:
+                if not line.startswith("- "):
+                    continue
+                match = re.match(r"(\S+) (\S+\.md) — (.*)$", line[2:].strip())
+                if match:
+                    tasks.append({"ref": match.group(1), "path": match.group(2), "title": match.group(3).strip()})
+                else:
+                    warnings.append(f"Sprint 任务行无法解析：{line[:60]}")
+    sprint["tasks"] = tasks
+    specs = []
+    for name, blocks in sections.items():
+        if name != "Spec 关联":
+            continue
+        for _, block in blocks:
+            for line in block:
+                if not line.startswith("- "):
+                    continue
+                match = re.match(r"(\S+) \[(none|add|modify)(?:/([\w-]+))?\] (\S+) — (.*)$", line[2:].strip())
+                if match:
+                    change = match.group(2)
+                    specs.append({"id": match.group(1), "change": change, "path": match.group(4), "relevance": match.group(5).strip(), "updateStatus": match.group(3) if match.group(3) and match.group(3) != "-" else ("pending" if change != "none" else "not_applicable")})
+                else:
+                    warnings.append(f"Spec 行无法解析：{line[:60]}")
+    sprint["specs"] = specs
+    sprint["execution"]["notes"] = [line[2:].strip() for name, blocks in sections.items() if name == "交付记录" for _, block in blocks for line in block if line.startswith("- ")]
+    for sub_name, block in sections.get("来源原文", []):
+        body = "\n".join(line[2:] if line.startswith("> ") else line for line in block).strip()
+        if sub_name and sub_name.startswith("本地文件"):
+            sprint["source"]["content"] = body
+        elif sub_name and sub_name.startswith("Issue") and sprint["github"].get("issue"):
+            sprint["github"]["issue"]["body"] = body
+    return sprint, warnings
+
+
+def load_sprint(path: Path) -> tuple[dict, list[str]]:
+    return parse_sprint_markdown(path.read_text(encoding="utf-8"), path)
+
+
 # ---------------------------------------------------------------- commands
 
 def command_create(args: argparse.Namespace, root: Path) -> dict:
@@ -490,7 +685,14 @@ def command_create(args: argparse.Namespace, root: Path) -> dict:
         task_id = f"task-local-{slugify(title)}"
     if not STEM_RE.match(task_id):
         raise ValueError(f"task 文件名需匹配 {TASK_GLOB}（task- 前缀且至少两段短横线）：{task_id}")
-    path = root / TASK_DIR / f"{task_id}.md"
+    sprint_ref = getattr(args, "sprint", None)
+    sprint_file = sprint_path(root, sprint_ref) if sprint_ref else None
+    sprint = load_sprint(sprint_file)[0] if sprint_file else None
+    task_dir = sprint_file.parent if sprint_file else root / TASK_DIR
+    path = task_dir / f"{task_id}.md"
+    existing = [item for item in (root / TASK_DIR).rglob(TASK_GLOB) if item.stem == task_id]
+    if existing and not (args.force and len(existing) == 1 and existing[0].resolve() == path.resolve()):
+        raise ValueError(f"task 已存在：{existing[0]}；同项目 task id 必须唯一")
     if path.exists() and not args.force:
         raise ValueError(f"task 已存在：{path}；如需覆盖请显式使用 --force")
     task = template()
@@ -510,7 +712,61 @@ def command_create(args: argparse.Namespace, root: Path) -> dict:
             if key in source_data:
                 task["github"][kind][key] = source_data[key]
     save_text(path, task_markdown(task))
-    return {"task": str(path.relative_to(root)).replace("\\", "/"), "id": task_id, "source": task["source"]["kind"], "next": "阅读输入与代码，填写分析后运行 validate --phase analysis"}
+    result = {"task": str(path.relative_to(root)).replace("\\", "/"), "id": task_id, "source": task["source"]["kind"], "next": "阅读输入与代码，填写分析后运行 validate --phase analysis"}
+    if sprint is not None:
+        next_ref = max([int(item["ref"][1:]) for item in sprint["tasks"] if re.fullmatch(r"T\d+", item.get("ref", ""))] or [0]) + 1
+        sprint["tasks"].append({"ref": f"T{next_ref}", "path": path.name, "title": title})
+        sprint["updatedAt"] = now()
+        try:
+            save_text(sprint_file, sprint_markdown(sprint))
+        except Exception:
+            path.unlink(missing_ok=True)
+            raise
+        result["sprint"] = sprint["id"]
+        result["sprintTaskRef"] = f"T{next_ref}"
+    return result
+
+
+def command_create_sprint(args: argparse.Namespace, root: Path) -> dict:
+    source_path = None
+    source_content = None
+    title = args.title
+    if getattr(args, "from_file", None):
+        source_path = Path(args.from_file)
+        source_path = (source_path if source_path.is_absolute() else root / source_path).resolve()
+        try:
+            source_path.relative_to(root)
+        except ValueError as exc:
+            raise ValueError("需求文件必须位于当前项目内") from exc
+        if source_path.stat().st_size > 200_000:
+            raise ValueError("需求文件超过 200 KB；请先提炼为任务输入文件")
+        source_content = source_path.read_text(encoding="utf-8")
+        if not title:
+            heading = re.search(r"^#\s+(.+)$", source_content, flags=re.MULTILINE)
+            title = heading.group(1).strip() if heading else source_path.stem
+    source_data = load_json(root / args.source_json) if getattr(args, "source_json", None) else None
+    if source_data and not title:
+        title = source_data.get("title")
+    if not title:
+        raise ValueError("请提供 --title，或使用包含标题的 --from-file/--source-json")
+    directory = slugify(args.id or title)
+    sprint_id = f"sprint-{directory}"
+    path = root / TASK_DIR / directory / "README.md"
+    if path.exists():
+        raise ValueError(f"Sprint 已存在：{path}；请继续原目录，不重复建档")
+    sprint = sprint_template()
+    sprint.update({"id": sprint_id, "title": title, "createdAt": now(), "updatedAt": now()})
+    sprint["source"] = {"kind": "file" if source_path else "issue" if args.issue else "local", "path": str(source_path.relative_to(root)).replace("\\", "/") if source_path else None, "content": source_content}
+    sprint["github"]["issue"] = github_ref(args.issue)
+    sprint["github"]["repository"] = args.repository
+    if source_data:
+        if not sprint["github"]["issue"]:
+            sprint["github"]["issue"] = {"number": None, "url": None, "state": "unknown", "body": None, "updatedAt": None}
+        for key in ("number", "title", "body", "url", "state", "updatedAt"):
+            if key in source_data:
+                sprint["github"]["issue"][key] = source_data[key]
+    save_text(path, sprint_markdown(sprint))
+    return {"sprint": str(path.relative_to(root)).replace("\\", "/"), "id": sprint_id, "source": sprint["source"]["kind"], "next": "填写 Sprint Context，再用 create --sprint 建立并分析子 task"}
 
 
 def command_migrate(args: argparse.Namespace, root: Path) -> dict:
@@ -645,6 +901,104 @@ def validate_task(task: dict, root: Path, phase: str) -> tuple[list[str], list[s
     return errors, warnings
 
 
+def validate_sprint(sprint: dict, sprint_file: Path, root: Path, phase: str) -> tuple[list[str], list[str]]:
+    errors: list[str] = []
+    warnings: list[str] = []
+    require_text(errors, sprint.get("id"), "id")
+    require_text(errors, sprint.get("title"), "title")
+    if sprint.get("schemaVersion") != SCHEMA_VERSION:
+        errors.append(f"schemaVersion 必须为 {SCHEMA_VERSION}")
+    if phase == "draft":
+        return errors, warnings
+    context = sprint.get("taskContext", {})
+    for key in ("problem", "goal"):
+        require_text(errors, context.get(key), f"taskContext.{key}")
+    if not context.get("scope"):
+        errors.append("taskContext.scope 至少一项")
+    glob = sprint.get("globalContext", {})
+    require_text(errors, glob.get("summary"), "globalContext.summary")
+    if not glob.get("sourceRefs"):
+        errors.append("globalContext.sourceRefs 至少一项")
+    design = sprint.get("designAnalysis", {})
+    specs = sprint.get("specs", [])
+    if design.get("affected"):
+        require_text(errors, design.get("currentBehavior"), "designAnalysis.currentBehavior")
+        require_text(errors, design.get("proposedBehavior"), "designAnalysis.proposedBehavior")
+        require_text(errors, design.get("globalContextImpact"), "designAnalysis.globalContextImpact")
+        if not design.get("decisions"):
+            errors.append("设计受影响时 designAnalysis.decisions 至少一项")
+        if not any(spec.get("change") != "none" for spec in specs):
+            errors.append("设计受影响时必须至少关联一项 add/modify Spec")
+    for index, spec in enumerate(specs):
+        base = f"specs[{index}]"
+        require_text(errors, spec.get("id"), base + ".id")
+        require_text(errors, spec.get("path"), base + ".path")
+        require_text(errors, spec.get("relevance"), base + ".relevance")
+        if spec.get("change") != "add" and not (root / spec.get("path", "")).exists():
+            errors.append(f"{base}.path 不存在：{spec.get('path')}")
+        if phase == "done" and spec.get("change") != "none" and spec.get("updateStatus") != "done":
+            errors.append(base + " 要求的 Spec 更新尚未完成")
+    if not specs:
+        errors.append("specs 至少一项；无变化也要记录依据")
+    tasks = sprint.get("tasks", [])
+    if not tasks:
+        errors.append("tasks 至少一项；Sprint 必须先分解为子 task")
+    refs = [item.get("ref") for item in tasks]
+    if len(refs) != len(set(refs)):
+        errors.append("分解任务 ref 必须唯一")
+    for index, item in enumerate(tasks):
+        base = f"tasks[{index}]"
+        relative = Path(item.get("path", ""))
+        child = (sprint_file.parent / relative).resolve()
+        try:
+            child.relative_to(sprint_file.parent.resolve())
+        except ValueError:
+            errors.append(base + ".path 必须位于 Sprint 目录内")
+            continue
+        if relative.name != str(relative) or relative.suffix != ".md":
+            errors.append(base + ".path 必须是当前目录的 task Markdown 文件")
+            continue
+        if not child.exists():
+            errors.append(base + f".path 不存在：{item.get('path')}")
+            continue
+        try:
+            task, parse_warnings = load_task(child)
+            child_errors, child_warnings = validate_task(task, root, phase)
+            errors.extend(f"{item.get('ref')} {error}" for error in child_errors)
+            warnings.extend(f"{item.get('ref')} {warning}" for warning in parse_warnings + child_warnings)
+        except ValueError as exc:
+            errors.append(f"{item.get('ref')} 无法解析：{exc}")
+    status = sprint.get("execution", {}).get("status")
+    if status not in STATUSES:
+        errors.append("execution.status 非法")
+    if phase == "done" and status != "done":
+        errors.append("完成门禁要求 execution.status=done")
+    return errors, warnings
+
+
+def command_validate_sprint(args: argparse.Namespace, root: Path) -> dict:
+    path = sprint_path(root, args.sprint)
+    sprint, parse_warnings = load_sprint(path)
+    errors, warnings = validate_sprint(sprint, path, root, args.phase)
+    result = {"sprint": str(path.relative_to(root)).replace("\\", "/"), "phase": args.phase, "ok": not errors, "errors": errors, "warnings": parse_warnings + warnings}
+    if errors:
+        raise CommandError(result)
+    return result
+
+
+def command_sprint_status(args: argparse.Namespace, root: Path) -> dict:
+    path = sprint_path(root, args.sprint)
+    sprint, _ = load_sprint(path)
+    if args.status not in STATUSES:
+        raise ValueError(f"状态必须为 {', '.join(sorted(STATUSES))}")
+    sprint["execution"]["status"] = args.status
+    if args.note:
+        sprint["execution"].setdefault("notes", []).append(args.note)
+    sprint["updatedAt"] = now()
+    save_text(path, sprint_markdown(sprint))
+    return {"ok": True, "id": sprint["id"], "status": args.status}
+
+
 def command_validate(args: argparse.Namespace, root: Path) -> dict:
     path = task_path(root, args.task)
     task, parse_warnings = load_task(path)
@@ -715,7 +1069,7 @@ RENDERERS = {"context": render_context, "features": render_features, "architectu
 
 def load_all_tasks(root: Path) -> list[tuple[Path, dict, list[str]]]:
     results = []
-    for path in sorted((root / TASK_DIR).glob(TASK_GLOB)):
+    for path in sorted((root / TASK_DIR).rglob(TASK_GLOB)):
         try:
             task, warnings = load_task(path)
         except ValueError as exc:
@@ -747,6 +1101,74 @@ def command_render(args: argparse.Namespace, root: Path) -> dict:
     manifest = {"schemaVersion": SCHEMA_VERSION, "generatedAt": now(), "taskId": task["id"], "taskFile": str(path.relative_to(root)).replace("\\", "/"), "canvas": {"title": f'{task["id"]} · {task["title"]}', "purpose": "GitHub Issue/PR 驱动任务的分析、验证与交付看板", "widgets": widgets}}
     save_json(output / "canvas.json", manifest)
     return {"ok": True, "manifest": str((output / "canvas.json").relative_to(root)).replace("\\", "/"), "widgets": len(widgets), "warnings": parse_warnings}
+
+
+def sprint_children(sprint: dict, sprint_file: Path) -> list[tuple[dict, dict]]:
+    children = []
+    for item in sprint.get("tasks", []):
+        task, _ = load_task(sprint_file.parent / item["path"])
+        children.append((item, task))
+    return children
+
+
+def render_sprint_tasks(sprint: dict, sprint_file: Path) -> str:
+    cards = []
+    for item, task in sprint_children(sprint, sprint_file):
+        verifications = [entry for feature in task.get("features", []) for entry in feature.get("verification", [])]
+        passed = sum(entry.get("status") == "passed" for entry in verifications)
+        cards.append(f'<div class="card"><h2>{esc(item["ref"])} · {esc(task["title"])}</h2><p><span class="status">{esc(task["execution"]["status"])}</span></p><p class="muted">{esc(task["taskContext"].get("goal"))}</p><div class="meta">验证：{passed}/{len(verifications)} · 文件：<code>{esc(item["path"])}</code></div></div>')
+    return page("Sprint 分解任务", sprint["id"], "".join(cards))
+
+
+def render_sprint_architecture(sprint: dict, sprint_file: Path) -> str:
+    children = sprint_children(sprint, sprint_file)
+    modules = []
+    for item, task in children:
+        for module in task.get("modules", []):
+            modules.append(f'<div class="card"><h3>{esc(item["ref"])} / {esc(module["id"])} · {esc(module.get("change", "modify"))}</h3><p><code>{esc(module["path"])}</code></p><p class="muted">{esc(module["reason"])}</p></div>')
+    specs = "".join(f'<div class="card"><h3>{esc(spec["id"])} · {esc(spec["change"])} / {esc(spec.get("updateStatus", "not_applicable"))}</h3><p><code>{esc(spec["path"])}</code></p><p class="muted">{esc(spec["relevance"])}</p></div>' for spec in sprint.get("specs", []))
+    return page("Sprint 模块与 Spec", sprint["id"], "<h2>子任务涉及模块</h2>" + "".join(modules) + "<h2>Sprint Spec</h2>" + specs)
+
+
+def render_sprint_delivery(sprint: dict, sprint_file: Path) -> str:
+    children = sprint_children(sprint, sprint_file)
+    counts = {status: sum(task["execution"]["status"] == status for _, task in children) for status in STATUSES}
+    source = sprint.get("source", {})
+    issue = sprint.get("github", {}).get("issue") or {}
+    body = f'<div class="card"><h2>执行状态</h2><p><span class="status">{esc(sprint["execution"]["status"])}</span></p><p>子任务：{len(children)} · done：{counts["done"]} · blocked：{counts["blocked"]}</p><p>来源：<code>{esc(source.get("path") or source.get("kind"))}</code></p><p>Issue：{esc("#" + str(issue["number"]) if issue.get("number") else "未关联")}</p><h3>记录</h3>{list_html(sprint["execution"].get("notes", []), "暂无")}</div>'
+    body += f'<div class="card"><h2>待确认问题</h2>{list_html(sprint["taskContext"].get("openQuestions", []), "无")}<h2>假设</h2>{list_html(sprint["taskContext"].get("assumptions", []), "无")}</div>'
+    return page("Sprint 交付与状态", sprint["id"], body)
+
+
+SPRINT_RENDERERS = {
+    "context": lambda sprint, path: render_context(sprint),
+    "tasks": render_sprint_tasks,
+    "architecture": render_sprint_architecture,
+    "delivery": render_sprint_delivery,
+}
+
+
+def command_render_sprint(args: argparse.Namespace, root: Path) -> dict:
+    path = sprint_path(root, args.sprint)
+    sprint, parse_warnings = load_sprint(path)
+    errors, warnings = validate_sprint(sprint, path, root, "analysis")
+    if errors:
+        raise CommandError({"ok": False, "errors": errors, "warnings": parse_warnings + warnings})
+    output = Path(args.output).resolve() if args.output else root / ".task-canvas" / sprint["id"]
+    try:
+        output.relative_to(root)
+    except ValueError as exc:
+        raise ValueError("Canvas 输出目录必须位于当前项目内") from exc
+    output.mkdir(parents=True, exist_ok=True)
+    titles = {"context": "Sprint Context", "tasks": "分解任务与状态", "architecture": "模块与 Spec", "delivery": "交付与状态"}
+    widgets = []
+    for index, key in enumerate(("context", "tasks", "architecture", "delivery")):
+        filename = key + ".html"
+        save_text(output / filename, SPRINT_RENDERERS[key](sprint, path))
+        widgets.append({"key": key, "title": f'{sprint["id"]} · {titles[key]}', "file": filename, "layout": {"mode": "grid", "x": (index % 2) * 6, "y": (index // 2) * 13, "w": 6, "h": 13}})
+    manifest = {"schemaVersion": SCHEMA_VERSION, "generatedAt": now(), "sprintId": sprint["id"], "sprintFile": str(path.relative_to(root)).replace("\\", "/"), "canvas": {"title": f'{sprint["id"]} · {sprint["title"]}', "purpose": "大任务拆解、子 task 状态与交付看板；默认只计划，不自动实施", "widgets": widgets}}
+    save_json(output / "canvas.json", manifest)
+    return {"ok": True, "manifest": str((output / "canvas.json").relative_to(root)).replace("\\", "/"), "widgets": len(widgets), "warnings": parse_warnings + warnings}
 
 
 def command_overview(args: argparse.Namespace, root: Path) -> dict:
@@ -886,8 +1308,17 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--repository")
     create.add_argument("--from-file", help="可选：从项目内 Markdown/文本需求文件创建本地 task")
     create.add_argument("--source-json", help="可选：项目内 gh view 风格的 JSON 快照")
+    create.add_argument("--sprint", help="可选：在既有 Sprint 目录创建子 task 并登记索引")
     create.add_argument("--force", action="store_true")
     create.set_defaults(handler=command_create)
+    create_sprint = sub.add_parser("create-sprint", help="创建大任务 Sprint 目录与 README Context；不自动实施子任务")
+    create_sprint.add_argument("--title")
+    create_sprint.add_argument("--id")
+    create_sprint.add_argument("--issue")
+    create_sprint.add_argument("--repository")
+    create_sprint.add_argument("--from-file")
+    create_sprint.add_argument("--source-json")
+    create_sprint.set_defaults(handler=command_create_sprint)
     migrate = sub.add_parser("migrate", help="把旧版 tasks/*.task.json 迁移为 docs/sprints/task-*.md")
     migrate.add_argument("json")
     migrate.add_argument("--force", action="store_true")
@@ -900,6 +1331,19 @@ def build_parser() -> argparse.ArgumentParser:
         else:
             item.add_argument("--output")
         item.set_defaults(handler=handler)
+    for name, handler in (("validate-sprint", command_validate_sprint), ("render-sprint", command_render_sprint)):
+        item = sub.add_parser(name)
+        item.add_argument("sprint")
+        if name == "validate-sprint":
+            item.add_argument("--phase", choices=("draft", "analysis", "review", "done"), default="analysis")
+        else:
+            item.add_argument("--output")
+        item.set_defaults(handler=handler)
+    sprint_status = sub.add_parser("sprint-status")
+    sprint_status.add_argument("sprint")
+    sprint_status.add_argument("status")
+    sprint_status.add_argument("--note")
+    sprint_status.set_defaults(handler=command_sprint_status)
     list_parser = sub.add_parser("list")
     list_parser.set_defaults(handler=command_list)
     overview = sub.add_parser("overview", help="生成跨任务总览 .task-canvas/tasks-overview.html")

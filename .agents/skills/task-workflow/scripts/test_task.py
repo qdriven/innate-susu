@@ -193,5 +193,125 @@ class TaskDriverTests(unittest.TestCase):
         self.assertEqual([], errors)
 
 
+    def valid_sprint(self) -> dict:
+        sprint = task_module.sprint_template()
+        sprint.update({"id": "sprint-w1b", "title": "W1b 壳组合", "createdAt": "now", "updatedAt": "now"})
+        sprint["taskContext"].update({"problem": "大任务问题", "goal": "拆解目标", "scope": ["两个子任务"]})
+        sprint["globalContext"]["summary"] = "Sprint 全局上下文"
+        sprint["designAnalysis"].update({"affected": True, "currentBehavior": "现状", "proposedBehavior": "目标", "decisions": ["先拆解"]})
+        sprint["specs"] = [{"id": "S1", "path": "docs/spec.md", "change": "modify", "relevance": "Sprint Spec", "updateStatus": "pending"}]
+        return sprint
+
+    def write_sprint(self) -> Path:
+        path = self.root / "docs/sprints/w1b/README.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(task_module.sprint_markdown(self.valid_sprint()), encoding="utf-8")
+        return path
+
+    def sprint_args(self, **overrides) -> Namespace:
+        values = {"id": "w1b", "title": "W1b 壳组合", "issue": None, "repository": None, "from_file": None, "source_json": None}
+        values.update(overrides)
+        return Namespace(**values)
+
+    def child_args(self, task_id: str, title: str, sprint="w1b") -> Namespace:
+        return Namespace(id=task_id, title=title, issue=None, pr=None, repository=None, from_file=None, source_json=None, force=False, sprint=sprint)
+
+    def add_valid_child(self, task_id="local-child-one", title="子任务一") -> dict:
+        result = task_module.command_create(self.child_args(task_id, title), self.root)
+        path = self.root / result["task"]
+        task = valid_task()
+        task["id"] = result["id"]
+        task["title"] = title
+        path.write_text(task_module.task_markdown(task), encoding="utf-8")
+        return result
+
+    def test_create_sprint_preserves_source_and_refuses_overwrite(self):
+        request = self.root / "docs/w1b.md"
+        request.write_text("# W1b 壳组合\n\n先拆成多个子任务。", encoding="utf-8")
+        args = self.sprint_args(title=None, from_file="docs/w1b.md")
+        result = task_module.command_create_sprint(args, self.root)
+        path = self.root / result["sprint"]
+        sprint, warnings = task_module.load_sprint(path)
+        self.assertEqual([], warnings)
+        self.assertEqual("file", sprint["source"]["kind"])
+        self.assertIn("先拆成多个子任务", sprint["source"]["content"])
+        with self.assertRaises(ValueError):
+            task_module.command_create_sprint(args, self.root)
+
+    def test_create_child_registers_index_and_supports_recursive_commands(self):
+        self.write_sprint()
+        first = self.add_valid_child()
+        second = task_module.command_create(self.child_args("local-child-two", "子任务二"), self.root)
+        self.assertEqual("T1", first["sprintTaskRef"])
+        self.assertEqual("T2", second["sprintTaskRef"])
+        sprint, warnings = task_module.load_sprint(self.root / "docs/sprints/w1b/README.md")
+        self.assertEqual([], warnings)
+        self.assertEqual(["T1", "T2"], [item["ref"] for item in sprint["tasks"]])
+        result = task_module.command_validate(Namespace(task=first["id"], phase="analysis"), self.root)
+        self.assertTrue(result["ok"])
+        overview = task_module.command_overview(Namespace(output=None), self.root)
+        self.assertEqual(2, overview["tasks"])
+
+    def test_validate_sprint_checks_context_and_child_analysis(self):
+        task_module.command_create_sprint(self.sprint_args(), self.root)
+        path = self.root / "docs/sprints/w1b/README.md"
+        sprint, _ = task_module.load_sprint(path)
+        errors, _ = task_module.validate_sprint(sprint, path, self.root, "analysis")
+        self.assertTrue(any("tasks 至少一项" in error for error in errors))
+        task_module.command_create(self.child_args("local-child-one", "子任务一"), self.root)
+        sprint, _ = task_module.load_sprint(path)
+        errors, _ = task_module.validate_sprint(sprint, path, self.root, "analysis")
+        self.assertTrue(any("taskContext.problem" in error for error in errors))
+        valid_sprint = self.valid_sprint()
+        valid_sprint["tasks"] = sprint["tasks"]
+        path.write_text(task_module.sprint_markdown(valid_sprint), encoding="utf-8")
+        child = valid_task()
+        child["id"] = "task-local-child-one"
+        (path.parent / "task-local-child-one.md").write_text(task_module.task_markdown(child), encoding="utf-8")
+        sprint, _ = task_module.load_sprint(path)
+        errors, warnings = task_module.validate_sprint(sprint, path, self.root, "analysis")
+        self.assertEqual([], errors)
+        self.assertEqual([], warnings)
+
+    def test_render_sprint_creates_four_views_and_escapes_html(self):
+        self.write_sprint()
+        result = self.add_valid_child(title="<img src=x onerror=alert(1)>")
+        self.assertEqual("task-local-child-one", result["id"])
+        rendered = task_module.command_render_sprint(Namespace(sprint="w1b", output=None), self.root)
+        self.assertEqual(4, rendered["widgets"])
+        output = self.root / ".task-canvas/sprint-w1b"
+        manifest = json.loads((output / "canvas.json").read_text(encoding="utf-8"))
+        self.assertEqual("sprint-w1b", manifest["sprintId"])
+        for key in ("context", "tasks", "architecture", "delivery"):
+            self.assertTrue((output / f"{key}.html").exists())
+        tasks_html = (output / "tasks.html").read_text(encoding="utf-8")
+        self.assertNotIn("<img src=x", tasks_html)
+        self.assertIn("&lt;img src=x", tasks_html)
+
+    def test_duplicate_nested_task_id_requires_full_path(self):
+        for directory in ("w1b", "w1c"):
+            path = self.root / f"docs/sprints/{directory}/task-1-demo.md"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(task_module.task_markdown(valid_task()), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "task id 不唯一"):
+            task_module.task_path(self.root, "task-1-demo")
+
+    def test_single_task_create_does_not_create_sprint_directory(self):
+        args = Namespace(id=None, title="single task", issue=None, pr=None, repository=None, from_file=None, source_json=None, force=False, sprint=None)
+        result = task_module.command_create(args, self.root)
+        self.assertEqual("docs/sprints/task-local-single-task.md", result["task"])
+        entries = list((self.root / "docs/sprints").iterdir())
+        self.assertEqual(1, len(entries))
+        self.assertTrue(entries[0].is_file())
+        self.assertFalse((self.root / "docs/sprints/w1b/README.md").exists())
+
+    def test_skill_defines_sprint_stop_and_explicit_run_all_exception(self):
+        skill = (Path(__file__).resolve().parents[1] / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("不创建 Sprint 目录、README 或 Sprint Canvas", skill)
+        self.assertIn("默认到此停止", skill)
+        self.assertIn("全部任务全部做完", skill)
+        self.assertIn("只有用户选择子 task 或明确要求全部完成时才继续", skill)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

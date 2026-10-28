@@ -148273,7 +148273,9 @@ let SessionRunGateService = class SessionRunGateService extends Disposable {
 	}
 	begin() {
 		const sessionId = this.ctx.sessionId;
+		const wasHeld = this.sessionLocks.held(sessionId);
 		this.sessionLocks.hold(sessionId);
+		if (wasHeld) return;
 		if (!this.agents.list().some((agent) => this.agents.handleOf(agent.agentId)?.accessor.get(IWireService).externallyModified() ?? false)) return;
 		this.sessionLocks.release(sessionId);
 		throw new Error2(SessionErrors.codes.SESSION_STALE, `Session "${sessionId}" was updated by another client; reload it before continuing`, { details: { sessionId } });

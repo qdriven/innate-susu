@@ -2,9 +2,9 @@
 
 ## 位置、命名与输入
 
-task 文件是 UTF-8 Markdown，位于 `docs/sprints/task-<source>-<slug>.md`。GitHub 任务可使用 `task-123-<slug>.md`，本地任务使用 `task-local-<slug>.md`；文件名必须匹配 `task-*-*.md`。
+task 文件是 UTF-8 Markdown。单 Task 位于 `docs/sprints/task-<source>-<slug>.md`；Sprint 子 task 位于 `docs/sprints/<sprint-id>/task-<source>-<slug>.md`。GitHub 任务可使用 `task-123-<slug>.md`，本地任务使用 `task-local-<slug>.md`；文件名必须匹配 `task-*-*.md`，同项目 task id 必须唯一。
 
-**双体系边界**：`docs/sprints/S*-*.md` 是计划流水线事实源；`docs/sprints/task-*-*.md` 是开发任务事实源。同目录按前缀区分，互不引用对方为事实源。Canvas 投影 `.task-canvas/` 永远只是派生物。
+**双体系边界**：`docs/sprints/S*-*.md` 是计划流水线事实源；`task-*-*.md` 是开发执行事实源；Sprint 目录的 `README.md` 是大任务 Context 与分解索引事实源（见 `sprint-file.md`）。三者按命名与职责区分，Canvas 投影 `.task-canvas/` 永远只是派生物。
 
 输入可以是 Issue、PR、现有 task、其他项目内需求文件或标题。现有 task 直接继续使用；其他需求文件通过 `create --from-file` 转为 task，`sourcePath` 保存原路径，`## 来源原文/### 本地文件` 保存快照。Issue 不是必填项。
 

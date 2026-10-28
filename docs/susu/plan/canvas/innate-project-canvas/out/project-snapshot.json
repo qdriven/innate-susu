@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "project": "innate-labs",
-  "generatedAt": "2026-10-28T06:50:34.098Z",
+  "generatedAt": "2026-10-28T08:27:33.089Z",
   "sources": [
     {
       "path": "docs/sprints/S0-w0-baseline.md",
-      "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973"
+      "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991"
     },
     {
       "path": "docs/sprints/S1-w1a-base.md",
@@ -60,7 +60,7 @@
       "declaredStatus": "待执行",
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973"
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991"
       }
     },
     {
@@ -179,7 +179,7 @@
       "id": "T0.1",
       "sprintId": "S0",
       "title": "W0.1 冻结源基线并建立迁移清单",
-      "status": "todo",
+      "status": "done",
       "summary": "记录 labs 与本仓 commit/工作区/版本；在 labs 实测 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop 并记录实测测试数；列迁移白名单（innate-dogic、tools、innate-project-canvas、根配置）与排除项；magpie.exe 记录版本与哈希。",
       "purpose": "迁移源可复现，范围无歧义。",
       "verification": "白名单每个包映射到目标路径；排除项不进清单。",
@@ -188,7 +188,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 3
       }
     },
@@ -207,7 +207,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 10
       }
     },
@@ -226,7 +226,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 17
       }
     },
@@ -245,7 +245,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 24
       }
     },
@@ -264,7 +264,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 31
       }
     },
@@ -283,7 +283,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 38
       }
     },
@@ -302,7 +302,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 45
       }
     },
@@ -321,7 +321,7 @@
       "evidence": [],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "ecab3a2e0b3378c6c9d724b2f38323a66f6a4f7ba8decbd944aa64b7ff748973",
+        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
         "line": 52
       }
     },

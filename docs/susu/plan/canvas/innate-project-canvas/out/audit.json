@@ -1,15 +1,22 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-28T06:50:34.122Z",
-  "snapshotHash": "f130ba35c49d8f0bdb8b1387a1e1934b75acf11cb390ffc2d6a5347ea6b9c357",
+  "generatedAt": "2026-10-28T08:27:33.090Z",
+  "snapshotHash": "9132032e66718a8ab9dbf866a4a138f1828af8a8f313893de33b5652d6e97b71",
   "summary": {
     "sprints": 12,
     "tasks": 71,
     "modules": 0,
-    "errors": 0,
+    "errors": 1,
     "warnings": 0,
     "driftChanges": 0
   },
-  "issues": [],
+  "issues": [
+    {
+      "code": "done-evidence-missing",
+      "severity": "error",
+      "message": "T0.1 is done but names no evidence artifact",
+      "subject": "T0.1"
+    }
+  ],
   "drift": []
 }
