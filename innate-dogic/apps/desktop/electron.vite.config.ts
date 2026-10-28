@@ -1,5 +1,6 @@
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 
 // 直接从 TS 源码打包内部包：保持 main/preload/renderer 使用同一插件实现。
@@ -28,7 +29,7 @@ export default defineConfig({
     resolve: { alias: aliases },
   },
   renderer: {
-    plugins: [react()],
+    plugins: [tailwindcss(), react()],
     resolve: { alias: aliases },
   },
 })

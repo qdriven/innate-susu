@@ -7,9 +7,12 @@ import HarnessPage from './HarnessPage'
 import ModeGate from './ModeGate'
 import { WorkspacePanel } from './plugin-registry'
 import Titlebar from './Titlebar'
-import { pagesForMode } from './pages'
+import { pagesForMode, resolveActivePage } from './pages'
+import ContentArea from './shell/ContentArea'
+import RightPanelHost from './shell/RightPanelHost'
+import ShellSidebar from './shell/ShellSidebar'
 
-export default function App(): JSX.Element {
+export default function App({ rightPanel = true }: { rightPanel?: boolean }): JSX.Element {
   const [tab, setTab] = useState('overview')
   const [mode, setMode] = useState<AppMode | null>(null)
   const [modeLoaded, setModeLoaded] = useState(false)
@@ -41,7 +44,11 @@ export default function App(): JSX.Element {
     return () => clearInterval(t)
   }, [refresh])
 
-  useEffect(() => api.onHarnessState(setHarness), [])
+  useEffect(() => {
+    const unsubscribe = api.onHarnessState(setHarness)
+    void api.getHarnessState().then(setHarness)
+    return unsubscribe
+  }, [])
 
   const launch = async (): Promise<void> => {
     setLaunching(true)
@@ -61,7 +68,7 @@ export default function App(): JSX.Element {
   if (mode === null) return <ModeGate onChoose={(m) => void chooseMode(m)} />
 
   const pages = pagesForMode(mode)
-  const activeTab = pages.some((p) => p.id === tab) ? tab : pages[0].id
+  const activeTab = resolveActivePage(mode, tab)?.id
 
   return (
     <div className="app">
@@ -73,34 +80,15 @@ export default function App(): JSX.Element {
       />
 
       <div className="shell">
-        <aside className="sidebar">
-          <nav className="nav">
-            {pages.map((n) => (
-              <button
-                key={n.id}
-                className={`nav-item ${activeTab === n.id ? 'current' : ''}`}
-                data-current={activeTab === n.id}
-                title={n.label}
-                onClick={() => setTab(n.id)}
-              >
-                <span className="nav-icon">{n.icon}</span>
-                <span className="nav-label">{n.label}</span>
-              </button>
-            ))}
-          </nav>
-          <div className="sidebar-foot">
-            <span className={`dot ${harness.phase === 'running' ? 'ok' : ''}`} />
-            <button
-              className="mode-switch"
-              title={mode === 'simple' ? '切换到开发工作台' : '切换到简易使用'}
-              onClick={() => void chooseMode(mode === 'simple' ? 'dev' : 'simple')}
-            >
-              ⇄
-            </button>
-          </div>
-        </aside>
+        <ShellSidebar
+          pages={pages}
+          activeId={activeTab}
+          harnessPhase={harness.phase}
+          onNavigate={setTab}
+          onSwitchMode={() => void chooseMode(mode === 'simple' ? 'dev' : 'simple')}
+        />
 
-        <div className="content">
+        <ContentArea>
           {activeTab === 'chat' && (
             <HarnessPage
               status={status}
@@ -192,7 +180,9 @@ export default function App(): JSX.Element {
       {activeTab === 'models' && <ModelsTab />}
       {activeTab === 'console' && <ConsolePage />}
       {activeTab === 'tools' && <ToolsTab />}
-        </div>
+        </ContentArea>
+
+        {mode === 'dev' && rightPanel && <RightPanelHost />}
       </div>
     </div>
   )

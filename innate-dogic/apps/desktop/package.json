@@ -10,9 +10,12 @@
     "build": "electron-vite build",
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "package": "electron-vite build && tsx scripts/package.ts",
-    "package:dir": "electron-vite build && tsx scripts/package.ts --dir"
+    "package:dir": "electron-vite build && tsx scripts/package.ts --dir",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@innate/ui": "^0.1.2",
+    "@innate-desktop/theme": "workspace:*",
     "@dogic/core": "workspace:*",
     "@dogic/kernel": "workspace:*",
     "@dogic/plugin-workspace": "workspace:*",
@@ -20,6 +23,12 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "vitest": "^5.0.5",
+    "jsdom": "^27.0.0",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/dom": "^10.4.0",
+    "tailwindcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",

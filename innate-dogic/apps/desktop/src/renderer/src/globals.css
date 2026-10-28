@@ -1,0 +1,6 @@
+/* Tailwind 入口（消费方持有；契约见 packages/theme/src/index.css 头注与 susu-overview 硬规则 5）：
+   token 层（orca 观感 + Geist 字体）来自 @innate-desktop/theme；@source 必须在入口文件、置于全部 @import 之后。 */
+@import "tailwindcss";
+@import "@innate-desktop/theme/index.css";
+@source "./";
+@source "../../../node_modules/@innate/ui/src";

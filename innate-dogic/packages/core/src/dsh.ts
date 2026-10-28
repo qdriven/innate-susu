@@ -115,18 +115,48 @@ export function globalNodeModulesFromCommand(cmdPath: string, platform = process
   return platform === 'win32' ? path.join(path.dirname(cmdPath), 'node_modules') : undefined
 }
 
+/** pnpm 全局 shim 内嵌 `cmd-shim-target=<绝对路径>`，指向真实包入口；返回其所属 node_modules 根。
+ * 真实 shim 里的路径用正斜杠（即使 Windows），分隔符需双向匹配。 */
+export async function pnpmGlobalRootFromShim(shimPath: string): Promise<string | undefined> {
+  try {
+    const text = await readFile(shimPath, 'utf8')
+    const target = /cmd-shim-target=(\S+)/.exec(text)?.[1]
+    if (!target) return undefined
+    const forward = target.lastIndexOf('/node_modules/')
+    const backward = target.lastIndexOf('\\node_modules\\')
+    const index = Math.max(forward, backward)
+    if (index < 0) return undefined
+    const sepLength = forward > backward ? '/node_modules/'.length : '\\node_modules\\'.length
+    return target.slice(0, index + sepLength)
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * 解析 dsh 安装：
- * 1) PATH 上的 dsh 若是包入口 JS 本身（unix bin 链接场景）直接用；
- * 2) npm 全局 node_modules/@deepseek-ai/dsh 的 package.json bin 字段；
- * 3) 失败则由调用方以 shell 方式运行 dsh。
+ * 1) INNATE_DSH_ENTRY 显式指定包入口（与 services backend-cli 契约一致）；
+ * 2) PATH 上的 dsh 若是包入口 JS 本身（unix bin 链接场景）直接用；
+ * 3) pnpm 全局 shim 反解（Windows `pnpm add -g` 布局）；
+ * 4) npm 全局 node_modules/@deepseek-ai/dsh 的 package.json bin 字段；
+ * 5) 失败则由调用方以 shell 方式运行 dsh。
  */
 export async function resolveDshEntry(): Promise<DshEntry> {
+  const envEntry = process.env.INNATE_DSH_ENTRY
+  if (envEntry) {
+    try {
+      await readFile(envEntry, 'utf8')
+      return { entry: envEntry, via: `env: ${envEntry}` }
+    } catch {
+      /* 环境变量指向不存在文件，继续常规解析 */
+    }
+  }
   const cmdPath = await commandExists('dsh')
   if (cmdPath && isDirectDshEntry(cmdPath)) {
     return { entry: cmdPath, via: `PATH: ${cmdPath}` }
   }
   const roots = [
+    cmdPath ? await pnpmGlobalRootFromShim(cmdPath) : undefined,
     cmdPath ? globalNodeModulesFromCommand(cmdPath) : undefined,
     await npmGlobalRoot(),
   ].filter((root): root is string => root !== undefined)
@@ -137,7 +167,7 @@ export async function resolveDshEntry(): Promise<DshEntry> {
         bin?: string | Record<string, string>
       }
       const rel = typeof pkg.bin === 'string' ? pkg.bin : pkg.bin?.dsh
-      if (rel) return { entry: path.join(pkgDir, rel), via: `npm global: ${pkgDir}` }
+      if (rel) return { entry: path.join(pkgDir, rel), via: `global: ${pkgDir}` }
     } catch {
       /* 包不存在或无 bin，继续尝试下一个全局根 */
     }

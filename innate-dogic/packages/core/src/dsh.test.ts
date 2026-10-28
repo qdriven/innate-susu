@@ -53,3 +53,60 @@ describe('parseDshDefaultModel', () => {
     expect(parseDshDefaultModel('- id: llm-pi-ai\n  config:\n    model: other/model\n')).toBeUndefined()
   })
 })
+
+describe('pnpmGlobalRootFromShim', () => {
+  it('derives the pnpm global node_modules root from the embedded cmd-shim-target', async () => {
+    const { pnpmGlobalRootFromShim } = await import('./dsh.js')
+    const { mkdtempSync, writeFileSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const dir = mkdtempSync(join(tmpdir(), 'dsh-shim-'))
+    const shim = join(dir, 'dsh')
+    const target = join(dir, 'global', 'v11', 'abc', 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js')
+    writeFileSync(shim, `#!/bin/sh\n# cmd-shim-target=${target}\nexec node "$target"\n`)
+    expect(await pnpmGlobalRootFromShim(shim)).toBe(join(dir, 'global', 'v11', 'abc', 'node_modules'))
+  })
+
+  it('parses real pnpm shims whose embedded target uses forward slashes', async () => {
+    const { pnpmGlobalRootFromShim } = await import('./dsh.js')
+    const { mkdtempSync, writeFileSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const dir = mkdtempSync(join(tmpdir(), 'dsh-shim-'))
+    const shim = join(dir, 'dsh')
+    writeFileSync(shim, '# cmd-shim-target=D:/pnpm/global/v11/abc/node_modules/@deepseek-ai/dsh/lib/bin.js
+')
+    expect(await pnpmGlobalRootFromShim(shim)).toBe('D:/pnpm/global/v11/abc/node_modules')
+  })
+
+  it('returns undefined when the shim has no target marker', async () => {
+    const { pnpmGlobalRootFromShim } = await import('./dsh.js')
+    const { mkdtempSync, writeFileSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const dir = mkdtempSync(join(tmpdir(), 'dsh-shim-'))
+    const shim = join(dir, 'dsh')
+    writeFileSync(shim, '#!/bin/sh\nexec node something\n')
+    expect(await pnpmGlobalRootFromShim(shim)).toBeUndefined()
+  })
+})
+
+describe('resolveDshEntry env override', () => {
+  it('uses INNATE_DSH_ENTRY when it points to a readable file', async () => {
+    const { resolveDshEntry } = await import('./dsh.js')
+    const { mkdtempSync, writeFileSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const dir = mkdtempSync(join(tmpdir(), 'dsh-env-'))
+    const entry = join(dir, 'bin.js')
+    writeFileSync(entry, '// entry')
+    process.env.INNATE_DSH_ENTRY = entry
+    try {
+      const resolved = await resolveDshEntry()
+      expect(resolved.entry).toBe(entry)
+      expect(resolved.via).toContain('env')
+    } finally {
+      delete process.env.INNATE_DSH_ENTRY
+    }
+  })
+})
