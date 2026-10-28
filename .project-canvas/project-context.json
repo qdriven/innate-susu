@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-10-28T03:11:01.607Z",
+  "rootName": "innate-desktop",
+  "projectName": "innate-desktop",
+  "modules": [
+    {
+      "id": "innate-desktop",
+      "name": "innate-desktop",
+      "path": ".",
+      "packageName": "innate-desktop",
+      "dependencies": [
+        "@innate/ui"
+      ]
+    }
+  ],
+  "specs": [
+    {
+      "path": "README.md",
+      "sha256": "cf32ebcf94e4028b234558ba443eb9fc2f52e67ae38cfd991a9ed047404c8ff7"
+    },
+    {
+      "path": "docs/CONTEXT.md",
+      "sha256": "e969dad2e600b638d6cad95aa3f0a21bd713396faf8080613e6d063c2d5a707a"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "9e4eb6e09c7698df4a9fb4b873c8fba01167a84f13e754ef0824ca9d19cb73f0"
+    },
+    {
+      "path": "docs/architecture/module-map.md",
+      "sha256": "31cac2a78ad973461f2fbdcd3884a1364f8afa2a8445e0ff9f9207b6be73a66e"
+    },
+    {
+      "path": "docs/architecture/orca-module-review.md",
+      "sha256": "07f3a9bb7159b89d1e82093583711f5aa57f40841c1475ecd443954470589c2a"
+    },
+    {
+      "path": "docs/architecture/plan-alignment-review.md",
+      "sha256": "cc0f8a16fd7c3363a477164cc39bdccf3c3f45bd9a707250744a653b4967c6d4"
+    },
+    {
+      "path": "docs/architecture/structured-io.md",
+      "sha256": "d240545d3bd3da5ca548a93369432b6ece62c0b81a1b6b5018ca1daf98013ec1"
+    },
+    {
+      "path": "docs/architecture/workbench-surfaces.md",
+      "sha256": "62ab8de3ff6d69a2b2fdd991d7024c2ddbef5a9139ddb546962e21a9dd08cb3e"
+    },
+    {
+      "path": "docs/build-path/01-monorepo-init/README.md",
+      "sha256": "1b3576a6c967f3506dfb8e01af8acc2d16b4172384380104884bcc4a7a17ad14"
+    },
+    {
+      "path": "docs/build-path/02-innate-dogic/README.md",
+      "sha256": "6420f74aea349b4047273da0eb4b6393e63e1aa21102bb1b1f7c4a0fb258a973"
+    },
+    {
+      "path": "docs/build-path/03-dogic-services/README.md",
+      "sha256": "20849034e48b9812c65843f30a01edd7efc726b507881fa50b63cd8b792f552d"
+    },
+    {
+      "path": "docs/build-path/04-desktop-packaging/README.md",
+      "sha256": "7fcdddbd42fff3e0fd835546846e211aacfd85cc3e2e0774a884b3dd5c87b1a0"
+    },
+    {
+      "path": "docs/build-path/README.md",
+      "sha256": "edfa0591d3f67e124a8b5fceb2865200ccc23422fb04d1b8db65e2636d0e65b8"
+    },
+    {
+      "path": "docs/dsh-tech-stack.md",
+      "sha256": "e27692e359c01f98746ec983e35b4298eb38c1d767e66cf88b113207cef2b9ff"
+    },
+    {
+      "path": "docs/innate-dogic/CONTEXT.md",
+      "sha256": "119a0ee03882e53e0dffcc5f60c264d2276e3e377a5a5714f2a72c48a74cee29"
+    },
+    {
+      "path": "docs/innate-dogic/README.md",
+      "sha256": "4de54c352f91a51d7d37df33e75e598499a1031f7d5fd68ea4b2728892dab4f2"
+    },
+    {
+      "path": "docs/innate-dogic/architecture/module-map.md",
+      "sha256": "1843c95e1d7a34659f944256923c677679218f815738237226fb8b7d4dad6210"
+    },
+    {
+      "path": "docs/innate-dogic/architecture/overview.md",
+      "sha256": "7fb6a8f87ae07071c64a4005f9c2d3274c9e22b4c67e47bf378755ec3b34bfee"
+    },
+    {
+      "path": "docs/innate-dogic/architecture/style-guide.md",
+      "sha256": "07474ce0dc886f6d3a5f32be93b5b5a3391cabdd9614d73cbec77426fe7a14c9"
+    },
+    {
+      "path": "docs/innate-dogic/build-path/README.md",
+      "sha256": "ed257184751898919a7be31518235d9668badd3d6aa7d76a0250ddad81ff4d00"
+    },
+    {
+      "path": "docs/innate-dogic/plans/README.md",
+      "sha256": "401d101952ba9c90bbf56f68fd4ca029a88578a6c14159af582de2ff3e40345f"
+    },
+    {
+      "path": "docs/innate-dogic/sprints/README.md",
+      "sha256": "02c5c942201ebe08228ce36ca68108f76419bb252769c810fb68f518687e5b5e"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/01-stage-1-embed-console.md",
+      "sha256": "b3fa836d2b674064d28a0a29e1f25531ae327f4d8d3961f2fea09a28701bd636"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/02-stage-2-simple-mode.md",
+      "sha256": "e6e8d0dce3994c38fd65a13f99eb0002dcbb2f9e0e16e2060b5681e7fb2b31a7"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/03-stage-3-dsh-integration.md",
+      "sha256": "7d8b24c01257c7308ed730667cba0a3bf22729e3ce0cd275e15d99f80514c0ad"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/04-stage-4-dsh-host-workspace.md",
+      "sha256": "6042312cb9ac7c19e257f2cde5a74ca47bad29d707b7bd4442e758dbf5f03a10"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/05-stage-5-dual-host-settings.md",
+      "sha256": "efc6d4627b19c07332255ec94c770996589cdaa4e7115df3a8afdd926a6ddf69"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/06-stage-6-surfaces-and-release.md",
+      "sha256": "931f7a310b5349244e3b46d0ad844482ae9d3a4f66f51b25928e06b933853726"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/README.md",
+      "sha256": "8d66dacb85b5e29a6a0540b0c037f40f48361f94a2dcddd20bb4702cdb1654e5"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/appendix-mini-gateway.md",
+      "sha256": "c9914c3cff67bfaa0a452f5c0f6a96b246ea5274599a62f9e43913039e87953f"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/engineering.md",
+      "sha256": "07b2acbacfa148ebf1a625a2fff683cbc2bd30e275d44d226ea3bc610cbde76a"
+    },
+    {
+      "path": "docs/research/kimi-work-zcode-platform-notes.md",
+      "sha256": "2859372c3424ac25e1ec376895368cb640c8eff566d3cf3546c6ddac2f12c6b6"
+    },
+    {
+      "path": "docs/sprints/README.md",
+      "sha256": "99fb0574b96011455425a9382b8dc6761290ad23e3ed276d70a5837e7ac8af5a"
+    },
+    {
+      "path": "docs/sprints/S0-engineering-baseline.md",
+      "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c"
+    },
+    {
+      "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+      "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20"
+    },
+    {
+      "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+      "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa"
+    },
+    {
+      "path": "docs/sprints/S3-m5-dual-host-settings.md",
+      "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6"
+    },
+    {
+      "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+      "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9"
+    },
+    {
+      "path": "docs/sprints/S5-mini-gateway-decision.md",
+      "sha256": "ead7493d804a15ab6f073dce5672e7db76911d486abfbf62f500ae1f689abcc5"
+    },
+    {
+      "path": "docs/sprints/S6-code-health.md",
+      "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528"
+    },
+    {
+      "path": "docs/susu/plan2/01-project-analysis.md",
+      "sha256": "44c64827f1faa6a19719a661f1e990cc21c06e355ec5ff89dfeba2744fe12487"
+    },
+    {
+      "path": "docs/susu/plan2/02-module-analysis.md",
+      "sha256": "8700340840267a11c061ba1e87bb3beeeaa06dca5f79551e188a8723b3cebba6"
+    },
+    {
+      "path": "docs/susu/plan2/03-migration-plan.md",
+      "sha256": "19b6594e35eb35679460c7b8cd8833630a374208535201f9c0e0140b1d396905"
+    },
+    {
+      "path": "docs/susu/plan2/README.md",
+      "sha256": "b0ac96aa8382108857e72ef3c8e27fa0d8801626fcfb0e290cc6a68dd869cf77"
+    },
+    {
+      "path": "docs/susu/plan2/phases/Q1-plan.md",
+      "sha256": "826b479146c1373621b676cda4002f33a81f29c7f16e870097adf9d58b0cb51e"
+    },
+    {
+      "path": "docs/susu/plan2/phases/Q2-canvas.md",
+      "sha256": "af6dd44e6005fdc500c4c3e7e752eb1f15b40073c25431f4924abef0e96b7db6"
+    },
+    {
+      "path": "docs/susu/plan2/phases/Q3-task.md",
+      "sha256": "e73dd7d723400d461053b51a049e899905166bbc90e8bbc2a49eb6ccef61e00c"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W0-baseline.md",
+      "sha256": "63f20fdb6e8c831dd6e922adbf39dd0580e1367b213148012f980763d343de2d"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W1-shell.md",
+      "sha256": "de558ab2a111fb8d0d4f7067035d038d4e721d6c78f67b8e8045c9d38ab1c680"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W2-runtime.md",
+      "sha256": "6c1d55ae25eff855bd473ef55f5d55d360ef458200b768c4f28377e702548274"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W3-workspace.md",
+      "sha256": "5dd9160bdaa0daf7a3aa511fea2b428393eba63a6fb2dddbc1256e58e23b87c9"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W4-terminal.md",
+      "sha256": "4693b11ae93c0e47e2116f0149627087dce7c7168bfef4ca44b49c94e353f64a"
+    },
+    {
+      "path": "docs/susu/plan2/phases/W5-browser.md",
+      "sha256": "7dd48c7861421ee3817331ab19bbb3c4cdf216d2908952647f3602c1bbda08c1"
+    }
+  ]
+}

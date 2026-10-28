@@ -1,0 +1,1574 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>innate-labs · 项目工作台</title><style>
+body .workspace,body .view,body .panel,body .overview-grid>*{min-width:0}body .next-task p{overflow-wrap:anywhere}body .ready-list button{grid-template-columns:42px minmax(0,1fr) auto}
+:root{color-scheme:light dark;--bg:#f4f5f7;--panel:#fff;--panel-subtle:#f8f9fa;--text:#202124;--muted:#71767d;--line:#e1e4e8;--line-strong:#c8cdd4;--accent:#315efb;--accent-soft:#edf1ff;--good:#18794e;--good-soft:#eaf7f0;--warn:#98600a;--bad:#c1353d;--bad-soft:#fff0f1;--target:#7950b8;--sidebar:#fbfbfd;--shadow:0 1px 2px rgba(20,24,30,.04)}
+@media(prefers-color-scheme:dark){:root{--bg:#141517;--panel:#1c1e21;--panel-subtle:#202226;--text:#eceef1;--muted:#a2a8b0;--line:#32363c;--line-strong:#4b515a;--accent:#9aafff;--accent-soft:#252d48;--good:#6ed3a0;--good-soft:#1d3329;--warn:#e3b15f;--bad:#ff969b;--bad-soft:#3b2428;--target:#c4a5ef;--sidebar:#18191c;--shadow:none}}
+*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;--sidebar-width:232px}button,input,select{font:inherit}button{color:inherit}button,a{-webkit-tap-highlight-color:transparent}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}a{color:inherit}code{font:12.5px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}h1,h2,h3,h4,p{margin-top:0}h1{font-size:32px;line-height:1.25;letter-spacing:-.025em;margin-bottom:12px}h2{font-size:18px;margin:3px 0 0}h3{font-size:16px}h4{font-size:13px}.muted{color:var(--muted)}.eyebrow{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}.sidebar{position:fixed;inset:0 auto 0 0;z-index:30;width:var(--sidebar-width);display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--line);transition:width .18s ease,transform .18s ease}.brand{display:flex;align-items:center;gap:10px;height:58px;padding:0 16px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden}.brand-mark{display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:8px;background:var(--text);color:var(--bg);font-weight:750;font-size:15px}.brand-text{min-width:0}.brand-text strong,.brand-text span{display:block;white-space:nowrap}.brand-text strong{font-size:14px}.brand-text span{font-size:11px;color:var(--muted)}.sidebar-scroll{flex:1;overflow-y:auto;padding:14px 10px}.nav-label{padding:10px 9px 6px;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}.nav-item,.sprint-nav{width:100%;border:0;background:transparent;cursor:pointer;text-align:left}.nav-item{display:flex;align-items:center;gap:10px;padding:8px 9px;margin:2px 0;border-radius:7px;color:var(--muted)}.nav-item:hover,.sprint-nav:hover{background:var(--panel-subtle);color:var(--text)}.nav-item[aria-current=page]{background:var(--accent-soft);color:var(--accent);font-weight:600}.nav-icon{display:grid;place-items:center;flex:0 0 20px;font-size:12px;font-family:ui-monospace,monospace}.nav-text{white-space:nowrap}.nav-count{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums}.sprint-nav{display:grid;grid-template-columns:28px minmax(0,1fr);gap:5px;padding:6px 9px;color:var(--muted);font-size:12px}.sprint-nav span:first-child{font-family:ui-monospace,monospace;color:var(--text)}.sprint-nav span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sidebar-footer{padding:12px 16px;border-top:1px solid var(--line);white-space:nowrap;overflow:hidden}.sidebar-footer code{display:block;color:var(--muted);font-size:11px}.sidebar-footer span{font-size:11px;color:var(--muted)}.workspace{min-height:100vh;margin-left:var(--sidebar-width);transition:margin-left .18s ease}.topbar{position:sticky;top:0;z-index:20;height:58px;display:flex;align-items:center;gap:12px;padding:0 24px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.icon-button{display:grid;place-items:center;width:30px;height:30px;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer}.icon-button:hover{background:var(--panel-subtle)}.breadcrumb{display:flex;align-items:center;gap:8px;min-width:0}.breadcrumb span:first-child{color:var(--muted)}.breadcrumb strong{font-size:13px}.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}.system-badge{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11px}.system-dot{width:6px;height:6px;border-radius:50%;background:var(--good)}.view{max-width:1540px;margin:auto;padding:26px 28px 48px}.overview-hero{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:12px 0 24px}.overview-hero>div{max-width:760px}.overview-hero p{max-width:680px;margin-bottom:0;color:var(--muted);font-size:14px}.snapshot-pill{padding:5px 9px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font:11px ui-monospace,monospace;white-space:nowrap}.metrics{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:10px;margin-bottom:18px}.metrics>div{padding:15px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel);box-shadow:var(--shadow)}.metrics strong,.metrics span{display:block}.metrics strong{font-size:27px;line-height:1.15;letter-spacing:-.02em}.metrics span{margin-top:5px;color:var(--muted);font-size:12px}.metrics .has-error strong{color:var(--bad)}.overview-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:14px}.panel,.sprint-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}.panel{padding:18px}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}.text-button{padding:0;border:0;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.text-button:hover{color:var(--accent)}.next-task{padding:15px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel-subtle)}.next-task code{margin-left:8px;color:var(--muted)}.next-task h3{margin:11px 0 6px;font-size:17px}.next-task p{margin-bottom:0;color:var(--muted);font-size:13px}.ready-list{margin-top:10px}.ready-list button{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:8px;width:100%;padding:8px 5px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}.ready-list button:last-child{border-bottom:0}.ready-list button:hover{color:var(--accent)}.ready-list code{color:var(--muted)}.badge{display:inline-flex;align-items:center;width:fit-content;padding:2px 6px;border:1px solid var(--line);border-radius:5px;color:var(--muted);background:var(--panel-subtle);font-size:11px;font-weight:600;line-height:1.5;white-space:nowrap}.badge.next,.badge.action{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.badge.done,.badge.current{border-color:color-mix(in srgb,var(--good) 40%,var(--line));color:var(--good);background:var(--good-soft)}.badge.error{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}.badge.target{border-style:dashed;color:var(--target)}.badge.neutral{background:transparent}.audit-callout{padding:15px;border:1px solid var(--line);border-radius:8px}.audit-callout strong{font-size:13px}.audit-callout p{margin:5px 0 0;color:var(--muted);font-size:12px}.audit-callout.error{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));background:var(--bad-soft)}.audit-callout.error strong{color:var(--bad)}.audit-callout.clean{border-color:var(--good);background:var(--good-soft)}.audit-callout.clean strong{color:var(--good)}.audit-numbers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 0}.audit-numbers>div{padding:10px;border-radius:7px;background:var(--panel-subtle)}.audit-numbers dt{color:var(--muted);font-size:11px}.audit-numbers dd{margin:2px 0 0;font-size:19px;font-weight:650}.section-block{margin-top:18px}.sprint-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.sprint-card{display:flex;flex-direction:column;gap:9px;padding:14px;text-align:left;cursor:pointer}.sprint-card:hover{border-color:var(--line-strong);transform:translateY(-1px)}.sprint-card-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.sprint-card strong{min-height:34px;font-size:13px}.progress{height:3px;overflow:hidden;border-radius:3px;background:var(--line)}.progress>span{display:block;height:100%;background:var(--accent)}.page-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:4px 0 20px}.page-heading p{max-width:720px;margin:7px 0 0;color:var(--muted);font-size:13px}.segmented{display:flex;padding:3px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}.segmented button{padding:5px 10px;border:0;border-radius:5px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.segmented button[aria-pressed=true]{background:var(--text);color:var(--bg)}.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px;margin-bottom:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}.filter-buttons{display:flex;gap:5px;flex-wrap:wrap}.filter-buttons button{padding:5px 8px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.filter-buttons button[aria-pressed=true]{border-color:var(--line-strong);background:var(--panel-subtle);color:var(--text);font-weight:600}.filter-controls{display:flex;gap:7px;margin-left:auto}.filter-controls select,.filter-controls input{height:30px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);padding:0 9px;font-size:12px}.filter-controls input{width:210px}.result-count{margin:0 0 18px;color:var(--muted);font-size:12px}.sprint-block{margin-bottom:24px}.sprint-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}.sprint-heading>div:first-child{display:flex;align-items:center;gap:10px}.sprint-heading h3{margin:0}.sprint-id{font:600 11px ui-monospace,monospace}.sprint-meta{display:flex;gap:10px;color:var(--muted);font-size:11px;flex-wrap:wrap;justify-content:flex-end}.task-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:10px}.task-card{align-self:start;border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}.task-card.next{border-color:var(--accent)}.task-card summary{display:flex;flex-direction:column;gap:9px;padding:13px;cursor:pointer;list-style:none}.task-card summary::-webkit-details-marker{display:none}.task-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.task-card-top>code{color:var(--muted)}.task-title{font-size:14px;font-weight:650}.task-summary{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3;color:var(--muted);font-size:12px}.task-expand{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.task-card[open] .task-expand span{transform:rotate(45deg)}.task-detail{padding:0 13px 13px;border-top:1px solid var(--line)}.task-detail dl{display:grid;grid-template-columns:40px 1fr;gap:4px;margin:12px 0;font-size:12px}.task-detail dt{color:var(--muted)}.task-detail dd{margin:0}.verification{padding:10px;border-radius:6px;background:var(--panel-subtle)}.verification strong{font-size:11px}.verification p{margin:5px 0 0;color:var(--muted);font-size:12px}.evidence{padding:0;list-style:none;font-size:11px}.evidence li{display:flex;justify-content:space-between;gap:8px;margin:4px 0}.evidence-verified{color:var(--good)}.evidence-missing,.evidence-unverified{color:var(--bad)}.source{margin:10px 0 0;color:var(--muted);font-size:11px}.empty{padding:24px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);text-align:center}.module-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:12px}.map-scroll{min-height:570px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}.module-map{display:block;width:100%;min-width:1050px;height:auto}.layer-label{fill:var(--muted);font-size:12px;font-weight:600}.edge{fill:none;stroke:var(--line-strong);stroke-width:1.2;opacity:.55}.edge.target{stroke:var(--target);stroke-dasharray:6 5}.edge.active{stroke:var(--accent);stroke-width:2;opacity:1}.arrow-current,.arrow-both{fill:var(--line-strong)}.arrow-target{fill:var(--target)}.module-node{cursor:pointer;outline:none}.module-node rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1}.module-node.target rect{stroke:var(--target);stroke-dasharray:5 4}.module-node.is-connected rect{stroke:var(--accent)}.module-node.is-selected rect{stroke:var(--accent);stroke-width:2;fill:var(--accent-soft)}.module-name{fill:var(--text);font-size:13px;font-weight:600}.module-package{fill:var(--muted);font-size:10px}.module-state{fill:var(--good);font-size:10px}.module-node.target .module-state{fill:var(--target)}.module-inspector{align-self:start;position:sticky;top:76px;min-height:360px;padding:17px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}.detail-badges{display:flex;gap:6px}.module-detail h3{margin:16px 0 4px;font-size:22px}.package-name{color:var(--muted)}.module-facts{margin:18px 0}.module-facts dt{margin-top:10px;color:var(--muted);font-size:11px}.module-facts dd{margin:3px 0 0}.interaction-list{padding-top:14px;border-top:1px solid var(--line)}.interaction{display:block;width:100%;margin:6px 0;padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--panel-subtle);text-align:left;cursor:pointer}.interaction:hover{border-color:var(--accent)}.interaction span,.interaction strong{display:block}.interaction span{color:var(--muted);font-size:11px}.interaction strong{margin-top:3px;font-size:12px}.audit-list{display:grid;gap:8px}.audit-item{padding:13px;border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:7px;background:var(--panel-subtle)}.audit-item.error{border-left-color:var(--bad)}.audit-item>div{display:flex;align-items:center;gap:8px}.audit-item p{margin:8px 0 0}.drift-list{display:grid;gap:7px}.drift-list article{display:grid;grid-template-columns:auto 100px 130px 1fr;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--line)}.drift-list p{margin:0;color:var(--muted)}.footer{padding:20px 0 0;color:var(--muted);font-size:11px}.sidebar-overlay{display:none}.sidebar-collapsed{--sidebar-width:64px}.sidebar-collapsed .brand{padding:0 18px}.sidebar-collapsed .brand-text,.sidebar-collapsed .nav-text,.sidebar-collapsed .nav-count,.sidebar-collapsed .nav-label,.sidebar-collapsed .sprint-nav span:last-child,.sidebar-collapsed .sidebar-footer{display:none}.sidebar-collapsed .nav-item{justify-content:center;padding:9px}.sidebar-collapsed .sprint-nav{grid-template-columns:1fr;text-align:center;padding:7px 0}.sidebar-collapsed .sidebar-scroll{padding:14px 10px}
+@media(max-width:1200px){.task-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sprint-cards{grid-template-columns:repeat(3,minmax(0,1fr))}.module-layout{grid-template-columns:1fr}.module-inspector{position:static;min-height:0}.map-scroll{min-height:0}.overview-grid{grid-template-columns:1fr}}
+@media(max-width:800px){body{--sidebar-width:0px}.sidebar{width:240px;transform:translateX(-100%)}.sidebar-open .sidebar{transform:translateX(0)}.sidebar-open .sidebar-overlay{display:block;position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.35)}.workspace{margin-left:0}.topbar{padding:0 14px}.view{padding:20px 14px 36px}.system-badge{display:none}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics>div:last-child{grid-column:span 2}.overview-hero{display:block}.snapshot-pill{display:inline-flex;margin-top:12px}.overview-grid{grid-template-columns:1fr}.sprint-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.task-grid{grid-template-columns:1fr}.filters{align-items:stretch}.filter-controls{width:100%;margin-left:0}.filter-controls select{max-width:45%;flex:1}.filter-controls input{min-width:0;flex:1}.sprint-heading{align-items:flex-start;flex-direction:column}.sprint-meta{justify-content:flex-start}.page-heading{align-items:flex-start;flex-direction:column}.drift-list article{grid-template-columns:auto 1fr}.drift-list p{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Top tabs are the default; Sidebar is an optional presentation of the same views. */
+.sidebar{display:none}.workspace{margin-left:0}.top-tab-bar{position:sticky;top:58px;z-index:19;display:flex;gap:4px;padding:0 24px;height:43px;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);overflow-x:auto}.top-tab{position:relative;flex:0 0 auto;padding:0 14px;border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}.top-tab:hover{color:var(--text)}.top-tab[aria-current=page]{color:var(--text);font-weight:650}.top-tab[aria-current=page]:after{content:"";position:absolute;right:12px;bottom:-1px;left:12px;height:2px;background:var(--accent)}.layout-switch{display:flex;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}.layout-switch button{padding:3px 7px;border:0;border-radius:4px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer}.layout-switch button[aria-pressed=true]{background:var(--panel-subtle);color:var(--text);font-weight:600}.sidebar-enabled .sidebar{display:flex}.sidebar-enabled .workspace{margin-left:var(--sidebar-width)}.sidebar-enabled .top-tab-bar{display:none}.sidebar-enabled #sidebar-trigger{display:grid}#sidebar-trigger{display:none}.task-actions{display:flex;gap:6px;padding:12px 0 0}.task-action{padding:4px 8px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--muted);font-size:11px;cursor:pointer}.task-action:hover{border-color:var(--accent);color:var(--accent)}.badge.edited{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.task-card-top>code{margin-right:auto}.draft-content{margin-top:12px}.markdown-section{margin-bottom:9px;padding:11px;border:1px solid var(--line);border-radius:7px;background:var(--panel-subtle)}.markdown-section:last-child{margin-bottom:0}.markdown-section h2,.markdown-section h3{margin:0 0 7px;font-size:12px}.markdown-section h2{color:var(--text)}.markdown-section p{margin:0 0 7px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}.markdown-section p:last-child{margin-bottom:0}.markdown-section ul{margin:0;padding-left:17px;color:var(--muted);font-size:12px}.markdown-section li{margin:3px 0;overflow-wrap:anywhere}.markdown-section code{padding:1px 3px;border-radius:3px;background:var(--panel)}.markdown-section pre{margin:0;padding:9px;overflow:auto;border-radius:5px;background:var(--panel)}.markdown-section pre code{padding:0}.markdown-section strong{color:var(--text)}.task-editor{width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);box-shadow:0 24px 80px rgba(0,0,0,.22)}.task-editor::backdrop{background:rgba(15,18,24,.48);backdrop-filter:blur(3px)}.editor-form{display:flex;flex-direction:column;max-height:calc(100vh - 50px)}.editor-header{display:flex;align-items:center;gap:9px;padding:15px 18px;border-bottom:1px solid var(--line)}.editor-header h2{margin:0;font-size:16px}.editor-header code{color:var(--muted)}.editor-close{margin-left:auto;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}.editor-close:hover{background:var(--panel-subtle);color:var(--text)}.editor-body{padding:16px 18px;overflow-y:auto}.editor-field{display:block;margin-bottom:13px}.editor-field>span{display:block;margin-bottom:6px;font-size:12px;font-weight:600}.editor-title{width:100%;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font-size:14px}.editor-tabs{display:flex;gap:3px;margin-bottom:7px;border-bottom:1px solid var(--line)}.editor-tabs button{padding:6px 11px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);font-size:12px;cursor:pointer}.editor-tabs button[aria-pressed=true]{border-bottom-color:var(--accent);color:var(--text);font-weight:600}.editor-markdown{display:block;width:100%;min-height:330px;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.editor-markdown:focus{border-color:var(--accent)}.editor-preview{min-height:330px;padding:1px 0}.editor-preview-empty{padding:24px;border:1px dashed var(--line);border-radius:7px;color:var(--muted);text-align:center}.editor-note{margin:10px 0 0;color:var(--muted);font-size:11px}.editor-error{min-height:18px;margin:7px 0 0;color:var(--bad);font-size:12px}.editor-footer{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}.editor-footer .muted{margin-right:auto;font-size:11px}.editor-button{padding:6px 13px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:12px;cursor:pointer}.editor-button.primary{border-color:var(--accent);background:var(--accent);color:var(--panel)}.editor-button:hover{filter:brightness(.97)}.editor-reset{margin-right:4px;color:var(--bad)}.copy-toast{position:fixed;right:20px;bottom:20px;z-index:60;padding:9px 13px;border:1px solid var(--line);border-radius:7px;background:var(--text);color:var(--bg);font-size:12px;box-shadow:var(--shadow)}
+.markdown-toolbar{display:flex;gap:7px;margin:0 0 8px;padding:5px;overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel-subtle);scrollbar-width:thin}.markdown-toolbar[hidden]{display:none}.markdown-toolbar-group{display:flex;flex:0 0 auto;gap:2px;padding-right:7px;border-right:1px solid var(--line)}.markdown-toolbar-group:last-child{padding-right:0;border-right:0}.markdown-toolbar button{min-width:27px;height:26px;padding:0 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--muted);font-size:12px;line-height:1;white-space:nowrap;cursor:pointer}.markdown-toolbar button:hover,.markdown-toolbar button:focus-visible{border-color:var(--line);background:var(--panel);color:var(--text);outline:none}.markdown-toolbar button:active{background:var(--accent-soft);color:var(--accent)}.markdown-section blockquote{margin:7px 0;padding:6px 10px;border-left:2px solid var(--accent);background:var(--panel);color:var(--muted)}.markdown-section blockquote p{margin:0}.markdown-section a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}.markdown-section li.task-item{list-style:none}.markdown-section li.task-item input{margin:0 6px 0 0;vertical-align:middle}.markdown-section del{color:var(--muted)}
+@media(max-width:800px){.top-tab-bar{padding:0 10px;height:41px}.top-tab{padding:0 11px}.sidebar-enabled .workspace{margin-left:0}.layout-switch{display:none}.task-editor{width:calc(100vw - 20px);max-height:calc(100vh - 20px)}.editor-form{max-height:calc(100vh - 22px)}.editor-header,.editor-body,.editor-footer{padding-right:13px;padding-left:13px}.editor-footer{flex-wrap:wrap}.editor-footer .muted{flex-basis:100%}.editor-markdown,.editor-preview{min-height:280px}}
+</style></head><body data-active-view="overview" data-project="innate-labs"><aside class="sidebar" aria-label="项目导航"><div class="brand"><span class="brand-mark">I</span><div class="brand-text"><strong>Innate Project Canvas</strong><span>项目计划与架构工作台</span></div></div><div class="sidebar-scroll"><div class="nav-label">工作区</div><button class="nav-item" data-view-target="overview" aria-current="page"><span class="nav-icon">01</span><span class="nav-text">项目总览</span></button><button class="nav-item" data-view-target="tasks"><span class="nav-icon">02</span><span class="nav-text">Sprint 任务</span><span class="nav-count">31</span></button><button class="nav-item" data-view-target="modules"><span class="nav-icon">03</span><span class="nav-text">模块交互</span><span class="nav-count">0</span></button><button class="nav-item" data-view-target="audit"><span class="nav-icon">04</span><span class="nav-text">审计与漂移</span></button><div class="nav-label">Sprints</div><button class="sprint-nav" data-sprint-target="S0"><span>S0</span><span>W0 基线整树迁入</span></button><button class="sprint-nav" data-sprint-target="S1"><span>S1</span><span>W1 壳：三栏 + token + 中栏多标签槽</span></button><button class="sprint-nav" data-sprint-target="S2"><span>S2</span><span>W2 magpie 收口进壳状态</span></button><button class="sprint-nav" data-sprint-target="S3"><span>S3</span><span>W3 文件树变常驻右栏 Panel</span></button><button class="sprint-nav" data-sprint-target="S4"><span>S4</span><span>W4 terminal：pty + process:execute</span></button><button class="sprint-nav" data-sprint-target="S5"><span>S5</span><span>W5 browser Surface</span></button><button class="sprint-nav" data-sprint-target="S6"><span>S6</span><span>Q1 一句话 → project-snapshot 快照</span></button><button class="sprint-nav" data-sprint-target="S7"><span>S7</span><span>Q2 人看的看板进中栏</span></button><button class="sprint-nav" data-sprint-target="S8"><span>S8</span><span>Q3 一条 task 串行执行 + 证据回写</span></button></div><div class="sidebar-footer"><code>5b7687128a0f44da</code><span>2026-10-28 · 结构化快照</span></div></aside><button class="sidebar-overlay" id="sidebar-overlay" aria-label="关闭导航"></button><div class="workspace"><header class="topbar"><button class="icon-button" id="sidebar-trigger" aria-label="折叠或展开导航" title="折叠导航 · Ctrl/⌘ B">☰</button><div class="breadcrumb"><span>innate-labs</span><span>/</span><strong id="view-title">项目总览</strong></div><div class="topbar-actions"><div class="layout-switch" aria-label="导航布局"><button type="button" data-layout="tabs" aria-pressed="true">Tabs</button><button type="button" data-layout="sidebar" aria-pressed="false">Sidebar</button></div><span class="system-badge"><span class="system-dot"></span>跟随系统</span></div></header><nav class="top-tab-bar" aria-label="项目视图"><button class="top-tab" data-view-target="overview" aria-current="page">项目总览</button><button class="top-tab" data-view-target="tasks">Sprint 任务</button><button class="top-tab" data-view-target="modules">模块交互</button><button class="top-tab" data-view-target="audit">审计与漂移</button></nav><main><section class="view" id="view-overview" data-view><div class="overview-hero"><div><span class="eyebrow">Evidence-gated project workspace</span><h1>innate-labs</h1><p>把计划、执行状态和模块关系放进同一个工作界面。所有数字都来自当前快照，目标架构不会被误认为已实现。</p></div><span class="snapshot-pill">快照 5b7687128a0f</span></div>
+    <section class="metrics" aria-label="项目摘要"><div><strong>9</strong><span>Sprint</span></div><div><strong>31</strong><span>任务卡</span></div><div><strong>1</strong><span>当前可执行</span></div><div><strong>0</strong><span>当前 + 目标模块</span></div><div class=""><strong>0</strong><span>审计错误</span></div></section>
+    <div class="overview-grid"><section class="panel next-panel"><div class="section-heading"><div><span class="eyebrow">Execution frontier</span><h2>当前推进面</h2></div><button class="text-button" data-view-target="tasks">全部任务 →</button></div><div class="next-task"><span class="badge next">下一项</span><code>T0.1</code><h3>整树拷贝</h3><p>从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。</p></div><div class="ready-list"><button data-open-task="T0.1"><code>T0.1</code><span>整树拷贝</span><span>→</span></button></div></section>
+    <section class="panel audit-summary"><div class="section-heading"><div><span class="eyebrow">Audit</span><h2>发布门禁</h2></div><button class="text-button" data-view-target="audit">查看审计 →</button></div><div class="audit-callout clean"><strong>结构、依赖和证据检查通过</strong><p>当前快照满足发布门禁。</p></div><dl class="audit-numbers"><div><dt>警告</dt><dd>0</dd></div><div><dt>语义漂移</dt><dd>0</dd></div></dl></section></div>
+    <section class="section-block"><div class="section-heading"><div><span class="eyebrow">Sprints</span><h2>按执行阶段查看</h2></div></div><div class="sprint-cards"><button class="sprint-card" type="button" data-sprint-target="S0"><span class="sprint-card-top"><code>S0</code><span>0/5</span></span><strong>W0 基线整树迁入</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">下一执行项 · 0.5–1 天</span></button><button class="sprint-card" type="button" data-sprint-target="S1"><span class="sprint-card-top"><code>S1</code><span>0/4</span></span><strong>W1 壳：三栏 + token + 中栏多标签槽</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 2–3 天</span></button><button class="sprint-card" type="button" data-sprint-target="S2"><span class="sprint-card-top"><code>S2</code><span>0/3</span></span><strong>W2 magpie 收口进壳状态</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队，可与 S3 并行 · 1–2 天</span></button><button class="sprint-card" type="button" data-sprint-target="S3"><span class="sprint-card-top"><code>S3</code><span>0/3</span></span><strong>W3 文件树变常驻右栏 Panel</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队，可与 S2 并行 · 1–2 天</span></button><button class="sprint-card" type="button" data-sprint-target="S4"><span class="sprint-card-top"><code>S4</code><span>0/5</span></span><strong>W4 terminal：pty + process:execute</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 2–3 天</span></button><button class="sprint-card" type="button" data-sprint-target="S5"><span class="sprint-card-top"><code>S5</code><span>0/3</span></span><strong>W5 browser Surface</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 1–2 天</span></button><button class="sprint-card" type="button" data-sprint-target="S6"><span class="sprint-card-top"><code>S6</code><span>0/3</span></span><strong>Q1 一句话 → project-snapshot 快照</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 2 天</span></button><button class="sprint-card" type="button" data-sprint-target="S7"><span class="sprint-card-top"><code>S7</code><span>0/2</span></span><strong>Q2 人看的看板进中栏</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 1–2 天</span></button><button class="sprint-card" type="button" data-sprint-target="S8"><span class="sprint-card-top"><code>S8</code><span>0/3</span></span><strong>Q3 一条 task 串行执行 + 证据回写</strong><span class="progress"><span style="width:0%"></span></span><span class="muted">排队 · 2–3 天</span></button></div></section></section><section class="view" id="view-tasks" data-view hidden><div class="page-heading"><div><span class="eyebrow">Execution board</span><h1>Sprint 任务</h1><p>从依赖图派生可执行状态。筛选只改变视图，不回写任务状态；展开卡片可查看验收、来源和证据，双击卡片可直接编辑。</p></div></div><div class="filters"><div class="filter-buttons" aria-label="任务状态筛选"><button data-task-filter="all" aria-pressed="true">全部</button><button data-task-filter="action" aria-pressed="false">可推进</button><button data-task-filter="blocked" aria-pressed="false">被阻塞</button><button data-task-filter="done" aria-pressed="false">已完成</button><button data-task-filter="optional" aria-pressed="false">可选与债务</button></div><div class="filter-controls"><select id="sprint-filter" aria-label="按 Sprint 筛选"><option value="all">全部 Sprint</option><option value="S0">S0 · W0 基线整树迁入</option><option value="S1">S1 · W1 壳：三栏 + token + 中栏多标签槽</option><option value="S2">S2 · W2 magpie 收口进壳状态</option><option value="S3">S3 · W3 文件树变常驻右栏 Panel</option><option value="S4">S4 · W4 terminal：pty + process:execute</option><option value="S5">S5 · W5 browser Surface</option><option value="S6">S6 · Q1 一句话 → project-snapshot 快照</option><option value="S7">S7 · Q2 人看的看板进中栏</option><option value="S8">S8 · Q3 一条 task 串行执行 + 证据回写</option></select><input id="task-search" type="search" placeholder="搜索任务 · /" aria-label="搜索任务"></div></div><p class="result-count" id="task-count" aria-live="polite">显示 31 / 31 张任务卡</p><section class="sprint-block" data-sprint-block="S0">
+      <header class="sprint-heading"><div><span class="sprint-id">S0</span><h3>W0 基线整树迁入</h3></div><div class="sprint-meta"><span>0/5 完成</span><span>0.5–1 天</span><span>下一执行项</span></div></header>
+      <div class="task-grid"><details class="task-card next" data-task data-filter="action" data-sprint="S0" data-search="t0.1 整树拷贝 从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。 目录清单与 labs 一致（排除项除外）；无 node_modules/构建产物混入。" data-original-title="整树拷贝" data-original-body="## 任务说明
+
+从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。
+
+## 验收标准
+
+目录清单与 labs 一致（排除项除外）；无 node_modules/构建产物混入。
+
+## 执行信息
+
+- 状态：下一项
+- 前置：无
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S0-w0-baseline.md:5" data-summary="从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。" id="task-T0.1">
+    <summary>
+      <span class="task-card-top"><code>T0.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge next">下一项</span></span>
+      <span class="task-title">整树拷贝</span>
+      <span class="task-summary">从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T0.1">编辑</button><button class="task-action" type="button" data-copy-task="T0.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>无</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>目录清单与 labs 一致（排除项除外）；无 node_modules/构建产物混入。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S0-w0-baseline.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S0" data-search="t0.2 workspace 接线与依赖安装 合并根 pnpm-workspace.yaml（apps、packages、innate-dogic 四组、innate-project-canvas）；根 package.json 并入 labs 脚本与 devdeps，保留 ui:sync 与 @innate/ui；合并 vitest/tsconfig/gitignore；.npmrc 保持 @innate 私有源；pnpm install 并补 electron 二进制。 pnpm install 无错；pnpm ls -r 同时列出 @susu/web 与全部 @dogic 包。" data-original-title="workspace 接线与依赖安装" data-original-body="## 任务说明
+
+合并根 pnpm-workspace.yaml（apps、packages、innate-dogic 四组、innate-project-canvas）；根 package.json 并入 labs 脚本与 devDeps，保留 ui:sync 与 @innate/ui；合并 vitest/tsconfig/gitignore；.npmrc 保持 @innate 私有源；pnpm install 并补 electron 二进制。
+
+## 验收标准
+
+pnpm install 无错；pnpm ls -r 同时列出 @susu/web 与全部 @dogic 包。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：T0.1
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S0-w0-baseline.md:12" data-summary="合并根 pnpm-workspace.yaml（apps、packages、innate-dogic 四组、innate-project-canvas）；根 package.json 并入 labs 脚本与 devDeps，保留 ui:sync 与 @innate/ui；合并 vitest/tsconfig/gitignore；.npmrc 保持 @innate 私有源；pnpm install 并补 electron 二进制。" id="task-T0.2">
+    <summary>
+      <span class="task-card-top"><code>T0.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">workspace 接线与依赖安装</span>
+      <span class="task-summary">合并根 pnpm-workspace.yaml（apps、packages、innate-dogic 四组、innate-project-canvas）；根 package.json 并入 labs 脚本与 devDeps，保留 ui:sync 与 @innate/ui；合并 vitest/tsconfig/gitignore；.npmrc 保持 @innate 私有源；pnpm install 并补 electron 二进制。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T0.2">编辑</button><button class="task-action" type="button" data-copy-task="T0.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>T0.1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>pnpm install 无错；pnpm ls -r 同时列出 @susu/web 与全部 @dogic 包。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S0-w0-baseline.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S0" data-search="t0.3 改名坏点收口 根 package.json name 改 innate-desktop；ui:sync 的 --dir 改指 innate-desktop（或改相对定位）；readme 更新为双轨说明；docs/readme.md 加 plan1 入口行。不改 git remote、不动产品代码。 pnpm ui:sync 幂等成功；仓库内无指向 innate-susu 绝对路径的脚本残留。" data-original-title="改名坏点收口" data-original-body="## 任务说明
+
+根 package.json name 改 innate-desktop；ui:sync 的 --dir 改指 innate-desktop（或改相对定位）；README 更新为双轨说明；docs/README.md 加 plan1 入口行。不改 git remote、不动产品代码。
+
+## 验收标准
+
+pnpm ui:sync 幂等成功；仓库内无指向 innate-susu 绝对路径的脚本残留。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：T0.2
+- 预估：0.25 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S0-w0-baseline.md:19" data-summary="根 package.json name 改 innate-desktop；ui:sync 的 --dir 改指 innate-desktop（或改相对定位）；README 更新为双轨说明；docs/README.md 加 plan1 入口行。不改 git remote、不动产品代码。" id="task-T0.3">
+    <summary>
+      <span class="task-card-top"><code>T0.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">改名坏点收口</span>
+      <span class="task-summary">根 package.json name 改 innate-desktop；ui:sync 的 --dir 改指 innate-desktop（或改相对定位）；README 更新为双轨说明；docs/README.md 加 plan1 入口行。不改 git remote、不动产品代码。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T0.3">编辑</button><button class="task-action" type="button" data-copy-task="T0.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>T0.2</dd><dt>预估</dt><dd>0.25 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>pnpm ui:sync 幂等成功；仓库内无指向 innate-susu 绝对路径的脚本残留。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S0-w0-baseline.md:19</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S0" data-search="t0.4 门禁对齐与冒烟 check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失目录；逐项跑 build、typecheck、test（对照 labs 基线 83 项）、smoke:desktop、verify:overlay、package:portable、ui:sync。 四门禁与 labs 同绿；便携包含对话、magpie、只读工作区三项冒烟；输出留证 docs/susu/evidence/w0/。" data-original-title="门禁对齐与冒烟" data-original-body="## 任务说明
+
+check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失目录；逐项跑 build、typecheck、test（对照 labs 基线 83 项）、smoke:desktop、verify:overlay、package:portable、ui:sync。
+
+## 验收标准
+
+四门禁与 labs 同绿；便携包含对话、magpie、只读工作区三项冒烟；输出留证 docs/susu/evidence/W0/。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：T0.3
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S0-w0-baseline.md:26" data-summary="check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失目录；逐项跑 build、typecheck、test（对照 labs 基线 83 项）、smoke:desktop、verify:overlay、package:portable、ui:sync。" id="task-T0.4">
+    <summary>
+      <span class="task-card-top"><code>T0.4</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">门禁对齐与冒烟</span>
+      <span class="task-summary">check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失目录；逐项跑 build、typecheck、test（对照 labs 基线 83 项）、smoke:desktop、verify:overlay、package:portable、ui:sync。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T0.4">编辑</button><button class="task-action" type="button" data-copy-task="T0.4">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>T0.3</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>四门禁与 labs 同绿；便携包含对话、magpie、只读工作区三项冒烟；输出留证 docs/susu/evidence/W0/。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S0-w0-baseline.md:26</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S0" data-search="t0.5 文档与执行源切换 docs/innate-dogic/sprints 与 plans 状态板顶部加「已由 plan1 取代、p 系列后置」标注；labs 仓 readme 与 susu-migration.md 加冻结声明；plan1 状态板回写。 按 readme 阅读顺序可直达 plan1 状态板；旧 p 状态板无「下一执行项」。" data-original-title="文档与执行源切换" data-original-body="## 任务说明
+
+docs/innate-dogic/sprints 与 plans 状态板顶部加「已由 plan1 取代、P 系列后置」标注；labs 仓 README 与 susu-migration.md 加冻结声明；plan1 状态板回写。
+
+## 验收标准
+
+按 README 阅读顺序可直达 plan1 状态板；旧 P 状态板无「下一执行项」。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：T0.4
+- 预估：0.25 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S0-w0-baseline.md:33" data-summary="docs/innate-dogic/sprints 与 plans 状态板顶部加「已由 plan1 取代、P 系列后置」标注；labs 仓 README 与 susu-migration.md 加冻结声明；plan1 状态板回写。" id="task-T0.5">
+    <summary>
+      <span class="task-card-top"><code>T0.5</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">文档与执行源切换</span>
+      <span class="task-summary">docs/innate-dogic/sprints 与 plans 状态板顶部加「已由 plan1 取代、P 系列后置」标注；labs 仓 README 与 susu-migration.md 加冻结声明；plan1 状态板回写。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T0.5">编辑</button><button class="task-action" type="button" data-copy-task="T0.5">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>T0.4</dd><dt>预估</dt><dd>0.25 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>按 README 阅读顺序可直达 plan1 状态板；旧 P 状态板无「下一执行项」。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S0-w0-baseline.md:33</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S1">
+      <header class="sprint-heading"><div><span class="sprint-id">S1</span><h3>W1 壳：三栏 + token + 中栏多标签槽</h3></div><div class="sprint-meta"><span>0/4 完成</span><span>2–3 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.1 token 与 tailwind 接入 desktop renderer 加 tailwindcss 与 @tailwindcss/vite、依赖 @innate/ui；renderer vite 配置挂插件；新建 globals.css（@import tailwindcss + @innate/ui/tokens.css + 两条 @source）；明暗走 .dark class；修订 style-guide 的 prefers-color-scheme 旧说法。 明暗截图各一张；壳层文件无硬编码 hex；构建产物含编译后 tailwind。" data-original-title="token 与 Tailwind 接入" data-original-body="## 任务说明
+
+desktop renderer 加 tailwindcss 与 @tailwindcss/vite、依赖 @innate/ui；renderer vite 配置挂插件；新建 globals.css（@import tailwindcss + @innate/ui/tokens.css + 两条 @source）；明暗走 .dark class；修订 style-guide 的 prefers-color-scheme 旧说法。
+
+## 验收标准
+
+明暗截图各一张；壳层文件无硬编码 hex；构建产物含编译后 Tailwind。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S0
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S1-w1-shell.md:5" data-summary="desktop renderer 加 tailwindcss 与 @tailwindcss/vite、依赖 @innate/ui；renderer vite 配置挂插件；新建 globals.css（@import tailwindcss + @innate/ui/tokens.css + 两条 @source）；明暗走 .dark class；修订 style-guide 的 prefers-color-scheme 旧说法。" id="task-T1.1">
+    <summary>
+      <span class="task-card-top"><code>T1.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">token 与 Tailwind 接入</span>
+      <span class="task-summary">desktop renderer 加 tailwindcss 与 @tailwindcss/vite、依赖 @innate/ui；renderer vite 配置挂插件；新建 globals.css（@import tailwindcss + @innate/ui/tokens.css + 两条 @source）；明暗走 .dark class；修订 style-guide 的 prefers-color-scheme 旧说法。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T1.1">编辑</button><button class="task-action" type="button" data-copy-task="T1.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S0</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>明暗截图各一张；壳层文件无硬编码 hex；构建产物含编译后 Tailwind。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1-shell.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.2 三段壳布局收口 新建 renderer shell/（titlebarstrip、sidebar、contentarea），l2 组合件只消费 @innate/ui 单入口；拆 367 行 app.tsx，titlebar/modegate 并入 shell，内联页拆 pages/；pages.ts 注册表与门控语义不动。 smoke:desktop 通过（导航、模式 pill、窗口控制 dom 断言）；simple/dev 门控与基线一致；空注册表负路径单测。" data-original-title="三段壳布局收口" data-original-body="## 任务说明
+
+新建 renderer shell/（TitlebarStrip、Sidebar、ContentArea），L2 组合件只消费 @innate/ui 单入口；拆 367 行 App.tsx，Titlebar/ModeGate 并入 shell，内联页拆 pages/；pages.ts 注册表与门控语义不动。
+
+## 验收标准
+
+smoke:desktop 通过（导航、模式 pill、窗口控制 DOM 断言）；simple/dev 门控与基线一致；空注册表负路径单测。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S0
+- 预估：1–2 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S1-w1-shell.md:12" data-summary="新建 renderer shell/（TitlebarStrip、Sidebar、ContentArea），L2 组合件只消费 @innate/ui 单入口；拆 367 行 App.tsx，Titlebar/ModeGate 并入 shell，内联页拆 pages/；pages.ts 注册表与门控语义不动。" id="task-T1.2">
+    <summary>
+      <span class="task-card-top"><code>T1.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">三段壳布局收口</span>
+      <span class="task-summary">新建 renderer shell/（TitlebarStrip、Sidebar、ContentArea），L2 组合件只消费 @innate/ui 单入口；拆 367 行 App.tsx，Titlebar/ModeGate 并入 shell，内联页拆 pages/；pages.ts 注册表与门控语义不动。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T1.2">编辑</button><button class="task-action" type="button" data-copy-task="T1.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S0</dd><dt>预估</dt><dd>1–2 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>smoke:desktop 通过（导航、模式 pill、窗口控制 DOM 断言）；simple/dev 门控与基线一致；空注册表负路径单测。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1-shell.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.3 中栏多标签 surface 槽 surface-host.ts 从单 view attach 扩为多 surface 注册 + 单 attach 切换（detach 不销毁不重载）；中栏标签条列 harness 与 magpie-console；ipc 加 surface:list 与 surface:activate 进类型化契约。 cdp 断言切换后 harness url 未变、未 reload；resize 后 bounds 正确；无 dsh 环境壳仍启动。" data-original-title="中栏多标签 Surface 槽" data-original-body="## 任务说明
+
+surface-host.ts 从单 view attach 扩为多 Surface 注册 + 单 attach 切换（detach 不销毁不重载）；中栏标签条列 harness 与 magpie-console；IPC 加 surface:list 与 surface:activate 进类型化契约。
+
+## 验收标准
+
+CDP 断言切换后 harness URL 未变、未 reload；resize 后 bounds 正确；无 dsh 环境壳仍启动。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S0
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S1-w1-shell.md:19" data-summary="surface-host.ts 从单 view attach 扩为多 Surface 注册 + 单 attach 切换（detach 不销毁不重载）；中栏标签条列 harness 与 magpie-console；IPC 加 surface:list 与 surface:activate 进类型化契约。" id="task-T1.3">
+    <summary>
+      <span class="task-card-top"><code>T1.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">中栏多标签 Surface 槽</span>
+      <span class="task-summary">surface-host.ts 从单 view attach 扩为多 Surface 注册 + 单 attach 切换（detach 不销毁不重载）；中栏标签条列 harness 与 magpie-console；IPC 加 surface:list 与 surface:activate 进类型化契约。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T1.3">编辑</button><button class="task-action" type="button" data-copy-task="T1.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S0</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>CDP 断言切换后 harness URL 未变、未 reload；resize 后 bounds 正确；无 dsh 环境壳仍启动。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1-shell.md:19</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S1" data-search="t1.4 simple overlay 回归 全部改动复跑 verify:overlay 与 simple 模式手测（首启选模式、simple 首页、dev 页面不可见）。 overlay 7/7 断言输出；simple 模式截图入证据。" data-original-title="simple overlay 回归" data-original-body="## 任务说明
+
+全部改动复跑 verify:overlay 与 simple 模式手测（首启选模式、simple 首页、dev 页面不可见）。
+
+## 验收标准
+
+overlay 7/7 断言输出；simple 模式截图入证据。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S0
+- 预估：0.25 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S1-w1-shell.md:26" data-summary="全部改动复跑 verify:overlay 与 simple 模式手测（首启选模式、simple 首页、dev 页面不可见）。" id="task-T1.4">
+    <summary>
+      <span class="task-card-top"><code>T1.4</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">simple overlay 回归</span>
+      <span class="task-summary">全部改动复跑 verify:overlay 与 simple 模式手测（首启选模式、simple 首页、dev 页面不可见）。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T1.4">编辑</button><button class="task-action" type="button" data-copy-task="T1.4">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S0</dd><dt>预估</dt><dd>0.25 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>overlay 7/7 断言输出；simple 模式截图入证据。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S1-w1-shell.md:26</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S2">
+      <header class="sprint-heading"><div><span class="sprint-id">S2</span><h3>W2 magpie 收口进壳状态</h3></div><div class="sprint-meta"><span>0/3 完成</span><span>1–2 天</span><span>排队，可与 S3 并行</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S2" data-search="t2.1 网关健康状态 pill main 侧复用 core/gateway 探测加轻量轮询（10s 级、退避）；状态机 未配置/探测中/健康/不可达；ipc 加 gateway:status 与事件推送；titlebarstrip 渲染 pill，点击打开 magpie-console 或显式 hint。 mock 网关状态机四态单测；真实环境三态截图；断网关 pill 变红且有 hint。" data-original-title="网关健康状态 pill" data-original-body="## 任务说明
+
+main 侧复用 core/gateway 探测加轻量轮询（10s 级、退避）；状态机 未配置/探测中/健康/不可达；IPC 加 gateway:status 与事件推送；TitlebarStrip 渲染 pill，点击打开 magpie-console 或显式 hint。
+
+## 验收标准
+
+mock 网关状态机四态单测；真实环境三态截图；断网关 pill 变红且有 hint。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S2-w2-magpie.md:5" data-summary="main 侧复用 core/gateway 探测加轻量轮询（10s 级、退避）；状态机 未配置/探测中/健康/不可达；IPC 加 gateway:status 与事件推送；TitlebarStrip 渲染 pill，点击打开 magpie-console 或显式 hint。" id="task-T2.1">
+    <summary>
+      <span class="task-card-top"><code>T2.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">网关健康状态 pill</span>
+      <span class="task-summary">main 侧复用 core/gateway 探测加轻量轮询（10s 级、退避）；状态机 未配置/探测中/健康/不可达；IPC 加 gateway:status 与事件推送；TitlebarStrip 渲染 pill，点击打开 magpie-console 或显式 hint。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T2.1">编辑</button><button class="task-action" type="button" data-copy-task="T2.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>mock 网关状态机四态单测；真实环境三态截图；断网关 pill 变红且有 hint。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S2-w2-magpie.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S2" data-search="t2.2 launcher 状态外露 launcher.ts 暴露 magpie 生命周期事件经 ipc 推壳；不动 bin 探测/consolekey/console 内核；disconnectdsh 状态回显。 事件序列断言；disconnectdsh 后 dsh 路由检测回读确认恢复。" data-original-title="launcher 状态外露" data-original-body="## 任务说明
+
+launcher.ts 暴露 magpie 生命周期事件经 ipc 推壳；不动 bin 探测/consoleKey/console 内核；disconnectDsh 状态回显。
+
+## 验收标准
+
+事件序列断言；disconnectDsh 后 dsh 路由检测回读确认恢复。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S2-w2-magpie.md:12" data-summary="launcher.ts 暴露 magpie 生命周期事件经 ipc 推壳；不动 bin 探测/consoleKey/console 内核；disconnectDsh 状态回显。" id="task-T2.2">
+    <summary>
+      <span class="task-card-top"><code>T2.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">launcher 状态外露</span>
+      <span class="task-summary">launcher.ts 暴露 magpie 生命周期事件经 ipc 推壳；不动 bin 探测/consoleKey/console 内核；disconnectDsh 状态回显。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T2.2">编辑</button><button class="task-action" type="button" data-copy-task="T2.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>事件序列断言；disconnectDsh 后 dsh 路由检测回读确认恢复。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S2-w2-magpie.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S2" data-search="t2.3 干净环境接线冒烟 tools 新增 smoke-magpie-wire.ts：隔离临时 dsh_home 裸 boot → magpie 接线 → dsh web 探活；只读/隔离命令，不碰真实用户配置；接 pnpm smoke:magpie。 全新临时 home 一次通过且重复跑幂等；真人对对话一轮属 uat 留证。" data-original-title="干净环境接线冒烟" data-original-body="## 任务说明
+
+tools 新增 smoke-magpie-wire.ts：隔离临时 DSH_HOME 裸 boot → magpie 接线 → dsh web 探活；只读/隔离命令，不碰真实用户配置；接 pnpm smoke:magpie。
+
+## 验收标准
+
+全新临时 HOME 一次通过且重复跑幂等；真人对对话一轮属 UAT 留证。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S2-w2-magpie.md:19" data-summary="tools 新增 smoke-magpie-wire.ts：隔离临时 DSH_HOME 裸 boot → magpie 接线 → dsh web 探活；只读/隔离命令，不碰真实用户配置；接 pnpm smoke:magpie。" id="task-T2.3">
+    <summary>
+      <span class="task-card-top"><code>T2.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">干净环境接线冒烟</span>
+      <span class="task-summary">tools 新增 smoke-magpie-wire.ts：隔离临时 DSH_HOME 裸 boot → magpie 接线 → dsh web 探活；只读/隔离命令，不碰真实用户配置；接 pnpm smoke:magpie。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T2.3">编辑</button><button class="task-action" type="button" data-copy-task="T2.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>全新临时 HOME 一次通过且重复跑幂等；真人对对话一轮属 UAT 留证。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S2-w2-magpie.md:19</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S3">
+      <header class="sprint-heading"><div><span class="sprint-id">S3</span><h3>W3 文件树变常驻右栏 Panel</h3></div><div class="sprint-meta"><span>0/3 完成</span><span>1–2 天</span><span>排队，可与 S2 并行</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S3" data-search="t3.1 右栏常驻 panel 化 plugin-workspace 的 renderer 迁到壳右栏插槽（宽度可拖拽）；dev 页面注册项移除；simple 右栏默认收起；plugin-workspace 的 main/shared 契约零改动。 smoke:desktop 断言右栏常驻（simple 收起）；文件预览/markdown/图片不回退。" data-original-title="右栏常驻 Panel 化" data-original-body="## 任务说明
+
+plugin-workspace 的 renderer 迁到壳右栏插槽（宽度可拖拽）；dev 页面注册项移除；simple 右栏默认收起；plugin-workspace 的 main/shared 契约零改动。
+
+## 验收标准
+
+smoke:desktop 断言右栏常驻（simple 收起）；文件预览/Markdown/图片不回退。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S3-w3-workspace-panel.md:5" data-summary="plugin-workspace 的 renderer 迁到壳右栏插槽（宽度可拖拽）；dev 页面注册项移除；simple 右栏默认收起；plugin-workspace 的 main/shared 契约零改动。" id="task-T3.1">
+    <summary>
+      <span class="task-card-top"><code>T3.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">右栏常驻 Panel 化</span>
+      <span class="task-summary">plugin-workspace 的 renderer 迁到壳右栏插槽（宽度可拖拽）；dev 页面注册项移除；simple 右栏默认收起；plugin-workspace 的 main/shared 契约零改动。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T3.1">编辑</button><button class="task-action" type="button" data-copy-task="T3.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>smoke:desktop 断言右栏常驻（simple 收起）；文件预览/Markdown/图片不回退。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S3-w3-workspace-panel.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S3" data-search="t3.2 workspace root 全局化 root 提升为壳级单源（main 已有 getroot/pickroot）；renderer 加 workspacecontext；main 暴露 workspace:rootchanged；契约 {rootpath, source} 一次定稳供 w4/q3 消费。 选根后各面板同步；无效根显式错误并回退上一根。" data-original-title="workspace root 全局化" data-original-body="## 任务说明
+
+root 提升为壳级单源（main 已有 getRoot/pickRoot）；renderer 加 WorkspaceContext；main 暴露 workspace:rootChanged；契约 {rootPath, source} 一次定稳供 W4/Q3 消费。
+
+## 验收标准
+
+选根后各面板同步；无效根显式错误并回退上一根。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S3-w3-workspace-panel.md:12" data-summary="root 提升为壳级单源（main 已有 getRoot/pickRoot）；renderer 加 WorkspaceContext；main 暴露 workspace:rootChanged；契约 {rootPath, source} 一次定稳供 W4/Q3 消费。" id="task-T3.2">
+    <summary>
+      <span class="task-card-top"><code>T3.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">workspace root 全局化</span>
+      <span class="task-summary">root 提升为壳级单源（main 已有 getRoot/pickRoot）；renderer 加 WorkspaceContext；main 暴露 workspace:rootChanged；契约 {rootPath, source} 一次定稳供 W4/Q3 消费。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T3.2">编辑</button><button class="task-action" type="button" data-copy-task="T3.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>选根后各面板同步；无效根显式错误并回退上一根。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S3-w3-workspace-panel.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S3" data-search="t3.3 布局状态快照 右栏布局状态（展开/选中/根/栏宽）版本化 json 持久化到 userdata，启动恢复；不兼容 schema 安全回退默认布局。 展开若干目录重载后恢复；破坏版本号回退默认布局的负路径测试。" data-original-title="布局状态快照" data-original-body="## 任务说明
+
+右栏布局状态（展开/选中/根/栏宽）版本化 JSON 持久化到 userData，启动恢复；不兼容 schema 安全回退默认布局。
+
+## 验收标准
+
+展开若干目录重载后恢复；破坏版本号回退默认布局的负路径测试。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S1
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S3-w3-workspace-panel.md:19" data-summary="右栏布局状态（展开/选中/根/栏宽）版本化 JSON 持久化到 userData，启动恢复；不兼容 schema 安全回退默认布局。" id="task-T3.3">
+    <summary>
+      <span class="task-card-top"><code>T3.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">布局状态快照</span>
+      <span class="task-summary">右栏布局状态（展开/选中/根/栏宽）版本化 JSON 持久化到 userData，启动恢复；不兼容 schema 安全回退默认布局。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T3.3">编辑</button><button class="task-action" type="button" data-copy-task="T3.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S1</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>展开若干目录重载后恢复；破坏版本号回退默认布局的负路径测试。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S3-w3-workspace-panel.md:19</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S4">
+      <header class="sprint-heading"><div><span class="sprint-id">S4</span><h3>W4 terminal：pty + process:execute</h3></div><div class="sprint-meta"><span>0/5 完成</span><span>2–3 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S4" data-search="t4.0 harness.ts 关键路径单测 给 main/harness.ts 补单测（stdout 解析含畸形输出、就绪探针含 401/超时、停止路径 taskkill 调用）；进程交互注入 fakechild，不真拉 dsh。 新增至少 5 用例；现有 dsh 冒烟不回归。" data-original-title="harness.ts 关键路径单测" data-original-body="## 任务说明
+
+给 main/harness.ts 补单测（stdout 解析含畸形输出、就绪探针含 401/超时、停止路径 taskkill 调用）；进程交互注入 fakeChild，不真拉 dsh。
+
+## 验收标准
+
+新增至少 5 用例；现有 dsh 冒烟不回归。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S2 · S3
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S4-w4-terminal.md:5" data-summary="给 main/harness.ts 补单测（stdout 解析含畸形输出、就绪探针含 401/超时、停止路径 taskkill 调用）；进程交互注入 fakeChild，不真拉 dsh。" id="task-T4.0">
+    <summary>
+      <span class="task-card-top"><code>T4.0</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">harness.ts 关键路径单测</span>
+      <span class="task-summary">给 main/harness.ts 补单测（stdout 解析含畸形输出、就绪探针含 401/超时、停止路径 taskkill 调用）；进程交互注入 fakeChild，不真拉 dsh。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T4.0">编辑</button><button class="task-action" type="button" data-copy-task="T4.0">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S2 · S3</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>新增至少 5 用例；现有 dsh 冒烟不回归。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S4-w4-terminal.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S4" data-search="t4.1 pty 服务 加 node-pty；新建 main/terminal/terminalservice（spawn/write/resize/exit、数据流转发）；宿主退出 taskkill 进程树回收；面板关闭即杀；异常退出显式 exit 事件；cwd 默认绑 s3 的 workspace root。 echo 真命令闭环、resize、exit 码上报契约测试；坏 shell 路径显式报错负路径。" data-original-title="pty 服务" data-original-body="## 任务说明
+
+加 node-pty；新建 main/terminal/TerminalService（spawn/write/resize/exit、数据流转发）；宿主退出 taskkill 进程树回收；面板关闭即杀；异常退出显式 exit 事件；cwd 默认绑 S3 的 workspace root。
+
+## 验收标准
+
+echo 真命令闭环、resize、exit 码上报契约测试；坏 shell 路径显式报错负路径。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S2 · S3
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S4-w4-terminal.md:12" data-summary="加 node-pty；新建 main/terminal/TerminalService（spawn/write/resize/exit、数据流转发）；宿主退出 taskkill 进程树回收；面板关闭即杀；异常退出显式 exit 事件；cwd 默认绑 S3 的 workspace root。" id="task-T4.1">
+    <summary>
+      <span class="task-card-top"><code>T4.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">pty 服务</span>
+      <span class="task-summary">加 node-pty；新建 main/terminal/TerminalService（spawn/write/resize/exit、数据流转发）；宿主退出 taskkill 进程树回收；面板关闭即杀；异常退出显式 exit 事件；cwd 默认绑 S3 的 workspace root。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T4.1">编辑</button><button class="task-action" type="button" data-copy-task="T4.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S2 · S3</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>echo 真命令闭环、resize、exit 码上报契约测试；坏 shell 路径显式报错负路径。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S4-w4-terminal.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S4" data-search="t4.2 terminal surface 加 @xterm/xterm + addon-fit；中栏标签内 react 终端面板；terminal:* 窄通道进类型化契约；scrollback 环形缓冲；多终端并存；simple 不渲染入口。 pnpm -v 与 git status 全链路；resize 跟随窗口；两会话输出隔离；simple 无入口负路径。" data-original-title="terminal Surface" data-original-body="## 任务说明
+
+加 @xterm/xterm + addon-fit；中栏标签内 React 终端面板；terminal:* 窄通道进类型化契约；scrollback 环形缓冲；多终端并存；simple 不渲染入口。
+
+## 验收标准
+
+pnpm -v 与 git status 全链路；resize 跟随窗口；两会话输出隔离；simple 无入口负路径。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S2 · S3
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S4-w4-terminal.md:19" data-summary="加 @xterm/xterm + addon-fit；中栏标签内 React 终端面板；terminal:* 窄通道进类型化契约；scrollback 环形缓冲；多终端并存；simple 不渲染入口。" id="task-T4.2">
+    <summary>
+      <span class="task-card-top"><code>T4.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">terminal Surface</span>
+      <span class="task-summary">加 @xterm/xterm + addon-fit；中栏标签内 React 终端面板；terminal:* 窄通道进类型化契约；scrollback 环形缓冲；多终端并存；simple 不渲染入口。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T4.2">编辑</button><button class="task-action" type="button" data-copy-task="T4.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S2 · S3</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>pnpm -v 与 git status 全链路；resize 跟随窗口；两会话输出隔离；simple 无入口负路径。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S4-w4-terminal.md:19</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S4" data-search="t4.3 process:execute 能力 process.execute 独立能力位（dev 默认开、simple 永久拒）；可执行文件白名单表落 userdata；cwd 强制在 workspace root 子树内（防 .. 逃逸）；参数数组、禁 shell 拼接；超时与输出截断上限；与终端面板共用 pty 底座但独立通道。 负路径四件套（非白名单、cwd 越界、simple 调用、绕 preload 直连）全拒；正路径 git status 在选定根真实执行。" data-original-title="process:execute 能力" data-original-body="## 任务说明
+
+process.execute 独立能力位（dev 默认开、simple 永久拒）；可执行文件白名单表落 userData；cwd 强制在 workspace root 子树内（防 .. 逃逸）；参数数组、禁 shell 拼接；超时与输出截断上限；与终端面板共用 pty 底座但独立通道。
+
+## 验收标准
+
+负路径四件套（非白名单、cwd 越界、simple 调用、绕 preload 直连）全拒；正路径 git status 在选定根真实执行。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S2 · S3
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S4-w4-terminal.md:26" data-summary="process.execute 独立能力位（dev 默认开、simple 永久拒）；可执行文件白名单表落 userData；cwd 强制在 workspace root 子树内（防 .. 逃逸）；参数数组、禁 shell 拼接；超时与输出截断上限；与终端面板共用 pty 底座但独立通道。" id="task-T4.3">
+    <summary>
+      <span class="task-card-top"><code>T4.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">process:execute 能力</span>
+      <span class="task-summary">process.execute 独立能力位（dev 默认开、simple 永久拒）；可执行文件白名单表落 userData；cwd 强制在 workspace root 子树内（防 .. 逃逸）；参数数组、禁 shell 拼接；超时与输出截断上限；与终端面板共用 pty 底座但独立通道。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T4.3">编辑</button><button class="task-action" type="button" data-copy-task="T4.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S2 · S3</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>负路径四件套（非白名单、cwd 越界、simple 调用、绕 preload 直连）全拒；正路径 git status 在选定根真实执行。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S4-w4-terminal.md:26</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S4" data-search="t4.4 无孤儿与资源上限 窗口关闭与宿主崩溃两路径的进程回收验证；并发 pty 上限（如 8）超限显式拒绝；scrollback 内存上限。 自动化脚本杀宿主后断言无遗留子进程；第 9 个 pty 被拒且 ui 有原因。" data-original-title="无孤儿与资源上限" data-original-body="## 任务说明
+
+窗口关闭与宿主崩溃两路径的进程回收验证；并发 pty 上限（如 8）超限显式拒绝；scrollback 内存上限。
+
+## 验收标准
+
+自动化脚本杀宿主后断言无遗留子进程；第 9 个 pty 被拒且 UI 有原因。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S2 · S3
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S4-w4-terminal.md:33" data-summary="窗口关闭与宿主崩溃两路径的进程回收验证；并发 pty 上限（如 8）超限显式拒绝；scrollback 内存上限。" id="task-T4.4">
+    <summary>
+      <span class="task-card-top"><code>T4.4</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">无孤儿与资源上限</span>
+      <span class="task-summary">窗口关闭与宿主崩溃两路径的进程回收验证；并发 pty 上限（如 8）超限显式拒绝；scrollback 内存上限。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T4.4">编辑</button><button class="task-action" type="button" data-copy-task="T4.4">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S2 · S3</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>自动化脚本杀宿主后断言无遗留子进程；第 9 个 pty 被拒且 UI 有原因。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S4-w4-terminal.md:33</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S5">
+      <header class="sprint-heading"><div><span class="sprint-id">S5</span><h3>W5 browser Surface</h3></div><div class="sprint-meta"><span>0/3 完成</span><span>1–2 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S5" data-search="t5.1 browser surface 新建 main/browser/browserhost：webcontentsview + 独立持久分区 persist:browser-surface；setpermissionrequesthandler 全部 deny 并脱敏落日志；window.open 一律 shell.openexternal 外跳；will-download 系统保存对话框；注册为标签槽 surface，可多标签。 公开网页加载截图；geolocation 触发被拒且日志脱敏；window.open 跳系统浏览器；下载弹保存框。" data-original-title="browser Surface" data-original-body="## 任务说明
+
+新建 main/browser/BrowserHost：WebContentsView + 独立持久分区 persist:browser-surface；setPermissionRequestHandler 全部 deny 并脱敏落日志；window.open 一律 shell.openExternal 外跳；will-download 系统保存对话框；注册为标签槽 Surface，可多标签。
+
+## 验收标准
+
+公开网页加载截图；geolocation 触发被拒且日志脱敏；window.open 跳系统浏览器；下载弹保存框。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S4
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S5-w5-browser.md:5" data-summary="新建 main/browser/BrowserHost：WebContentsView + 独立持久分区 persist:browser-surface；setPermissionRequestHandler 全部 deny 并脱敏落日志；window.open 一律 shell.openExternal 外跳；will-download 系统保存对话框；注册为标签槽 Surface，可多标签。" id="task-T5.1">
+    <summary>
+      <span class="task-card-top"><code>T5.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">browser Surface</span>
+      <span class="task-summary">新建 main/browser/BrowserHost：WebContentsView + 独立持久分区 persist:browser-surface；setPermissionRequestHandler 全部 deny 并脱敏落日志；window.open 一律 shell.openExternal 外跳；will-download 系统保存对话框；注册为标签槽 Surface，可多标签。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T5.1">编辑</button><button class="task-action" type="button" data-copy-task="T5.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S4</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>公开网页加载截图；geolocation 触发被拒且日志脱敏；window.open 跳系统浏览器；下载弹保存框。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S5-w5-browser.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S5" data-search="t5.2 最小地址栏 ui 地址栏 + back/forward/reload/stop + 加载进度；ui 只用 @innate/ui 原语与 token；不提供任意 js 执行入口，devtools 默认关；不做收藏/历史。 导航/回退/刷新 dom 断言；非 http(s) 输入被拒并提示；devtools 不可达负路径。" data-original-title="最小地址栏 UI" data-original-body="## 任务说明
+
+地址栏 + back/forward/reload/stop + 加载进度；UI 只用 @innate/ui 原语与 token；不提供任意 JS 执行入口，devtools 默认关；不做收藏/历史。
+
+## 验收标准
+
+导航/回退/刷新 DOM 断言；非 http(s) 输入被拒并提示；devtools 不可达负路径。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S4
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S5-w5-browser.md:12" data-summary="地址栏 + back/forward/reload/stop + 加载进度；UI 只用 @innate/ui 原语与 token；不提供任意 JS 执行入口，devtools 默认关；不做收藏/历史。" id="task-T5.2">
+    <summary>
+      <span class="task-card-top"><code>T5.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">最小地址栏 UI</span>
+      <span class="task-summary">地址栏 + back/forward/reload/stop + 加载进度；UI 只用 @innate/ui 原语与 token；不提供任意 JS 执行入口，devtools 默认关；不做收藏/历史。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T5.2">编辑</button><button class="task-action" type="button" data-copy-task="T5.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S4</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>导航/回退/刷新 DOM 断言；非 http(s) 输入被拒并提示；devtools 不可达负路径。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S5-w5-browser.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S5" data-search="t5.3 network:navigate 能力预留 main 登记 network:navigate 能力声明与白名单域配置占位；browser surface 暴露受控 navigate/capture/title-url 快照 api；不开放 executejavascript。 navigate + capture 隔离页面工作且截图入证据；renderer 直连越权不可达。" data-original-title="network:navigate 能力预留" data-original-body="## 任务说明
+
+main 登记 network:navigate 能力声明与白名单域配置占位；browser Surface 暴露受控 navigate/capture/title-url 快照 API；不开放 executeJavaScript。
+
+## 验收标准
+
+navigate + capture 隔离页面工作且截图入证据；renderer 直连越权不可达。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S4
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S5-w5-browser.md:19" data-summary="main 登记 network:navigate 能力声明与白名单域配置占位；browser Surface 暴露受控 navigate/capture/title-url 快照 API；不开放 executeJavaScript。" id="task-T5.3">
+    <summary>
+      <span class="task-card-top"><code>T5.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">network:navigate 能力预留</span>
+      <span class="task-summary">main 登记 network:navigate 能力声明与白名单域配置占位；browser Surface 暴露受控 navigate/capture/title-url 快照 API；不开放 executeJavaScript。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T5.3">编辑</button><button class="task-action" type="button" data-copy-task="T5.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S4</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>navigate + capture 隔离页面工作且截图入证据；renderer 直连越权不可达。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S5-w5-browser.md:19</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S6">
+      <header class="sprint-heading"><div><span class="sprint-id">S6</span><h3>Q1 一句话 → project-snapshot 快照</h3></div><div class="sprint-meta"><span>0/3 完成</span><span>2 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S6" data-search="t6.1 规划入口与网关调用 sidebar 顶部一句话输入框；main 侧 planning/planservice 经 magpie 网关调 llm（复用 core/gateway 发现与 fetch）；prompt 内嵌 project-snapshot.schema.json 与只输出 json 约束 + workspace 摘要（不含文件内容）；网关不可达显式错误态。 mock 网关单测 prompt 组装与解析；真实环境一次人跑留证。" data-original-title="规划入口与网关调用" data-original-body="## 任务说明
+
+Sidebar 顶部一句话输入框；main 侧 planning/PlanService 经 magpie 网关调 LLM（复用 core/gateway 发现与 fetch）；prompt 内嵌 project-snapshot.schema.json 与只输出 JSON 约束 + workspace 摘要（不含文件内容）；网关不可达显式错误态。
+
+## 验收标准
+
+mock 网关单测 prompt 组装与解析；真实环境一次人跑留证。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S5
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S6-q1-plan-snapshot.md:5" data-summary="Sidebar 顶部一句话输入框；main 侧 planning/PlanService 经 magpie 网关调 LLM（复用 core/gateway 发现与 fetch）；prompt 内嵌 project-snapshot.schema.json 与只输出 JSON 约束 + workspace 摘要（不含文件内容）；网关不可达显式错误态。" id="task-T6.1">
+    <summary>
+      <span class="task-card-top"><code>T6.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">规划入口与网关调用</span>
+      <span class="task-summary">Sidebar 顶部一句话输入框；main 侧 planning/PlanService 经 magpie 网关调 LLM（复用 core/gateway 发现与 fetch）；prompt 内嵌 project-snapshot.schema.json 与只输出 JSON 约束 + workspace 摘要（不含文件内容）；网关不可达显式错误态。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T6.1">编辑</button><button class="task-action" type="button" data-copy-task="T6.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S5</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>mock 网关单测 prompt 组装与解析；真实环境一次人跑留证。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S6-q1-plan-snapshot.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S6" data-search="t6.2 schema 校验与落盘 剥围栏 → json.parse → innate-project-canvas validate 模块（进程内 import）校验；失败显式原因且不落盘；成功写 workspace 的 docs/sprints/（目录可配），frontmatter 含 id/来源/audit 状态；同名版本递增不覆盖。 坏 json、缺字段、未知依赖三条负路径均不落盘且原因可达；合法快照可被 canvas audit 读取。" data-original-title="schema 校验与落盘" data-original-body="## 任务说明
+
+剥围栏 → JSON.parse → innate-project-canvas validate 模块（进程内 import）校验；失败显式原因且不落盘；成功写 workspace 的 docs/sprints/（目录可配），frontmatter 含 id/来源/audit 状态；同名版本递增不覆盖。
+
+## 验收标准
+
+坏 JSON、缺字段、未知依赖三条负路径均不落盘且原因可达；合法快照可被 canvas audit 读取。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S5
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S6-q1-plan-snapshot.md:12" data-summary="剥围栏 → JSON.parse → innate-project-canvas validate 模块（进程内 import）校验；失败显式原因且不落盘；成功写 workspace 的 docs/sprints/（目录可配），frontmatter 含 id/来源/audit 状态；同名版本递增不覆盖。" id="task-T6.2">
+    <summary>
+      <span class="task-card-top"><code>T6.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">schema 校验与落盘</span>
+      <span class="task-summary">剥围栏 → JSON.parse → innate-project-canvas validate 模块（进程内 import）校验；失败显式原因且不落盘；成功写 workspace 的 docs/sprints/（目录可配），frontmatter 含 id/来源/audit 状态；同名版本递增不覆盖。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T6.2">编辑</button><button class="task-action" type="button" data-copy-task="T6.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S5</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>坏 JSON、缺字段、未知依赖三条负路径均不落盘且原因可达；合法快照可被 canvas audit 读取。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S6-q1-plan-snapshot.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S6" data-search="t6.3 audit 门 落盘前跑 innate-project-canvas audit（进程内 import）；不通过则快照标 invalid 并展示失败项，不进看板；audit 结论写回 frontmatter。 构造幻觉依赖的固定模型输出被 audit 拦截并标 fail；合法快照 audit pass。" data-original-title="audit 门" data-original-body="## 任务说明
+
+落盘前跑 innate-project-canvas audit（进程内 import）；不通过则快照标 invalid 并展示失败项，不进看板；audit 结论写回 frontmatter。
+
+## 验收标准
+
+构造幻觉依赖的固定模型输出被 audit 拦截并标 fail；合法快照 audit pass。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S5
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S6-q1-plan-snapshot.md:19" data-summary="落盘前跑 innate-project-canvas audit（进程内 import）；不通过则快照标 invalid 并展示失败项，不进看板；audit 结论写回 frontmatter。" id="task-T6.3">
+    <summary>
+      <span class="task-card-top"><code>T6.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">audit 门</span>
+      <span class="task-summary">落盘前跑 innate-project-canvas audit（进程内 import）；不通过则快照标 invalid 并展示失败项，不进看板；audit 结论写回 frontmatter。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T6.3">编辑</button><button class="task-action" type="button" data-copy-task="T6.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S5</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>构造幻觉依赖的固定模型输出被 audit 拦截并标 fail；合法快照 audit pass。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S6-q1-plan-snapshot.md:19</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S7">
+      <header class="sprint-heading"><div><span class="sprint-id">S7</span><h3>Q2 人看的看板进中栏</h3></div><div class="sprint-meta"><span>0/2 完成</span><span>1–2 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S7" data-search="t7.1 看板 surface valid 快照经 canvas sync/generate 产出自包含 html（复用其生成器，壳内不重写渲染）；以只读 surface 独立分区加载；侧栏列全部快照，invalid 灰显；快照变更重新生成产物级刷新。 q1 快照在看板完整可见（对照 json 字段）；invalid 灰显负路径；重载后内容更新。" data-original-title="看板 Surface" data-original-body="## 任务说明
+
+valid 快照经 canvas sync/generate 产出自包含 HTML（复用其生成器，壳内不重写渲染）；以只读 Surface 独立分区加载；侧栏列全部快照，invalid 灰显；快照变更重新生成产物级刷新。
+
+## 验收标准
+
+Q1 快照在看板完整可见（对照 JSON 字段）；invalid 灰显负路径；重载后内容更新。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S6
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S7-q2-canvas-board.md:5" data-summary="valid 快照经 canvas sync/generate 产出自包含 HTML（复用其生成器，壳内不重写渲染）；以只读 Surface 独立分区加载；侧栏列全部快照，invalid 灰显；快照变更重新生成产物级刷新。" id="task-T7.1">
+    <summary>
+      <span class="task-card-top"><code>T7.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">看板 Surface</span>
+      <span class="task-summary">valid 快照经 canvas sync/generate 产出自包含 HTML（复用其生成器，壳内不重写渲染）；以只读 Surface 独立分区加载；侧栏列全部快照，invalid 灰显；快照变更重新生成产物级刷新。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T7.1">编辑</button><button class="task-action" type="button" data-copy-task="T7.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S6</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>Q1 快照在看板完整可见（对照 JSON 字段）；invalid 灰显负路径；重载后内容更新。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S7-q2-canvas-board.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S7" data-search="t7.2 状态变更门 看板只读；状态变更只允许 q3 跑完回写或人编辑源文件后重新 audit；frontmatter 增加 status: draft|confirmed，q1 产出默认 draft，人确认触发 re-audit，confirmed 后 q3 才可取任务。 draft 下 q3 取不到任务负路径；确认按钮触发 re-audit 且 fail 时拒绝；直接改 html 不影响快照事实源。" data-original-title="状态变更门" data-original-body="## 任务说明
+
+看板只读；状态变更只允许 Q3 跑完回写或人编辑源文件后重新 audit；frontmatter 增加 status: draft|confirmed，Q1 产出默认 draft，人确认触发 re-audit，confirmed 后 Q3 才可取任务。
+
+## 验收标准
+
+draft 下 Q3 取不到任务负路径；确认按钮触发 re-audit 且 fail 时拒绝；直接改 HTML 不影响快照事实源。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S6
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S7-q2-canvas-board.md:12" data-summary="看板只读；状态变更只允许 Q3 跑完回写或人编辑源文件后重新 audit；frontmatter 增加 status: draft|confirmed，Q1 产出默认 draft，人确认触发 re-audit，confirmed 后 Q3 才可取任务。" id="task-T7.2">
+    <summary>
+      <span class="task-card-top"><code>T7.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">状态变更门</span>
+      <span class="task-summary">看板只读；状态变更只允许 Q3 跑完回写或人编辑源文件后重新 audit；frontmatter 增加 status: draft|confirmed，Q1 产出默认 draft，人确认触发 re-audit，confirmed 后 Q3 才可取任务。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T7.2">编辑</button><button class="task-action" type="button" data-copy-task="T7.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S6</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>draft 下 Q3 取不到任务负路径；确认按钮触发 re-audit 且 fail 时拒绝；直接改 HTML 不影响快照事实源。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S7-q2-canvas-board.md:12</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><section class="sprint-block" data-sprint-block="S8">
+      <header class="sprint-heading"><div><span class="sprint-id">S8</span><h3>Q3 一条 task 串行执行 + 证据回写</h3></div><div class="sprint-meta"><span>0/3 完成</span><span>2–3 天</span><span>排队</span></div></header>
+      <div class="task-grid"><details class="task-card " data-task data-filter="blocked" data-sprint="S8" data-search="t8.1 任务路由器 用 innate-project-canvas derive 取一条可执行 task（仅 confirmed 快照）；capability 路由：process:execute 走 t4.3 通道、agent:tools 走 dsh（需接线）、network:navigate 走 t5.3；执行器缺失显式 skipped 带原因；单飞串行锁，进行中禁止取下一条，可取消（杀进程树标 cancelled）。 三分支路由单测；skipped 带原因负路径；串行锁并发断言；取消路径进程杀净。" data-original-title="任务路由器" data-original-body="## 任务说明
+
+用 innate-project-canvas derive 取一条可执行 task（仅 confirmed 快照）；capability 路由：process:execute 走 T4.3 通道、agent:tools 走 DSH（需接线）、network:navigate 走 T5.3；执行器缺失显式 skipped 带原因；单飞串行锁，进行中禁止取下一条，可取消（杀进程树标 cancelled）。
+
+## 验收标准
+
+三分支路由单测；skipped 带原因负路径；串行锁并发断言；取消路径进程杀净。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S7
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S8-q3-task-execution.md:5" data-summary="用 innate-project-canvas derive 取一条可执行 task（仅 confirmed 快照）；capability 路由：process:execute 走 T4.3 通道、agent:tools 走 DSH（需接线）、network:navigate 走 T5.3；执行器缺失显式 skipped 带原因；单飞串行锁，进行中禁止取下一条，可取消（杀进程树标 cancelled）。" id="task-T8.1">
+    <summary>
+      <span class="task-card-top"><code>T8.1</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">任务路由器</span>
+      <span class="task-summary">用 innate-project-canvas derive 取一条可执行 task（仅 confirmed 快照）；capability 路由：process:execute 走 T4.3 通道、agent:tools 走 DSH（需接线）、network:navigate 走 T5.3；执行器缺失显式 skipped 带原因；单飞串行锁，进行中禁止取下一条，可取消（杀进程树标 cancelled）。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T8.1">编辑</button><button class="task-action" type="button" data-copy-task="T8.1">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S7</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>三分支路由单测；skipped 带原因负路径；串行锁并发断言；取消路径进程杀净。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S8-q3-task-execution.md:5</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S8" data-search="t8.2 证据回写 每次执行落证据（命令与退出码、截断输出、截图、会话摘要，不含 token）；快照 task 状态回写 done/failed/cancelled，回写经校验器 + audit 门后触发看板重生成；失败标 failed 停在 frontier，不自动跳下一条。 真实跑一条 pnpm test 任务三处对账（证据目录、快照状态、看板刷新）；必败命令 fail closed 断言。" data-original-title="证据回写" data-original-body="## 任务说明
+
+每次执行落证据（命令与退出码、截断输出、截图、会话摘要，不含 token）；快照 task 状态回写 done/failed/cancelled，回写经校验器 + audit 门后触发看板重生成；失败标 failed 停在 frontier，不自动跳下一条。
+
+## 验收标准
+
+真实跑一条 pnpm test 任务三处对账（证据目录、快照状态、看板刷新）；必败命令 fail closed 断言。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S7
+- 预估：1 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S8-q3-task-execution.md:12" data-summary="每次执行落证据（命令与退出码、截断输出、截图、会话摘要，不含 token）；快照 task 状态回写 done/failed/cancelled，回写经校验器 + audit 门后触发看板重生成；失败标 failed 停在 frontier，不自动跳下一条。" id="task-T8.2">
+    <summary>
+      <span class="task-card-top"><code>T8.2</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">证据回写</span>
+      <span class="task-summary">每次执行落证据（命令与退出码、截断输出、截图、会话摘要，不含 token）；快照 task 状态回写 done/failed/cancelled，回写经校验器 + audit 门后触发看板重生成；失败标 failed 停在 frontier，不自动跳下一条。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T8.2">编辑</button><button class="task-action" type="button" data-copy-task="T8.2">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S7</dd><dt>预估</dt><dd>1 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>真实跑一条 pnpm test 任务三处对账（证据目录、快照状态、看板刷新）；必败命令 fail closed 断言。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S8-q3-task-execution.md:12</code></p>
+      </div>
+    </div>
+  </details><details class="task-card " data-task data-filter="blocked" data-sprint="S8" data-search="t8.3 无外部依赖闭环 验证无 magpie/无 dsh 环境下纯 process:execute 任务从快照到证据全闭环；规划输入框给显式「规划需网关」提示；agent:tools 任务同环境显式 skipped。 停 magpie + 空临时 dsh_home 跑通一条终端任务；agent:tools 同环境 skipped 且原因显式。" data-original-title="无外部依赖闭环" data-original-body="## 任务说明
+
+验证无 magpie/无 dsh 环境下纯 process:execute 任务从快照到证据全闭环；规划输入框给显式「规划需网关」提示；agent:tools 任务同环境显式 skipped。
+
+## 验收标准
+
+停 magpie + 空临时 DSH_HOME 跑通一条终端任务；agent:tools 同环境 skipped 且原因显式。
+
+## 执行信息
+
+- 状态：被阻塞
+- 前置：S7
+- 预估：0.5 天
+
+## 证据
+
+- 未登记证据路径
+
+## 来源
+
+docs/sprints/S8-q3-task-execution.md:19" data-summary="验证无 magpie/无 dsh 环境下纯 process:execute 任务从快照到证据全闭环；规划输入框给显式「规划需网关」提示；agent:tools 任务同环境显式 skipped。" id="task-T8.3">
+    <summary>
+      <span class="task-card-top"><code>T8.3</code><span class="badge edited" data-draft-badge hidden>本地草稿</span><span class="badge blocked">被阻塞</span></span>
+      <span class="task-title">无外部依赖闭环</span>
+      <span class="task-summary">验证无 magpie/无 dsh 环境下纯 process:execute 任务从快照到证据全闭环；规划输入框给显式「规划需网关」提示；agent:tools 任务同环境显式 skipped。</span>
+      <span class="task-expand">查看验收与证据 <span aria-hidden="true">＋</span></span>
+    </summary>
+    <div class="task-detail">
+      <div class="task-actions"><button class="task-action" type="button" data-edit-task="T8.3">编辑</button><button class="task-action" type="button" data-copy-task="T8.3">复制 Markdown</button></div>
+      <article class="draft-content" data-draft-content hidden></article>
+      <div data-original-content>
+        <dl><dt>前置</dt><dd>S7</dd><dt>预估</dt><dd>0.5 天</dd></dl>
+        <div class="verification"><strong>如何验证</strong><p>停 magpie + 空临时 DSH_HOME 跑通一条终端任务；agent:tools 同环境 skipped 且原因显式。</p></div>
+        <h4>证据</h4><ul class="evidence"><li class="muted">未登记证据路径</li></ul>
+        <p class="source">来源 <code>docs/sprints/S8-q3-task-execution.md:19</code></p>
+      </div>
+    </div>
+  </details></div>
+    </section><p class="empty" id="task-empty" hidden>没有符合当前筛选条件的任务。</p></section><section class="view" id="view-modules" data-view hidden><div class="page-heading"><div><span class="eyebrow">Architecture canvas</span><h1>模块交互</h1><p>0 个当前模块，0 个目标模块。点击节点查看目录、来源和直接依赖；目标状态始终用虚线标识。</p></div><div class="segmented" aria-label="模块视图"><button data-module-mode="current" aria-pressed="false">当前</button><button data-module-mode="target" aria-pressed="false">目标</button><button data-module-mode="all" aria-pressed="true">全部</button></div></div><div class="module-layout"><div class="map-scroll"><svg class="module-map" viewBox="0 0 900 360" role="img" aria-label="可交互的当前与目标模块图">
+    <defs><marker id="sidebar-arrow-current" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" class="arrow-current" /></marker><marker id="sidebar-arrow-target" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" class="arrow-target" /></marker><marker id="sidebar-arrow-both" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" class="arrow-both" /></marker></defs>
+    <g></g><g></g></svg></div><aside class="module-inspector"></aside></div></section><section class="view" id="view-audit" data-view hidden><div class="page-heading"><div><span class="eyebrow">Evidence gate</span><h1>审计与漂移</h1><p>审计错误不会因为页面成功生成而消失。漂移只比较任务、模块、边和来源的语义变化。</p></div></div><section class="panel"><div class="section-heading"><div><span class="eyebrow">Audit findings</span><h2>审计结果</h2></div><span class="badge current">0 错误 · 0 警告</span></div><div class="audit-list"><div class="audit-callout clean"><strong>没有审计问题</strong><p>结构、依赖、证据和来源检查通过。</p></div></div></section><section class="panel section-block"><div class="section-heading"><div><span class="eyebrow">Semantic diff</span><h2>快照漂移</h2></div><span class="muted">0 项变化</span></div><p class="empty">没有语义漂移。生成时间变化不计入漂移。</p></section></section><footer class="footer view">同一份 project-snapshot.json 驱动全部视图。请修改权威来源后重新同步，不要手工编辑生成文件。</footer></main></div><dialog class="task-editor" id="task-editor" aria-labelledby="editor-heading"><form class="editor-form" id="editor-form"><header class="editor-header"><h2 id="editor-heading">编辑任务</h2><code id="editor-task-id"></code><button class="editor-close" type="button" id="editor-close" aria-label="关闭">×</button></header><div class="editor-body"><label class="editor-field"><span>标题</span><input class="editor-title" id="editor-title" required maxlength="300"></label><div class="editor-tabs" aria-label="编辑模式"><button type="button" data-editor-mode="edit" aria-pressed="true">Markdown 编辑</button><button type="button" data-editor-mode="preview" aria-pressed="false">分块预览</button></div><div class="markdown-toolbar" id="markdown-toolbar" role="toolbar" aria-label="Markdown 格式化工具栏"><div class="markdown-toolbar-group"><button type="button" data-md-action="paragraph" aria-label="正文" title="正文">正文</button><button type="button" data-md-action="heading2" aria-label="二级标题" title="二级标题">H2</button><button type="button" data-md-action="heading3" aria-label="三级标题" title="三级标题">H3</button></div><div class="markdown-toolbar-group"><button type="button" data-md-action="bold" aria-label="粗体" title="粗体 (Ctrl/⌘ B)"><strong>B</strong></button><button type="button" data-md-action="italic" aria-label="斜体" title="斜体 (Ctrl/⌘ I)"><em>I</em></button><button type="button" data-md-action="strike" aria-label="删除线" title="删除线"><s>S</s></button><button type="button" data-md-action="inlineCode" aria-label="行内代码" title="行内代码">&lt;/&gt;</button><button type="button" data-md-action="codeBlock" aria-label="代码块" title="代码块">{ }</button></div><div class="markdown-toolbar-group"><button type="button" data-md-action="bulletList" aria-label="无序列表" title="无序列表">• 列表</button><button type="button" data-md-action="orderedList" aria-label="有序列表" title="有序列表">1. 列表</button><button type="button" data-md-action="taskList" aria-label="检查列表" title="检查列表">☑ 列表</button></div><div class="markdown-toolbar-group"><button type="button" data-md-action="quote" aria-label="引用" title="引用">❝</button><button type="button" data-md-action="link" aria-label="链接" title="链接 (Ctrl/⌘ K)">链接</button></div></div><textarea class="editor-markdown" id="editor-markdown" aria-label="任务 Markdown 正文" spellcheck="false"></textarea><article class="editor-preview" id="editor-preview" hidden></article><p class="editor-note">标题独立编辑；其余全部内容使用 Markdown。二级标题（##）会在保存后自动分块。快捷键：Ctrl/⌘ B、I、K，Ctrl/⌘ Enter 保存。</p><p class="editor-error" id="editor-error" role="alert"></p></div><footer class="editor-footer"><span class="muted">保存到当前浏览器，不修改权威 Sprint 文档</span><button class="editor-button editor-reset" type="button" id="editor-reset">恢复原始</button><button class="editor-button" type="button" id="editor-cancel">取消</button><button class="editor-button primary" type="submit">保存草稿</button></footer></form></dialog><div class="copy-toast" id="copy-toast" role="status" hidden></div><script>
+(() => {
+  const body = document.body
+  const views = [...document.querySelectorAll('[data-view]')]
+  const navButtons = [...document.querySelectorAll('[data-view-target]')]
+  const title = document.getElementById('view-title')
+  const showView = (name, updateHash = true) => {
+    if (!document.getElementById('view-' + name)) name = 'overview'
+    views.forEach((view) => { view.hidden = view.id !== 'view-' + name })
+    navButtons.forEach((button) => {
+      if (button.dataset.viewTarget === name) button.setAttribute('aria-current', 'page')
+      else button.removeAttribute('aria-current')
+    })
+    body.dataset.activeView = name
+    title.textContent = ({overview:'项目总览',tasks:'Sprint 任务',modules:'模块交互',audit:'审计与漂移'})[name]
+    if (updateHash) history.replaceState(null, '', '#' + name)
+    body.classList.remove('sidebar-open')
+    window.scrollTo({top: 0, behavior: 'instant'})
+  }
+  navButtons.forEach((button) => button.addEventListener('click', () => showView(button.dataset.viewTarget)))
+  const toggleSidebar = () => {
+    if (matchMedia('(max-width: 800px)').matches) body.classList.toggle('sidebar-open')
+    else {
+      body.classList.toggle('sidebar-collapsed')
+      try { localStorage.setItem('ipc-sidebar', body.classList.contains('sidebar-collapsed') ? 'collapsed' : 'expanded') } catch {}
+    }
+  }
+  document.getElementById('sidebar-trigger').addEventListener('click', toggleSidebar)
+  document.getElementById('sidebar-overlay').addEventListener('click', () => body.classList.remove('sidebar-open'))
+  document.addEventListener('keydown', (event) => {
+    if (event.key.toLowerCase() === 'b' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); toggleSidebar() }
+    if (event.key === 'Escape') body.classList.remove('sidebar-open')
+    if (event.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { event.preventDefault(); showView('tasks'); document.getElementById('task-search').focus() }
+  })
+  try { if (localStorage.getItem('ipc-sidebar') === 'collapsed') body.classList.add('sidebar-collapsed') } catch {}
+  const taskCards = [...document.querySelectorAll('[data-task]')]
+  const filterButtons = [...document.querySelectorAll('[data-task-filter]')]
+  const sprintSelect = document.getElementById('sprint-filter')
+  const search = document.getElementById('task-search')
+  let activeFilter = 'all'
+  const filterTasks = () => {
+    const query = search.value.trim().toLowerCase()
+    let visible = 0
+    taskCards.forEach((card) => {
+      const show = (activeFilter === 'all' || card.dataset.filter === activeFilter) && (sprintSelect.value === 'all' || card.dataset.sprint === sprintSelect.value) && card.dataset.search.includes(query)
+      card.hidden = !show
+      if (show) visible++
+    })
+    document.querySelectorAll('[data-sprint-block]').forEach((block) => { block.hidden = ![...block.querySelectorAll('[data-task]')].some((card) => !card.hidden) })
+    document.getElementById('task-count').textContent = '显示 ' + visible + ' / ' + taskCards.length + ' 张任务卡'
+    document.getElementById('task-empty').hidden = visible !== 0
+  }
+  filterButtons.forEach((button) => button.addEventListener('click', () => {
+    activeFilter = button.dataset.taskFilter
+    filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)))
+    filterTasks()
+  }))
+  sprintSelect.addEventListener('change', filterTasks)
+  search.addEventListener('input', filterTasks)
+  const selectSprint = (id) => { sprintSelect.value = id; showView('tasks'); filterTasks() }
+  document.querySelectorAll('[data-sprint-target]').forEach((button) => button.addEventListener('click', () => selectSprint(button.dataset.sprintTarget)))
+  document.querySelectorAll('[data-open-task]').forEach((button) => button.addEventListener('click', () => {
+    activeFilter = 'all'; sprintSelect.value = 'all'; search.value = ''
+    filterButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.taskFilter === 'all')))
+    showView('tasks'); filterTasks()
+    const card = document.getElementById('task-' + button.dataset.openTask)
+    card.open = true; card.scrollIntoView({block:'center'})
+  }))
+  let moduleMode = 'all'
+  let selectedModule = document.querySelector('[data-module-node]')?.dataset.moduleId
+  const moduleNodes = [...document.querySelectorAll('[data-module-node]')]
+  const moduleEdges = [...document.querySelectorAll('[data-module-edge]')]
+  const selectModule = (id) => {
+    selectedModule = id
+    const connected = new Set([id])
+    moduleEdges.forEach((edge) => {
+      if (edge.dataset.source === id) connected.add(edge.dataset.target)
+      if (edge.dataset.target === id) connected.add(edge.dataset.source)
+      edge.classList.toggle('active', edge.dataset.source === id || edge.dataset.target === id)
+    })
+    moduleNodes.forEach((node) => {
+      node.classList.toggle('is-selected', node.dataset.moduleId === id)
+      node.classList.toggle('is-connected', connected.has(node.dataset.moduleId))
+    })
+    document.querySelectorAll('[data-module-detail]').forEach((detail) => { detail.hidden = detail.dataset.moduleDetail !== id })
+  }
+  const setModuleMode = (mode) => {
+    moduleMode = mode
+    document.querySelectorAll('[data-module-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.moduleMode === mode)))
+    moduleNodes.forEach((node) => { node.hidden = mode === 'current' && node.dataset.presence === 'target' })
+    moduleEdges.forEach((edge) => { edge.hidden = mode !== 'all' && edge.dataset.view !== 'both' && edge.dataset.view !== mode })
+    const selected = moduleNodes.find((node) => node.dataset.moduleId === selectedModule)
+    if (!selected || selected.hidden) selectModule(moduleNodes.find((node) => !node.hidden)?.dataset.moduleId)
+    else selectModule(selectedModule)
+  }
+  document.querySelectorAll('[data-module-mode]').forEach((button) => button.addEventListener('click', () => setModuleMode(button.dataset.moduleMode)))
+  moduleNodes.forEach((node) => {
+    node.addEventListener('click', () => selectModule(node.dataset.moduleId))
+    node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectModule(node.dataset.moduleId) } })
+  })
+  document.querySelectorAll('[data-select-module]').forEach((button) => button.addEventListener('click', () => {
+    const node = moduleNodes.find((item) => item.dataset.moduleId === button.dataset.selectModule)
+    if (node?.hidden) setModuleMode('all')
+    selectModule(button.dataset.selectModule)
+  }))
+  setModuleMode('all')
+  showView(location.hash.slice(1), false)
+})()
+</script><script>
+(() => {
+  const body = document.body
+  const layoutButtons = [...document.querySelectorAll('[data-layout]')]
+  const setLayout = (layout, persist = true) => {
+    const sidebar = layout === 'sidebar'
+    body.classList.toggle('sidebar-enabled', sidebar)
+    if (!sidebar) body.classList.remove('sidebar-open', 'sidebar-collapsed')
+    layoutButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.layout === layout)))
+    if (persist) try { localStorage.setItem('ipc-layout', layout) } catch {}
+  }
+  layoutButtons.forEach((button) => button.addEventListener('click', () => setLayout(button.dataset.layout)))
+  let savedLayout = 'tabs'
+  try { savedLayout = localStorage.getItem('ipc-layout') || 'tabs' } catch {}
+  setLayout(savedLayout, false)
+
+  const storageKey = 'ipc-task-drafts-v1:' + body.dataset.project
+  const readDrafts = () => {
+    try { const value = JSON.parse(localStorage.getItem(storageKey) || '{}'); return value && typeof value === 'object' ? value : {} } catch { return {} }
+  }
+  let drafts = readDrafts()
+  let editingId = null
+  const dialog = document.getElementById('task-editor')
+  const titleInput = document.getElementById('editor-title')
+  const markdownInput = document.getElementById('editor-markdown')
+  const preview = document.getElementById('editor-preview')
+  const error = document.getElementById('editor-error')
+  markdownInput.addEventListener('input', () => { error.textContent = '' })
+  const escape = (value) => String(value).replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))
+  const safeUrl = (value) => {
+    try {
+      const url = new URL(String(value).replace(/&amp;/g, '&'))
+      return url.protocol === 'http:' || url.protocol === 'https:' ? escape(url.href) : null
+    } catch { return null }
+  }
+  const inline = (value) => {
+    const code = []
+    let output = escape(value).replace(/\x60([^\x60]+)\x60/g, (_, content) => {
+      code.push('<code>' + content + '</code>')
+      return '\u0000' + (code.length - 1) + '\u0000'
+    })
+    output = output.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (match, label, href) => {
+      const safe = safeUrl(href)
+      return safe ? '<a href="' + safe + '" target="_blank" rel="noopener noreferrer">' + label + '</a>' : match
+    })
+    output = output.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/~~([^~]+)~~/g, '<del>$1</del>').replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')
+    return output.replace(/\u0000(\d+)\u0000/g, (_, index) => code[Number(index)])
+  }
+  const markdown = (source) => {
+    const lines = String(source).replace(/\r\n/g, '\n').split('\n')
+    const sections = []
+    let section = { title: '', level: 2, lines: [] }
+    const flush = () => { if (section.title || section.lines.some((line) => line.trim())) sections.push(section) }
+    for (const line of lines) {
+      const heading = /^(##|###)\s+(.+)$/.exec(line)
+      if (heading) { flush(); section = { title: heading[2], level: heading[1].length, lines: [] } }
+      else section.lines.push(line)
+    }
+    flush()
+    const renderSection = (item) => {
+      const output = []
+      let inCode = false, code = [], listType = '', paragraph = []
+      const flushParagraph = () => { if (paragraph.length) output.push('<p>' + inline(paragraph.join(' ').trim()) + '</p>'); paragraph = [] }
+      const flushList = () => { if (listType) output.push('</' + listType + '>'); listType = '' }
+      const openList = (type) => { flushParagraph(); if (listType !== type) { flushList(); output.push('<' + type + '>'); listType = type } }
+      for (const line of item.lines) {
+        const task = /^\s*[-*]\s+\[([ xX])\]\s+(.+)$/.exec(line)
+        const bullet = /^\s*[-*]\s+(.+)$/.exec(line)
+        const ordered = /^\s*\d+[.)]\s+(.+)$/.exec(line)
+        const quote = /^\s*>\s?(.*)$/.exec(line)
+        if (line.trim().startsWith('\x60\x60\x60')) {
+          flushParagraph(); flushList()
+          if (inCode) { output.push('<pre><code>' + escape(code.join('\n')) + '</code></pre>'); code = [] }
+          inCode = !inCode
+        } else if (inCode) code.push(line)
+        else if (task) {
+          openList('ul')
+          output.push('<li class="task-item"><input type="checkbox" disabled' + (task[1].toLowerCase() === 'x' ? ' checked' : '') + '>' + inline(task[2]) + '</li>')
+        } else if (bullet) {
+          openList('ul'); output.push('<li>' + inline(bullet[1]) + '</li>')
+        } else if (ordered) {
+          openList('ol'); output.push('<li>' + inline(ordered[1]) + '</li>')
+        } else if (quote) {
+          flushParagraph(); flushList(); output.push('<blockquote><p>' + inline(quote[1]) + '</p></blockquote>')
+        } else if (!line.trim()) { flushParagraph(); flushList() }
+        else { flushList(); paragraph.push(line) }
+      }
+      if (inCode) output.push('<pre><code>' + escape(code.join('\n')) + '</code></pre>')
+      flushParagraph(); flushList()
+      const heading = item.title ? '<h' + item.level + '>' + inline(item.title) + '</h' + item.level + '>' : ''
+      return '<section class="markdown-section">' + heading + output.join('') + '</section>'
+    }
+    return sections.length ? sections.map(renderSection).join('') : '<p class="editor-preview-empty">输入 Markdown 后在这里查看分块效果。</p>'
+  }
+  const applyDraft = (id) => {
+    const card = document.getElementById('task-' + id)
+    if (!card) return
+    const draft = drafts[id]
+    const title = card.querySelector('.task-title')
+    const summary = card.querySelector('.task-summary')
+    const original = card.querySelector('[data-original-content]')
+    const content = card.querySelector('[data-draft-content]')
+    const badge = card.querySelector('[data-draft-badge]')
+    title.textContent = draft?.title || card.dataset.originalTitle
+    summary.textContent = draft?.body || card.dataset.summary
+    original.hidden = Boolean(draft)
+    content.hidden = !draft
+    badge.hidden = !draft
+    if (draft) content.innerHTML = markdown(draft.body)
+    else content.innerHTML = ''
+    card.dataset.search = (id + ' ' + title.textContent + ' ' + summary.textContent).toLowerCase()
+  }
+  const applyAll = () => { document.querySelectorAll('[data-task]').forEach((card) => applyDraft(card.id.replace(/^task-/, ''))) }
+  applyAll()
+  const setEditorMode = (mode) => {
+    document.querySelectorAll('[data-editor-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.editorMode === mode)))
+    markdownInput.hidden = mode === 'preview'
+    preview.hidden = mode !== 'preview'
+    document.getElementById('markdown-toolbar').hidden = mode === 'preview'
+    if (mode === 'preview') preview.innerHTML = markdown(markdownInput.value)
+  }
+  document.querySelectorAll('[data-editor-mode]').forEach((button) => button.addEventListener('click', () => setEditorMode(button.dataset.editorMode)))
+  const replaceSelection = (replacement, selectionStart, selectionEnd) => {
+    const start = markdownInput.selectionStart, end = markdownInput.selectionEnd
+    markdownInput.setRangeText(replacement, start, end, 'end')
+    markdownInput.focus()
+    markdownInput.setSelectionRange(selectionStart ?? start, selectionEnd ?? (start + replacement.length))
+    markdownInput.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  const toggleWrap = (marker, placeholder) => {
+    const value = markdownInput.value, start = markdownInput.selectionStart, end = markdownInput.selectionEnd
+    const selected = value.slice(start, end)
+    if (start >= marker.length && value.slice(start - marker.length, start) === marker && value.slice(end, end + marker.length) === marker) {
+      markdownInput.setRangeText(selected, start - marker.length, end + marker.length, 'end')
+      markdownInput.focus(); markdownInput.setSelectionRange(start - marker.length, end - marker.length)
+      return
+    }
+    if (selected.startsWith(marker) && selected.endsWith(marker) && selected.length >= marker.length * 2) {
+      const unwrapped = selected.slice(marker.length, -marker.length)
+      replaceSelection(unwrapped, start, start + unwrapped.length)
+      return
+    }
+    const content = selected || placeholder
+    replaceSelection(marker + content + marker, start + marker.length, start + marker.length + content.length)
+  }
+  const transformLines = (transform) => {
+    const value = markdownInput.value, start = markdownInput.selectionStart, end = markdownInput.selectionEnd
+    const lineStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1
+    const nextBreak = value.indexOf('\n', end)
+    const lineEnd = nextBreak === -1 ? value.length : nextBreak
+    const replacement = value.slice(lineStart, lineEnd).split('\n').map(transform).join('\n')
+    markdownInput.setRangeText(replacement, lineStart, lineEnd, 'end')
+    markdownInput.focus(); markdownInput.setSelectionRange(lineStart, lineStart + replacement.length)
+    markdownInput.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+  const applyLineAction = (action) => {
+    const prefixes = { bulletList: '- ', orderedList: '', taskList: '- [ ] ', quote: '> ' }
+    const patterns = { bulletList: /^\s*[-*]\s+(?!\[[ xX]\]\s)/, orderedList: /^\s*\d+[.)]\s+/, taskList: /^\s*[-*]\s+\[[ xX]\]\s+/, quote: /^\s*>\s?/ }
+    if (action === 'paragraph' || action === 'heading2' || action === 'heading3') {
+      const heading = action === 'heading2' ? '## ' : action === 'heading3' ? '### ' : ''
+      transformLines((line) => {
+        const content = line.replace(/^\s*#{2,3}\s+/, '')
+        if (!content.trim() || !heading) return content
+        const alreadyCurrent = action === 'heading2' ? /^\s*##\s+/.test(line) : /^\s*###\s+/.test(line)
+        return alreadyCurrent ? content : heading + content
+      })
+      return
+    }
+    const pattern = patterns[action]
+    const selected = markdownInput.value.slice(markdownInput.selectionStart, markdownInput.selectionEnd)
+    const selectedLines = selected.split('\n').filter((line) => line.trim())
+    const remove = selectedLines.length > 0 && selectedLines.every((line) => pattern.test(line))
+    transformLines((line, index) => {
+      if (!line.trim()) return line
+      if (remove) return line.replace(pattern, '')
+      const content = line.replace(/^\s*(?:[-*]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+|>\s?)/, '')
+      return action === 'orderedList' ? (index + 1) + '. ' + content : prefixes[action] + content
+    })
+  }
+  const applyMarkdownAction = (action) => {
+    error.textContent = ''
+    if (action === 'bold') return toggleWrap('**', '粗体文字')
+    if (action === 'italic') return toggleWrap('*', '斜体文字')
+    if (action === 'strike') return toggleWrap('~~', '删除文字')
+    if (action === 'inlineCode') return toggleWrap('\x60', '代码')
+    if (action === 'codeBlock') {
+      const start = markdownInput.selectionStart
+      const selected = markdownInput.value.slice(start, markdownInput.selectionEnd) || '代码'
+      const fence = '\x60\x60\x60'
+      return replaceSelection(fence + '\n' + selected + '\n' + fence, start + fence.length + 1, start + fence.length + 1 + selected.length)
+    }
+    if (action === 'link') {
+      const href = window.prompt('输入 http:// 或 https:// 链接', 'https://')
+      if (href === null) return
+      if (!safeUrl(href)) { error.textContent = '链接仅支持有效的 http:// 或 https:// 地址。'; return }
+      const start = markdownInput.selectionStart
+      const label = markdownInput.value.slice(start, markdownInput.selectionEnd) || '链接文字'
+      return replaceSelection('[' + label + '](' + href + ')', start + 1, start + 1 + label.length)
+    }
+    applyLineAction(action)
+  }
+  const toolbar = document.getElementById('markdown-toolbar')
+  toolbar.addEventListener('mousedown', (event) => { if (event.target.closest('button')) event.preventDefault() })
+  toolbar.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-md-action]')
+    if (button) applyMarkdownAction(button.dataset.mdAction)
+  })
+  document.getElementById('editor-form').addEventListener('keydown', (event) => {
+    if (!(event.ctrlKey || event.metaKey)) return
+    if (event.key === 'Enter') { event.preventDefault(); document.getElementById('editor-form').requestSubmit(); return }
+    if (document.activeElement !== markdownInput) return
+    const action = ({ b: 'bold', i: 'italic', k: 'link' })[event.key.toLowerCase()]
+    if (action) { event.preventDefault(); applyMarkdownAction(action) }
+  })
+  const openEditor = (id) => {
+    const card = document.getElementById('task-' + id)
+    if (!card) return
+    editingId = id
+    const draft = drafts[id]
+    document.getElementById('editor-task-id').textContent = id
+    titleInput.value = draft?.title || card.dataset.originalTitle
+    markdownInput.value = draft?.body || card.dataset.originalBody
+    error.textContent = ''
+    setEditorMode('edit')
+    dialog.showModal()
+    titleInput.focus()
+  }
+  const closeEditor = () => { dialog.close(); editingId = null }
+  document.querySelectorAll('[data-edit-task]').forEach((button) => button.addEventListener('click', () => openEditor(button.dataset.editTask)))
+  document.querySelectorAll('.task-card').forEach((card) => card.addEventListener('dblclick', (event) => {
+    if (event.target.closest('.task-detail, button, a, input, select, textarea')) return
+    openEditor(card.id.replace(/^task-/, ''))
+  }))
+  document.getElementById('editor-close').addEventListener('click', closeEditor)
+  document.getElementById('editor-cancel').addEventListener('click', closeEditor)
+  dialog.addEventListener('click', (event) => { if (event.target === dialog) closeEditor() })
+  document.getElementById('editor-form').addEventListener('submit', (event) => {
+    event.preventDefault()
+    if (!editingId || !titleInput.value.trim()) { error.textContent = '标题不能为空。'; return }
+    const next = { ...drafts, [editingId]: { title: titleInput.value.trim(), body: markdownInput.value, updatedAt: new Date().toISOString() } }
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); drafts = next; applyDraft(editingId); closeEditor() }
+    catch { error.textContent = '浏览器存储不可用，草稿尚未保存。请复制 Markdown 备份。' }
+  })
+  document.getElementById('editor-reset').addEventListener('click', () => {
+    if (!editingId) return
+    const next = { ...drafts }; delete next[editingId]
+    try { localStorage.setItem(storageKey, JSON.stringify(next)); drafts = next; applyDraft(editingId) } catch {}
+    const card = document.getElementById('task-' + editingId)
+    titleInput.value = card.dataset.originalTitle
+    markdownInput.value = card.dataset.originalBody
+    setEditorMode('edit')
+  })
+  const toast = (message) => {
+    const element = document.getElementById('copy-toast')
+    element.textContent = message; element.hidden = false
+    clearTimeout(toast.timer); toast.timer = setTimeout(() => { element.hidden = true }, 1800)
+  }
+  const copyText = async (text) => {
+    if (navigator.clipboard?.writeText) {
+      try { await navigator.clipboard.writeText(text); return } catch {}
+    }
+    const area = document.createElement('textarea'); area.value = text; document.body.appendChild(area); area.select()
+    const copied = document.execCommand('copy'); area.remove(); if (!copied) throw new Error('copy failed')
+  }
+  document.querySelectorAll('[data-copy-task]').forEach((button) => button.addEventListener('click', async () => {
+    const id = button.dataset.copyTask
+    const card = document.getElementById('task-' + id)
+    const draft = drafts[id]
+    const text = '# ' + (draft?.title || card.dataset.originalTitle) + '\n\n' + (draft?.body || card.dataset.originalBody)
+    try { await copyText(text); toast('Markdown 已复制') } catch { toast('复制失败，请使用编辑器全选复制') }
+  }))
+})()
+</script></body></html>

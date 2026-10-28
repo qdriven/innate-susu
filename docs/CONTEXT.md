@@ -1,4 +1,4 @@
-# innate-labs 全局 Context
+# innate-desktop 全局 Context
 
 > 单一入口文档，回答五个问题：**做什么、架构是什么、模块是什么、插件模式是什么、协议是什么**。
 > 细节按第 8 节文档地图跳转；待执行任务在 [docs/sprints/](./sprints/README.md)。
@@ -8,15 +8,15 @@
 
 ## 1. 做什么
 
-**Innate 工作台（`innate-dogic`）× DeepSeek Harness（DSH）双向宿主。**
+**innate-desktop 工作台 × DeepSeek Harness（DSH）双向宿主。**
 
-DSH 是真正运行 Agent 会话、执行工具、提供 Harness Web UI 的外部运行时；magpie 是模型控制面与网关；`innate-dogic` 是托管它们的桌面工作台底座。三者分工不可互换：
+DSH 是真正运行 Agent 会话、执行工具、提供 Harness Web UI 的外部运行时；magpie 是模型控制面与网关；`innate-desktop` 是托管它们的桌面工作台。三者分工不可互换：
 
 | 对象 | 角色 | 是否在本仓 |
 | --- | --- | --- |
 | DSH（`@deepseek-ai/dsh`） | Agent runtime、会话与工具执行、Harness UI、profile/patch/插件机制 | 否；本机 npm 全局解析，系统 Node 启动 |
 | magpie | Provider/模型管理、Agent 接线、协议互译、路由与用量 | 只保留开发用 `bin/magpie.exe`，不持有源码 |
-| `innate-dogic` | 桌面壳、进程与 Surface 生命周期、模式门控、工作区、插件组合 | 是；唯一产品工程 |
+| `innate-desktop` | 桌面壳、进程与 Surface 生命周期、模式门控、工作区、插件组合 | 是；唯一产品工程 |
 
 两个方向都进主线（双向宿主，**不递归嵌入**）：
 
@@ -32,7 +32,7 @@ DSH 是真正运行 Agent 会话、执行工具、提供 Harness Web UI 的外�
 **单一 pnpm workspace，唯一产品工程 `innate-dogic`，四类同级模块：**
 
 ```text
-innate-labs/
+innate-desktop/
 ├─ innate-dogic/                唯一产品 monorepo
 │  ├─ apps/                     可独立启动的应用（desktop = Electron 主产品；shell = Node/Web 壳）
 │  ├─ plugins/                  可独立构建/测试/组合的插件（workspace、model-gateway）

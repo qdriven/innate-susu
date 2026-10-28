@@ -1,0 +1,731 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "innate-labs",
+  "generatedAt": "2026-10-28T03:08:23.846Z",
+  "sources": [
+    {
+      "path": "docs/sprints/S0-w0-baseline.md",
+      "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c"
+    },
+    {
+      "path": "docs/sprints/S1-w1-shell.md",
+      "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22"
+    },
+    {
+      "path": "docs/sprints/S2-w2-magpie.md",
+      "sha256": "6484446d0d246a9710d79b50948b53225447e2ba02cf8d960b261232fe6c95ec"
+    },
+    {
+      "path": "docs/sprints/S3-w3-workspace-panel.md",
+      "sha256": "3644996674564ae42a3e3bb765c843c6036dcd5ff072b3cd9d9d6871d808d970"
+    },
+    {
+      "path": "docs/sprints/S4-w4-terminal.md",
+      "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952"
+    },
+    {
+      "path": "docs/sprints/S5-w5-browser.md",
+      "sha256": "0eff10ae28a2eaf223d9dd50597bed0f7198263df8c63716dbba21e699357fb4"
+    },
+    {
+      "path": "docs/sprints/S6-q1-plan-snapshot.md",
+      "sha256": "3e07fd7cbef42988c2a0f489368c748ff3b7c7b014741e6b4dbcc2252b7a898a"
+    },
+    {
+      "path": "docs/sprints/S7-q2-canvas-board.md",
+      "sha256": "b60805253f623c8146039ea783f507b4ea2ffc49f69e40709a9f1334d81d33b8"
+    },
+    {
+      "path": "docs/sprints/S8-q3-task-execution.md",
+      "sha256": "0a75269ec694a027c3effc5d11e7254f9038a4898137f4ea6b48cc93400bc603"
+    }
+  ],
+  "sprints": [
+    {
+      "id": "S0",
+      "title": "W0 基线整树迁入",
+      "estimate": "0.5–1 天",
+      "declaredStatus": "下一执行项",
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c"
+      }
+    },
+    {
+      "id": "S1",
+      "title": "W1 壳：三栏 + token + 中栏多标签槽",
+      "estimate": "2–3 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S1-w1-shell.md",
+        "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22"
+      }
+    },
+    {
+      "id": "S2",
+      "title": "W2 magpie 收口进壳状态",
+      "estimate": "1–2 天",
+      "declaredStatus": "排队，可与 S3 并行",
+      "source": {
+        "path": "docs/sprints/S2-w2-magpie.md",
+        "sha256": "6484446d0d246a9710d79b50948b53225447e2ba02cf8d960b261232fe6c95ec"
+      }
+    },
+    {
+      "id": "S3",
+      "title": "W3 文件树变常驻右栏 Panel",
+      "estimate": "1–2 天",
+      "declaredStatus": "排队，可与 S2 并行",
+      "source": {
+        "path": "docs/sprints/S3-w3-workspace-panel.md",
+        "sha256": "3644996674564ae42a3e3bb765c843c6036dcd5ff072b3cd9d9d6871d808d970"
+      }
+    },
+    {
+      "id": "S4",
+      "title": "W4 terminal：pty + process:execute",
+      "estimate": "2–3 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952"
+      }
+    },
+    {
+      "id": "S5",
+      "title": "W5 browser Surface",
+      "estimate": "1–2 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S5-w5-browser.md",
+        "sha256": "0eff10ae28a2eaf223d9dd50597bed0f7198263df8c63716dbba21e699357fb4"
+      }
+    },
+    {
+      "id": "S6",
+      "title": "Q1 一句话 → project-snapshot 快照",
+      "estimate": "2 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S6-q1-plan-snapshot.md",
+        "sha256": "3e07fd7cbef42988c2a0f489368c748ff3b7c7b014741e6b4dbcc2252b7a898a"
+      }
+    },
+    {
+      "id": "S7",
+      "title": "Q2 人看的看板进中栏",
+      "estimate": "1–2 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S7-q2-canvas-board.md",
+        "sha256": "b60805253f623c8146039ea783f507b4ea2ffc49f69e40709a9f1334d81d33b8"
+      }
+    },
+    {
+      "id": "S8",
+      "title": "Q3 一条 task 串行执行 + 证据回写",
+      "estimate": "2–3 天",
+      "declaredStatus": "排队",
+      "source": {
+        "path": "docs/sprints/S8-q3-task-execution.md",
+        "sha256": "0a75269ec694a027c3effc5d11e7254f9038a4898137f4ea6b48cc93400bc603"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T0.1",
+      "sprintId": "S0",
+      "title": "整树拷贝",
+      "status": "todo",
+      "summary": "从 innate-labs 拷入 innate-dogic/ 全树（apps/packages/plugins/services、bin/magpie.exe、tsconfig.base.json）、tools/ 五个工程脚本、innate-project-canvas/（含 schema）。排除 node_modules、构建产物、sites、prototypes、references、labs 的 docs 与 .agents。",
+      "purpose": "本仓获得与 labs 相同的产品树与工具链，结构保持不变。",
+      "verification": "目录清单与 labs 一致（排除项除外）；无 node_modules/构建产物混入。",
+      "estimate": "0.5 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c",
+        "line": 5
+      }
+    },
+    {
+      "id": "T0.2",
+      "sprintId": "S0",
+      "title": "workspace 接线与依赖安装",
+      "status": "todo",
+      "summary": "合并根 pnpm-workspace.yaml（apps、packages、innate-dogic 四组、innate-project-canvas）；根 package.json 并入 labs 脚本与 devDeps，保留 ui:sync 与 @innate/ui；合并 vitest/tsconfig/gitignore；.npmrc 保持 @innate 私有源；pnpm install 并补 electron 二进制。",
+      "purpose": "一套 workspace 同时承载 susu-web 与 dogic 产品树。",
+      "verification": "pnpm install 无错；pnpm ls -r 同时列出 @susu/web 与全部 @dogic 包。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T0.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c",
+        "line": 12
+      }
+    },
+    {
+      "id": "T0.3",
+      "sprintId": "S0",
+      "title": "改名坏点收口",
+      "status": "todo",
+      "summary": "根 package.json name 改 innate-desktop；ui:sync 的 --dir 改指 innate-desktop（或改相对定位）；README 更新为双轨说明；docs/README.md 加 plan1 入口行。不改 git remote、不动产品代码。",
+      "purpose": "改名遗留断点一次清零，ui:sync 恢复可用。",
+      "verification": "pnpm ui:sync 幂等成功；仓库内无指向 innate-susu 绝对路径的脚本残留。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "T0.2"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c",
+        "line": 19
+      }
+    },
+    {
+      "id": "T0.4",
+      "sprintId": "S0",
+      "title": "门禁对齐与冒烟",
+      "status": "todo",
+      "summary": "check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失目录；逐项跑 build、typecheck、test（对照 labs 基线 83 项）、smoke:desktop、verify:overlay、package:portable、ui:sync。",
+      "purpose": "迁移动的保险——任何一步不过禁止开 S1。",
+      "verification": "四门禁与 labs 同绿；便携包含对话、magpie、只读工作区三项冒烟；输出留证 docs/susu/evidence/W0/。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T0.3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c",
+        "line": 26
+      }
+    },
+    {
+      "id": "T0.5",
+      "sprintId": "S0",
+      "title": "文档与执行源切换",
+      "status": "todo",
+      "summary": "docs/innate-dogic/sprints 与 plans 状态板顶部加「已由 plan1 取代、P 系列后置」标注；labs 仓 README 与 susu-migration.md 加冻结声明；plan1 状态板回写。",
+      "purpose": "新会话直达唯一执行源，旧板无待执行任务残留。",
+      "verification": "按 README 阅读顺序可直达 plan1 状态板；旧 P 状态板无「下一执行项」。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "T0.4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-w0-baseline.md",
+        "sha256": "060e10cc524bd1b9564e5f00529ed195c3f8463818c8a98a227e203df631607c",
+        "line": 33
+      }
+    },
+    {
+      "id": "T1.1",
+      "sprintId": "S1",
+      "title": "token 与 Tailwind 接入",
+      "status": "todo",
+      "summary": "desktop renderer 加 tailwindcss 与 @tailwindcss/vite、依赖 @innate/ui；renderer vite 配置挂插件；新建 globals.css（@import tailwindcss + @innate/ui/tokens.css + 两条 @source）；明暗走 .dark class；修订 style-guide 的 prefers-color-scheme 旧说法。",
+      "purpose": "壳层接入 @innate/ui token 体系，明暗可切。",
+      "verification": "明暗截图各一张；壳层文件无硬编码 hex；构建产物含编译后 Tailwind。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S0"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-w1-shell.md",
+        "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22",
+        "line": 5
+      }
+    },
+    {
+      "id": "T1.2",
+      "sprintId": "S1",
+      "title": "三段壳布局收口",
+      "status": "todo",
+      "summary": "新建 renderer shell/（TitlebarStrip、Sidebar、ContentArea），L2 组合件只消费 @innate/ui 单入口；拆 367 行 App.tsx，Titlebar/ModeGate 并入 shell，内联页拆 pages/；pages.ts 注册表与门控语义不动。",
+      "purpose": "orca 式三段壳；页面自包含可摘除。",
+      "verification": "smoke:desktop 通过（导航、模式 pill、窗口控制 DOM 断言）；simple/dev 门控与基线一致；空注册表负路径单测。",
+      "estimate": "1–2 天",
+      "blockedBy": [
+        "S0"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-w1-shell.md",
+        "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22",
+        "line": 12
+      }
+    },
+    {
+      "id": "T1.3",
+      "sprintId": "S1",
+      "title": "中栏多标签 Surface 槽",
+      "status": "todo",
+      "summary": "surface-host.ts 从单 view attach 扩为多 Surface 注册 + 单 attach 切换（detach 不销毁不重载）；中栏标签条列 harness 与 magpie-console；IPC 加 surface:list 与 surface:activate 进类型化契约。",
+      "purpose": "中栏成为可摘除客人的 Surface 槽。",
+      "verification": "CDP 断言切换后 harness URL 未变、未 reload；resize 后 bounds 正确；无 dsh 环境壳仍启动。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S0"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-w1-shell.md",
+        "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22",
+        "line": 19
+      }
+    },
+    {
+      "id": "T1.4",
+      "sprintId": "S1",
+      "title": "simple overlay 回归",
+      "status": "todo",
+      "summary": "全部改动复跑 verify:overlay 与 simple 模式手测（首启选模式、simple 首页、dev 页面不可见）。",
+      "purpose": "行为不回退红线复验。",
+      "verification": "overlay 7/7 断言输出；simple 模式截图入证据。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "S0"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-w1-shell.md",
+        "sha256": "5c87c38a925db1fe8c5a6f78ad6bfa35450f84ac546cb04b3630cc1cfd68fb22",
+        "line": 26
+      }
+    },
+    {
+      "id": "T2.1",
+      "sprintId": "S2",
+      "title": "网关健康状态 pill",
+      "status": "todo",
+      "summary": "main 侧复用 core/gateway 探测加轻量轮询（10s 级、退避）；状态机 未配置/探测中/健康/不可达；IPC 加 gateway:status 与事件推送；TitlebarStrip 渲染 pill，点击打开 magpie-console 或显式 hint。",
+      "purpose": "网关状态全局可见，不可达有原因不静默。",
+      "verification": "mock 网关状态机四态单测；真实环境三态截图；断网关 pill 变红且有 hint。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-w2-magpie.md",
+        "sha256": "6484446d0d246a9710d79b50948b53225447e2ba02cf8d960b261232fe6c95ec",
+        "line": 5
+      }
+    },
+    {
+      "id": "T2.2",
+      "sprintId": "S2",
+      "title": "launcher 状态外露",
+      "status": "todo",
+      "summary": "launcher.ts 暴露 magpie 生命周期事件经 ipc 推壳；不动 bin 探测/consoleKey/console 内核；disconnectDsh 状态回显。",
+      "purpose": "启动/退出/失败可见，接线恢复可操作。",
+      "verification": "事件序列断言；disconnectDsh 后 dsh 路由检测回读确认恢复。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-w2-magpie.md",
+        "sha256": "6484446d0d246a9710d79b50948b53225447e2ba02cf8d960b261232fe6c95ec",
+        "line": 12
+      }
+    },
+    {
+      "id": "T2.3",
+      "sprintId": "S2",
+      "title": "干净环境接线冒烟",
+      "status": "todo",
+      "summary": "tools 新增 smoke-magpie-wire.ts：隔离临时 DSH_HOME 裸 boot → magpie 接线 → dsh web 探活；只读/隔离命令，不碰真实用户配置；接 pnpm smoke:magpie。",
+      "purpose": "从零到接线的链路可重复验证。",
+      "verification": "全新临时 HOME 一次通过且重复跑幂等；真人对对话一轮属 UAT 留证。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-w2-magpie.md",
+        "sha256": "6484446d0d246a9710d79b50948b53225447e2ba02cf8d960b261232fe6c95ec",
+        "line": 19
+      }
+    },
+    {
+      "id": "T3.1",
+      "sprintId": "S3",
+      "title": "右栏常驻 Panel 化",
+      "status": "todo",
+      "summary": "plugin-workspace 的 renderer 迁到壳右栏插槽（宽度可拖拽）；dev 页面注册项移除；simple 右栏默认收起；plugin-workspace 的 main/shared 契约零改动。",
+      "purpose": "文件树/Git 常驻可见，页面注册表减负。",
+      "verification": "smoke:desktop 断言右栏常驻（simple 收起）；文件预览/Markdown/图片不回退。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-w3-workspace-panel.md",
+        "sha256": "3644996674564ae42a3e3bb765c843c6036dcd5ff072b3cd9d9d6871d808d970",
+        "line": 5
+      }
+    },
+    {
+      "id": "T3.2",
+      "sprintId": "S3",
+      "title": "workspace root 全局化",
+      "status": "todo",
+      "summary": "root 提升为壳级单源（main 已有 getRoot/pickRoot）；renderer 加 WorkspaceContext；main 暴露 workspace:rootChanged；契约 {rootPath, source} 一次定稳供 W4/Q3 消费。",
+      "purpose": "选定根成为全局事实，后续执行面共享 cwd。",
+      "verification": "选根后各面板同步；无效根显式错误并回退上一根。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-w3-workspace-panel.md",
+        "sha256": "3644996674564ae42a3e3bb765c843c6036dcd5ff072b3cd9d9d6871d808d970",
+        "line": 12
+      }
+    },
+    {
+      "id": "T3.3",
+      "sprintId": "S3",
+      "title": "布局状态快照",
+      "status": "todo",
+      "summary": "右栏布局状态（展开/选中/根/栏宽）版本化 JSON 持久化到 userData，启动恢复；不兼容 schema 安全回退默认布局。",
+      "purpose": "重载后工作区状态原样。",
+      "verification": "展开若干目录重载后恢复；破坏版本号回退默认布局的负路径测试。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-w3-workspace-panel.md",
+        "sha256": "3644996674564ae42a3e3bb765c843c6036dcd5ff072b3cd9d9d6871d808d970",
+        "line": 19
+      }
+    },
+    {
+      "id": "T4.0",
+      "sprintId": "S4",
+      "title": "harness.ts 关键路径单测",
+      "status": "todo",
+      "summary": "给 main/harness.ts 补单测（stdout 解析含畸形输出、就绪探针含 401/超时、停止路径 taskkill 调用）；进程交互注入 fakeChild，不真拉 dsh。",
+      "purpose": "最关键零测试文件获得护栏，测试基线只增。",
+      "verification": "新增至少 5 用例；现有 dsh 冒烟不回归。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S2",
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952",
+        "line": 5
+      }
+    },
+    {
+      "id": "T4.1",
+      "sprintId": "S4",
+      "title": "pty 服务",
+      "status": "todo",
+      "summary": "加 node-pty；新建 main/terminal/TerminalService（spawn/write/resize/exit、数据流转发）；宿主退出 taskkill 进程树回收；面板关闭即杀；异常退出显式 exit 事件；cwd 默认绑 S3 的 workspace root。",
+      "purpose": "壳自建终端的进程底座。",
+      "verification": "echo 真命令闭环、resize、exit 码上报契约测试；坏 shell 路径显式报错负路径。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S2",
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952",
+        "line": 12
+      }
+    },
+    {
+      "id": "T4.2",
+      "sprintId": "S4",
+      "title": "terminal Surface",
+      "status": "todo",
+      "summary": "加 @xterm/xterm + addon-fit；中栏标签内 React 终端面板；terminal:* 窄通道进类型化契约；scrollback 环形缓冲；多终端并存；simple 不渲染入口。",
+      "purpose": "dev 模式可开多终端真干活。",
+      "verification": "pnpm -v 与 git status 全链路；resize 跟随窗口；两会话输出隔离；simple 无入口负路径。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S2",
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952",
+        "line": 19
+      }
+    },
+    {
+      "id": "T4.3",
+      "sprintId": "S4",
+      "title": "process:execute 能力",
+      "status": "todo",
+      "summary": "process.execute 独立能力位（dev 默认开、simple 永久拒）；可执行文件白名单表落 userData；cwd 强制在 workspace root 子树内（防 .. 逃逸）；参数数组、禁 shell 拼接；超时与输出截断上限；与终端面板共用 pty 底座但独立通道。",
+      "purpose": "Q3 任务执行面的能力与安全地基。",
+      "verification": "负路径四件套（非白名单、cwd 越界、simple 调用、绕 preload 直连）全拒；正路径 git status 在选定根真实执行。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S2",
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952",
+        "line": 26
+      }
+    },
+    {
+      "id": "T4.4",
+      "sprintId": "S4",
+      "title": "无孤儿与资源上限",
+      "status": "todo",
+      "summary": "窗口关闭与宿主崩溃两路径的进程回收验证；并发 pty 上限（如 8）超限显式拒绝；scrollback 内存上限。",
+      "purpose": "不留孤儿进程，资源有界。",
+      "verification": "自动化脚本杀宿主后断言无遗留子进程；第 9 个 pty 被拒且 UI 有原因。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S2",
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-w4-terminal.md",
+        "sha256": "8148059147db7a7eff44688d01ee9e01b38b884973baa833b3a3fb17f2cea952",
+        "line": 33
+      }
+    },
+    {
+      "id": "T5.1",
+      "sprintId": "S5",
+      "title": "browser Surface",
+      "status": "todo",
+      "summary": "新建 main/browser/BrowserHost：WebContentsView + 独立持久分区 persist:browser-surface；setPermissionRequestHandler 全部 deny 并脱敏落日志；window.open 一律 shell.openExternal 外跳；will-download 系统保存对话框；注册为标签槽 Surface，可多标签。",
+      "purpose": "独立分区、权限默认拒、外链外跳、下载可控。",
+      "verification": "公开网页加载截图；geolocation 触发被拒且日志脱敏；window.open 跳系统浏览器；下载弹保存框。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S5-w5-browser.md",
+        "sha256": "0eff10ae28a2eaf223d9dd50597bed0f7198263df8c63716dbba21e699357fb4",
+        "line": 5
+      }
+    },
+    {
+      "id": "T5.2",
+      "sprintId": "S5",
+      "title": "最小地址栏 UI",
+      "status": "todo",
+      "summary": "地址栏 + back/forward/reload/stop + 加载进度；UI 只用 @innate/ui 原语与 token；不提供任意 JS 执行入口，devtools 默认关；不做收藏/历史。",
+      "purpose": "用户可控的最小浏览面。",
+      "verification": "导航/回退/刷新 DOM 断言；非 http(s) 输入被拒并提示；devtools 不可达负路径。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S5-w5-browser.md",
+        "sha256": "0eff10ae28a2eaf223d9dd50597bed0f7198263df8c63716dbba21e699357fb4",
+        "line": 12
+      }
+    },
+    {
+      "id": "T5.3",
+      "sprintId": "S5",
+      "title": "network:navigate 能力预留",
+      "status": "todo",
+      "summary": "main 登记 network:navigate 能力声明与白名单域配置占位；browser Surface 暴露受控 navigate/capture/title-url 快照 API；不开放 executeJavaScript。",
+      "purpose": "Q3 浏览类任务的受控执行面。",
+      "verification": "navigate + capture 隔离页面工作且截图入证据；renderer 直连越权不可达。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S5-w5-browser.md",
+        "sha256": "0eff10ae28a2eaf223d9dd50597bed0f7198263df8c63716dbba21e699357fb4",
+        "line": 19
+      }
+    },
+    {
+      "id": "T6.1",
+      "sprintId": "S6",
+      "title": "规划入口与网关调用",
+      "status": "todo",
+      "summary": "Sidebar 顶部一句话输入框；main 侧 planning/PlanService 经 magpie 网关调 LLM（复用 core/gateway 发现与 fetch）；prompt 内嵌 project-snapshot.schema.json 与只输出 JSON 约束 + workspace 摘要（不含文件内容）；网关不可达显式错误态。",
+      "purpose": "一句话目的进入规划链路。",
+      "verification": "mock 网关单测 prompt 组装与解析；真实环境一次人跑留证。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S5"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-q1-plan-snapshot.md",
+        "sha256": "3e07fd7cbef42988c2a0f489368c748ff3b7c7b014741e6b4dbcc2252b7a898a",
+        "line": 5
+      }
+    },
+    {
+      "id": "T6.2",
+      "sprintId": "S6",
+      "title": "schema 校验与落盘",
+      "status": "todo",
+      "summary": "剥围栏 → JSON.parse → innate-project-canvas validate 模块（进程内 import）校验；失败显式原因且不落盘；成功写 workspace 的 docs/sprints/（目录可配），frontmatter 含 id/来源/audit 状态；同名版本递增不覆盖。",
+      "purpose": "快照合法才存在，失败无副作用。",
+      "verification": "坏 JSON、缺字段、未知依赖三条负路径均不落盘且原因可达；合法快照可被 canvas audit 读取。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S5"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-q1-plan-snapshot.md",
+        "sha256": "3e07fd7cbef42988c2a0f489368c748ff3b7c7b014741e6b4dbcc2252b7a898a",
+        "line": 12
+      }
+    },
+    {
+      "id": "T6.3",
+      "sprintId": "S6",
+      "title": "audit 门",
+      "status": "todo",
+      "summary": "落盘前跑 innate-project-canvas audit（进程内 import）；不通过则快照标 invalid 并展示失败项，不进看板；audit 结论写回 frontmatter。",
+      "purpose": "幻觉依赖被挡在入库前。",
+      "verification": "构造幻觉依赖的固定模型输出被 audit 拦截并标 fail；合法快照 audit pass。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S5"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-q1-plan-snapshot.md",
+        "sha256": "3e07fd7cbef42988c2a0f489368c748ff3b7c7b014741e6b4dbcc2252b7a898a",
+        "line": 19
+      }
+    },
+    {
+      "id": "T7.1",
+      "sprintId": "S7",
+      "title": "看板 Surface",
+      "status": "todo",
+      "summary": "valid 快照经 canvas sync/generate 产出自包含 HTML（复用其生成器，壳内不重写渲染）；以只读 Surface 独立分区加载；侧栏列全部快照，invalid 灰显；快照变更重新生成产物级刷新。",
+      "purpose": "人在中栏看见 frontier、下一项与任务卡。",
+      "verification": "Q1 快照在看板完整可见（对照 JSON 字段）；invalid 灰显负路径；重载后内容更新。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S6"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S7-q2-canvas-board.md",
+        "sha256": "b60805253f623c8146039ea783f507b4ea2ffc49f69e40709a9f1334d81d33b8",
+        "line": 5
+      }
+    },
+    {
+      "id": "T7.2",
+      "sprintId": "S7",
+      "title": "状态变更门",
+      "status": "todo",
+      "summary": "看板只读；状态变更只允许 Q3 跑完回写或人编辑源文件后重新 audit；frontmatter 增加 status: draft|confirmed，Q1 产出默认 draft，人确认触发 re-audit，confirmed 后 Q3 才可取任务。",
+      "purpose": "草稿与正式分离，杜绝点一下改状态。",
+      "verification": "draft 下 Q3 取不到任务负路径；确认按钮触发 re-audit 且 fail 时拒绝；直接改 HTML 不影响快照事实源。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S6"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S7-q2-canvas-board.md",
+        "sha256": "b60805253f623c8146039ea783f507b4ea2ffc49f69e40709a9f1334d81d33b8",
+        "line": 12
+      }
+    },
+    {
+      "id": "T8.1",
+      "sprintId": "S8",
+      "title": "任务路由器",
+      "status": "todo",
+      "summary": "用 innate-project-canvas derive 取一条可执行 task（仅 confirmed 快照）；capability 路由：process:execute 走 T4.3 通道、agent:tools 走 DSH（需接线）、network:navigate 走 T5.3；执行器缺失显式 skipped 带原因；单飞串行锁，进行中禁止取下一条，可取消（杀进程树标 cancelled）。",
+      "purpose": "一条跑完才下一条的执行序。",
+      "verification": "三分支路由单测；skipped 带原因负路径；串行锁并发断言；取消路径进程杀净。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S7"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S8-q3-task-execution.md",
+        "sha256": "0a75269ec694a027c3effc5d11e7254f9038a4898137f4ea6b48cc93400bc603",
+        "line": 5
+      }
+    },
+    {
+      "id": "T8.2",
+      "sprintId": "S8",
+      "title": "证据回写",
+      "status": "todo",
+      "summary": "每次执行落证据（命令与退出码、截断输出、截图、会话摘要，不含 token）；快照 task 状态回写 done/failed/cancelled，回写经校验器 + audit 门后触发看板重生成；失败标 failed 停在 frontier，不自动跳下一条。",
+      "purpose": "执行结果可审计、快照始终合法。",
+      "verification": "真实跑一条 pnpm test 任务三处对账（证据目录、快照状态、看板刷新）；必败命令 fail closed 断言。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "S7"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S8-q3-task-execution.md",
+        "sha256": "0a75269ec694a027c3effc5d11e7254f9038a4898137f4ea6b48cc93400bc603",
+        "line": 12
+      }
+    },
+    {
+      "id": "T8.3",
+      "sprintId": "S8",
+      "title": "无外部依赖闭环",
+      "status": "todo",
+      "summary": "验证无 magpie/无 dsh 环境下纯 process:execute 任务从快照到证据全闭环；规划输入框给显式「规划需网关」提示；agent:tools 任务同环境显式 skipped。",
+      "purpose": "壳的基本执行力不锁死在外部运行时上。",
+      "verification": "停 magpie + 空临时 DSH_HOME 跑通一条终端任务；agent:tools 同环境 skipped 且原因显式。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S7"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S8-q3-task-execution.md",
+        "sha256": "0a75269ec694a027c3effc5d11e7254f9038a4898137f4ea6b48cc93400bc603",
+        "line": 19
+      }
+    }
+  ],
+  "modules": [],
+  "moduleEdges": []
+}

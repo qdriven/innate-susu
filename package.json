@@ -1,0 +1,11 @@
+{
+  "name": "innate-desktop",
+  "private": true,
+  "scripts": {
+    "ui:sync": "bun D:/innate-workspace/framework/innate-fe/innate-fe-cli/src/index.ts install --dir . --root D:/innate-workspace/framework/innate-fe",
+    "ui:sync:bump": "bun D:/innate-workspace/framework/innate-fe/innate-fe-cli/src/index.ts install --dir . --root D:/innate-workspace/framework/innate-fe --bump patch"
+  },
+  "dependencies": {
+    "@innate/ui": "^0.1.1"
+  }
+}

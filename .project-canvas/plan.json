@@ -1,0 +1,2041 @@
+{
+  "schemaVersion": "1.0.0",
+  "request": "请用 project canvas plugin 展示 innate-desktop 当前项目需要做的事情，基于 docs/susu/plan2 的 W0–W5、Q1–Q3 迁移计划",
+  "spec": {
+    "title": "innate-desktop 当前迁移与项目执行画布",
+    "goal": "按 Plan2 完成 labs 基线迁移、桌面工作台收口和项目任务闭环，所有任务以真实验收证据为准。",
+    "scope": [
+      "W0–W5：基线、桌面壳、运行时、工作区、Terminal 与 Browser",
+      "Q1–Q3：计划生成、人侧项目看板与单任务执行",
+      "每个叶子任务包含实施说明、验收标准和证据要求"
+    ],
+    "nonGoals": [
+      "不创建 GitHub Issue、分支、提交或 PR",
+      "不在本展示中执行任何迁移或项目任务",
+      "不迁 references/prototypes，不 fork orca，不提前展开旧 P 系列平台 backlog",
+      "不恢复已删除的 apps/susu-web 验证应用"
+    ],
+    "acceptance": [
+      "9 个阶段、66 个叶子任务与 docs/susu/plan2 内容一致",
+      "依赖顺序为 W0→W1，W2/W3 并行，合流后 W4→W5→Q1→Q2→Q3",
+      "计划通过 project-canvas validate，页面数量与 plan.json 一致",
+      "所有执行状态均为 not_started，Issue 和运行记录均为空"
+    ],
+    "assumptions": [
+      "旧 apps/susu-web 已删除，当前扫描只发现根项目 innate-desktop；待迁移模块不伪装为已存在模块",
+      "叶子任务暂归根项目影响范围，新模块在对应阶段真实建立后再补充扫描",
+      "Plan2 全部任务待执行，evidence 字段表示需要产出的证据，不表示证据已经存在"
+    ],
+    "modulesTouched": [
+      "innate-desktop"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "E-W0",
+      "parentId": null,
+      "title": "W0：基线迁入",
+      "description": "在不重排 innate-dogic/ 模块、不改桌面布局和不新增 Surface 的前提下，把 labs 的可运行基线迁入 innate-desktop。旧 @susu/web 验证应用已删除，不纳入迁移或门禁；@innate/ui 由新桌面 renderer 在 W1 接入。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W0 的全部叶子任务完成且阶段证据齐全",
+        "在不重排 innate-dogic/ 模块、不改桌面布局和不新增 Surface 的前提下，把 labs 的可运行基线迁入 innate-desktop。旧 @susu/web 验证应用已删除，不纳入迁移或门禁；@innate/ui 由新桌面 renderer 在 W1 接入。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W0-baseline.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W0/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.1",
+      "parentId": "E-W0",
+      "title": "冻结源基线并建立迁移清单",
+      "description": "改动位置：docs/susu/plan2/evidence/W0/；不改产品代码。。实施：记录 labs 与 innate-desktop 的 commit、工作区状态和 Node/pnpm 版本。；在 labs 运行现有 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop，记录实测测试数，而非照抄历史 83。；列出迁移文件白名单：innate-dogic/、tools/、innate-project-canvas/ 和必要根配置。；列出排除项：.git、node_modules、构建产物、references、prototypes、真实用户配置和密钥。；对 bin/magpie.exe 记录版本与哈希，确保后续可核对。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "白名单中的每个 workspace 包都能映射到目标路径；排除项不出现在拷贝清单。",
+        "源基线可复现，实测命令和测试数已保存，迁移清单经复核。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.1）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.2",
+      "parentId": "E-W0",
+      "title": "在源基线修复启动日志脱敏",
+      "description": "改动位置：labs 的 apps/desktop/src/main/harness.ts、services/harness-runtime/src/index.ts 及对应测试；修复通过后重新记录源 commit。。实施：增加共享或局部最小 redactLaunchSecrets，将 DSH/magpie URL 的 token/k/key 等查询参数替换为 [redacted]。；保证运行时可变状态仍持有真实认证 URL，只有日志输出脱敏。；桌面内存日志、落盘日志和 service log callback 全部经过同一脱敏边界。；不借本任务调整进程启动参数或 UI。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.1"
+      ],
+      "acceptance": [
+        "包含 dsh web: http://127.0.0.1:<port>/?token=secret 与 magpie ?k=secret 的夹具在日志中被脱敏；正常 URL 和非敏感错误仍可读；原始 token 不出现在任何日志断言。",
+        "安全测试通过，W0.1 基线门禁重新全绿，目标拷贝源包含此修复。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.2）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.3",
+      "parentId": "E-W0",
+      "title": "统一目标仓工程身份与 workspace",
+      "description": "改动位置：目标根 package.json、pnpm-workspace.yaml、.npmrc、README、UI sync 脚本配置。。实施：根工程名统一为 innate-desktop，旧 @susu/web 应用和专属脚本保持删除，不重新加入 workspace。；workspace 同时包含 apps/*、innate-dogic/apps/*、packages/*、plugins/*、services/*、sites 不适用项不添加，以及 innate-project-canvas。；合并 pnpm onlyBuiltDependencies/allowBuilds 配置，Electron postinstall 与目标现有 esbuild 规则均保留。；ui:sync 使用当前目标目录和自动发现 innate-fe；移除写死的 innate-susu 目标路径。；对齐包管理器与 Node engine；若 labs/root 与新桌面工具链版本不同，先记录兼容矩阵，不批量降级依赖。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.2"
+      ],
+      "acceptance": [
+        "pnpm install 成功且 lockfile 不含旧 Web importer；pnpm ui:sync -- --dry-run 显示正确目标根，不写工作区外路径。",
+        "目标身份、workspace 和私有 UI 消费路径可重复，不依赖原目录名或废弃应用。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.3）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.4",
+      "parentId": "E-W0",
+      "title": "按白名单迁入产品与画布模块",
+      "description": "改动位置：目标 innate-dogic/、innate-project-canvas/。。实施：原样复制 W0.1 白名单中的源码、resources、package/tsconfig 和 magpie 二进制。；保留 @dogic/*、@innate-labs/project-canvas 包名及 exports，避免本阶段改写 imports。；不复制 labs 根 README 中的旧相对文档链接，不覆盖目标已有 docs。；检查所有 workspace 依赖均能由 W0.3 的 patterns 解析。；检查没有 .env、真实 console-key.json、DSH profile 或用户快照进入目标仓。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.3"
+      ],
+      "acceptance": [
+        "pnpm -r list --depth -1 能看到预期模块；源码 diff 仅含 W0.2 和明确的路径适配；敏感文件扫描无结果。",
+        "所有计划模块落位且来源可追踪，无排除目录和真实配置。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.4）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.5",
+      "parentId": "E-W0",
+      "title": "迁入并适配工程工具与根脚本",
+      "description": "改动位置：目标 tools/、根 package.json、tsconfig/vitest 配置。。实施：迁入 smoke-desktop、verify-overlay、package-portable、check-typescript 等工具。；把工具中的 INNATE_WORKSPACE_ROOT 和相对路径解析适配新根；保留显式环境变量覆盖。；根脚本补齐 build/typecheck/test/check:typescript/dev/dev:shell/smoke:desktop/verify:overlay/package:portable。；新桌面应用的 build/typecheck 纳入总门禁；不保留指向旧 Web 包的 filter 或空壳脚本。；CI 或本地门禁脚本记录实际命令顺序，避免递归调用自身。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.4"
+      ],
+      "acceptance": [
+        "pnpm build && pnpm typecheck && pnpm test && pnpm check:typescript 全绿；测试数不少于 W0.1 源基线，新桌面构建成功。",
+        "目标根一套命令可验证全部已迁入模块，工具不引用 labs 绝对路径。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.5）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.6",
+      "parentId": "E-W0",
+      "title": "恢复桌面开发和基线行为",
+      "description": "改动位置：仅在路径适配必要时修改 desktop 配置；资源解析保持原语义。。实施：启动 Electron 开发模式，验证单实例、窗口控制、simple/dev 模式选择。；在隔离临时 userData/DSH_HOME 中验证 magpie 检测、模型状态、Harness 启动与控制台 Surface。；验证工作区选根、文件/Markdown/图片预览、Git status/diff。；验证 simple overlay 7/7 与 Surface 切换不重载。；对照 labs 记录每项相同/差异；行为差异必须在本阶段消除，不能留给 W1。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.5"
+      ],
+      "acceptance": [
+        "pnpm verify:overlay && pnpm smoke:desktop 全绿；真实 DSH/magpie 集成结果另记，不用 mock 替代。",
+        "M0–M2 行为矩阵全部与源基线一致，日志脱敏仍有效。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.6）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.7",
+      "parentId": "E-W0",
+      "title": "验证便携目录与资源完整性",
+      "description": "改动位置：electron-builder 配置、package scripts、tools/package-portable，仅修路径与缺漏。。实施：构建目录型便携包，确认 renderer/main/preload、simple patch 和 magpie.exe 位于预期位置。；从便携目录运行真实 Electron 冒烟，不使用开发服务器代替。；检查关闭后无本任务启动的 Harness/console 孤儿进程。；检查包内无开发仓绝对路径、用户配置和认证信息。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.6"
+      ],
+      "acceptance": [
+        "便携冒烟通过，资源清单和进程检查入证据。",
+        "便携目录可复制到另一干净目录运行，行为与开发基线一致。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.7）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W0.8",
+      "parentId": "E-W0",
+      "title": "切换迁移执行源并冻结基线",
+      "description": "改动位置：docs/README.md、相关 Sprint 索引、Plan2 evidence、目标 README。。实施：标记 Plan2 为 labs→innate-desktop 的 W/Q 迁移执行源，旧 P 系列标为后续 backlog。；保留 M4/M5 等历史文档链接，但明确不是本阶段任务。；保存 W0 全部命令、截图、测试数、版本和已知限制。；创建可回退的 W0 基线工作点；此后 labs 只收关键 bugfix，目标仓承担前向开发。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.7"
+      ],
+      "acceptance": [
+        "新会话从目标 README 能唯一找到 W1 任务，不会同时被引导执行 P0。",
+        "W0.1–W0.8 均有证据，W0 便携包保留，才允许开始 W1。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W0-baseline.md（W0.8）",
+        "验收记录：docs/susu/plan2/evidence/W0/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-W1",
+      "parentId": null,
+      "title": "W1：三栏壳与中栏 Surface 槽",
+      "description": "把现有单页 React 组合收敛为 titlebar、左栏、中栏、右栏的桌面壳；中栏支持多 Surface 标签和不同 provider，切换时 detach 而非销毁。只改组合和生命周期，不重写 magpie/DSH 协议，不实现 terminal/browser。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W1 的全部叶子任务完成且阶段证据齐全",
+        "把现有单页 React 组合收敛为 titlebar、左栏、中栏、右栏的桌面壳；中栏支持多 Surface 标签和不同 provider，切换时 detach 而非销毁。只改组合和生命周期，不重写 magpie/DSH 协议，不实现 terminal/browser。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W1-shell.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W1/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.1",
+      "parentId": "E-W1",
+      "title": "固定现有页面与 Surface 行为基线",
+      "description": "改动位置：desktop renderer/main 测试、tools/smoke-desktop。。实施：为 simple/dev 页面集合、默认页、模式切换和 Harness 启动状态补回归断言。；记录 Harness 与 magpie 控制台 show/hide/bounds/close 的现有行为。；增加“离开对话再返回，URL 未变不 reload”和“显式停止才 close”的测试。；保存当前窗口尺寸、resize 与 WebContents bounds 计算证据。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W0.8"
+      ],
+      "acceptance": [
+        "测试在 W0 实现上通过；后续重构使用同一组断言。",
+        "行为基线覆盖现有公开页面和两个 WebContents Surface。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.1）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.2",
+      "parentId": "E-W1",
+      "title": "给桌面 renderer 接入目标 UI 基座",
+      "description": "改动位置：apps/desktop/package.json、electron.vite 配置、renderer 入口 CSS/Theme 组合。。实施：添加 @innate/ui、Tailwind 与 Vite 插件依赖，按消费方规范配置本仓源码和 UI 包源码扫描，路径以新 desktop 实际位置为准。；引入 @innate/ui/tokens.css 和宿主 ThemeProvider，明暗只经 .dark class。；建立旧 CSS 到新语义 token 的映射，先桥接壳样式，不要求一次重写所有业务页。；禁止深引 @innate/ui 内部路径，不在本仓复制 Button/Card 等 primitive。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.1"
+      ],
+      "acceptance": [
+        "桌面明暗截图、桌面构建和 typecheck 通过；代表页面无裸样式；旧 simple/dev 行为不变。",
+        "桌面 renderer 可消费 UI 基座，主题和 token 有唯一来源。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.2）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.3",
+      "parentId": "E-W1",
+      "title": "抽取桌面壳组合",
+      "description": "改动位置：renderer App.tsx、Titlebar、pages、新增 shell/ 组合文件。。实施：将 titlebar、Sidebar、ContentArea、RightPanelHost 拆成明确组件，App 只负责组合和顶层状态。；页面注册表扩展 slot/mode 等必要元数据，保持现有页面 id 与门控。；左栏只负责导航与状态；右栏先承载可拆卸容器，不把工作区逻辑写回 App。；simple 模式隐藏开发 Panel 和入口，dev 模式保持现有全部功能。；新组合使用 @innate/ui primitive 与语义 token；业务逻辑保持原实现。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.2"
+      ],
+      "acceptance": [
+        "导航、模式切换、窗口控制、状态轮询与旧行为一致；删除一个可选页面注册时壳仍启动。",
+        "三栏布局可运行，App 不再直接实现每块壳 UI，W0 冒烟全绿。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.3）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.4",
+      "parentId": "E-W1",
+      "title": "建立 provider 中立的 Surface 标签模型",
+      "description": "改动位置：packages/core/src/surface.ts、renderer surfaces/、surface 测试。。实施：复用 SurfaceDescriptor/Registry，定义 renderer 标签状态只保存 id/kind/providerId/title/workspaceId/capabilities。；定义 provider 注册接口，至少容纳 webcontents 与 renderer document/panel 两类实现；terminal/browser 只保留现有 kind，不建空实现。；实现 SurfaceTabs：open/activate/deactivate/close，激活项持久化安全 id。；保持 snapshot v1 可读；新增元数据必须可选，非法版本安全回退。；URL token、webContents、ChildProcess 不进入 renderer 标签状态。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.3"
+      ],
+      "acceptance": [
+        "多 Surface 打开/切换/关闭、activeId 恢复、重复 id、非法 descriptor、旧快照兼容单测。",
+        "标签条不感知 Harness/magpie 私有类型，生命周期语义与现有 Registry 一致。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.4）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.5",
+      "parentId": "E-W1",
+      "title": "将 Harness 与控制台接入统一 Surface 槽",
+      "description": "改动位置：main surface-host.ts、ipc.ts、preload、renderer HarnessPage/ConsolePage。。实施：增加 provider 中立的 surface show/hide/bounds/close 窄 IPC，参数为安全 descriptor、provider 句柄和 bounds。；main 内部将认证 URL 解析限制在对应 runtime provider；通用 renderer 不提交任意认证 URL。；保留旧 Harness/console IPC 作为临时适配，逐一转到新 SurfaceTabs。；切换标签只 detach；URL 未变不 reload；显式 close 才销毁 view。；新路径全绿后删除重复 renderer 状态和无调用旧通道，保留 runtime 启动 API。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.4"
+      ],
+      "acceptance": [
+        "Harness 与控制台交替切换不重载；resize/maximize bounds 正确；关闭其中一个不影响另一个；伪造 providerId 被拒。",
+        "两个 WebContents 客人使用同一中栏槽，无专用重复标签逻辑，token 不进快照。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.5）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.6",
+      "parentId": "E-W1",
+      "title": "保留可摘除的运行时降级",
+      "description": "改动位置：renderer 组合、runtime provider 注册与错误页。。实施：DSH 未安装、未启动或 provider 注册失败时，壳、导航和其他本地页面仍可用。；对话 Surface 显示明确启动/重试/查看提示，不白屏、不阻塞整个 App。；禁用 magpie console provider 时只移除其标签和贡献，不停止 Harness。；不为 terminal/browser 添加无功能入口。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.5"
+      ],
+      "acceptance": [
+        "模拟 DSH 缺失、控制台启动失败、provider dispose；壳与其余 Surface 保持可用。",
+        "任一客人失败只影响自身，错误和恢复动作显式可见。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.6）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W1.7",
+      "parentId": "E-W1",
+      "title": "完成壳与便携回归",
+      "description": "改动位置：tools/smoke-desktop、证据文档。。实施：更新 DOM 断言覆盖三栏、标签、simple/dev 与错误降级。；运行全量门禁、overlay 和开发桌面冒烟。；构建便携目录，重复多 Surface 切换、resize、关闭回收。；保存明暗截图和生命周期日志摘要，检查无 token。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.6"
+      ],
+      "acceptance": [
+        "W0 所有行为不回退，新生命周期断言全绿。",
+        "W1.1–W1.7 证据齐全，才允许 W2/W3 并行开始。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W1-shell.md（W1.7）",
+        "验收记录：docs/susu/plan2/evidence/W1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-W2",
+      "parentId": null,
+      "title": "W2：magpie 与 DSH 运行链路收口",
+      "description": "让桌面通过明确契约管理 magpie 生命周期、控制台、状态和接线提示，并对照收敛两套 Harness 实现。保留现有 DSH/magpie 协议，不复制 per-agent 账号或模型配置体系。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W2 的全部叶子任务完成且阶段证据齐全",
+        "让桌面通过明确契约管理 magpie 生命周期、控制台、状态和接线提示，并对照收敛两套 Harness 实现。保留现有 DSH/magpie 协议，不复制 per-agent 账号或模型配置体系。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W2-runtime.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W2/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.1",
+      "parentId": "E-W2",
+      "title": "建立运行链路和行为对照矩阵",
+      "description": "改动位置：runtime 测试与 evidence/W2/behavior-matrix.md。。实施：列出 desktop launcher/core、plugins/model-gateway、services/model-gateway 的职责重叠与独有行为。；列出 desktop main/harness.ts 与 services/harness-runtime 在 DSH_HOME、首次 profile、patch、Node 解析、端口、状态、日志、停止上的差异。；固定目标链：gateway ensureRunning → 必要时裸 boot profile → 隔离环境 wire → Harness launch → Surface show。；明确 console 与 gateway 是两个进程/认证域，不共享猜测的 key。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.7"
+      ],
+      "acceptance": [
+        "每个差异都有保留、收敛或删除决定及对应测试。",
+        "没有“直接换实现但未覆盖差异”的未决项。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.1）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.2",
+      "parentId": "E-W2",
+      "title": "统一 magpie sidecar 生命周期",
+      "description": "改动位置：services/model-gateway、desktop main 组合、plugins/model-gateway 必要适配。。实施：复用 MagpieGateway ensureRunning/healthcheck/崩溃退避，注入 binary、env、log 和隔离配置。；桌面启动 magpie 时区分 desktop、serve 与已存在健康实例，不重复启动。；将停止、异常退出、健康超时映射为稳定的 GatewayStatus。；保留 DirectModelGateway 降级，但 UI 必须明确“直连/未安装/未运行”，不能显示假健康。；不在本任务移动 magpie web console 的 key 管理。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.1"
+      ],
+      "acceptance": [
+        "已运行复用、未安装、启动超时、健康恢复、异常退出退避、显式停止不再重启等契约测试。",
+        "桌面不再维护第二套等价的 serve 生命周期，状态可由 SDK 契约表达。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.2）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.3",
+      "parentId": "E-W2",
+      "title": "收口 magpie CLI、模型与接线操作",
+      "description": "改动位置：desktop main IPC/preload、model-gateway MagpieCli、models/tools 页面适配。。实施：模型目录、provider/agent 状态、quota 和 wire/unwire 通过类型化 gateway facade 调用。；保留 execFile 参数数组与超时；不在 renderer 传命令行。；写操作仅在用户明确动作触发；自动测试使用 mock 或隔离临时 DSH_HOME。；断开后恢复默认模型的结果、失败原因和下一步 hint 显式返回。；不引入具体 Agent 的账号、provider pool 或用量实现。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.2"
+      ],
+      "acceptance": [
+        "ModelGateway 契约测试、CLI 输出解析、超时/非零退出、伪造 agent/model 参数负路径。",
+        "桌面模型与接线功能可运行，真实用户配置不被自动测试修改。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.3）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.4",
+      "parentId": "E-W2",
+      "title": "保留并适配受管 magpie 控制台",
+      "description": "改动位置：desktop launcher.ts、console Surface provider、key 存储。。实施：控制台继续使用独立回环端口与稳定受管 key，stdout magpie web on <url?k=> 只在 main 解析。；key 文件仅存 userData，权限与损坏重生成行为有测试；日志和快照只保留脱敏地址。；console Surface 使用 W1 通用生命周期，启动失败只影响控制台。；stop/dispose 回收自己启动的进程，不终止非本应用拥有的已有实例。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.3"
+      ],
+      "acceptance": [
+        "重复 show 不重复 spawn、URL 不变不 reload、认证链接缺失报错、进程退出状态可见、关闭无孤儿。",
+        "控制台内嵌和外跳行为与基线一致，key 不泄漏。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.4）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.5",
+      "parentId": "E-W2",
+      "title": "收敛 Harness 共享实现并保留桌面语义",
+      "description": "改动位置：services/harness-runtime、desktop main/harness.ts 与 runtime adapter。。实施：将系统 Node 解析、端口分配、stdout URL 捕获、就绪探测、脱敏日志、状态事件和停止放入壳无关实现。；配置项显式覆盖 DSH_HOME、patchPaths、userData/log、启动超时；桌面继续默认真实用户 DSH_HOME，测试必须注入隔离目录。；保持 simple 模式 --profile web --patch 与 dev web 参数语义。；保留首次 DSH_HOME 先裸 boot 再 wire 的顺序；不得把 bootBackend 的具体默认模型静默带入桌面。；Windows 使用进程树回收；非 Windows 使用明确信号并等待退出。；新实现通过对照后，desktop 删除私有重复逻辑，仅保留状态/IPC/Surface adapter。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.4"
+      ],
+      "acceptance": [
+        "Node shim、ELECTRON_RUN_AS_NODE 清理、首次/非首次启动、patch、重复 launch、60s/120s 超时配置、异常退出、停止进程树、日志脱敏。",
+        "只有一套 Harness 进程实现；桌面状态、overlay 和真实对话与 W1 基线一致。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.5）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.6",
+      "parentId": "E-W2",
+      "title": "将运行状态接入壳状态区",
+      "description": "改动位置：Titlebar/Sidebar 状态、overview/models/chat 页面、事件契约。。实施：状态区区分 gateway、console、Harness，不用单个“在线”掩盖部分失败。；用事件更新运行状态，必要时低频 reconciling，移除无意义重复轮询。；对未安装、未接线、网关断开、模型为空、启动超时给出具体下一步。；simple 只显示用户可理解的状态和设置入口，dev 可查看诊断细节。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.5"
+      ],
+      "acceptance": [
+        "各状态转换 UI 测试；断开 gateway 后提示出现且恢复后可重试；无明文 token。",
+        "用户能从壳判断当前阻塞在哪一层，不需查看原始进程日志。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.6）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.7",
+      "parentId": "E-W2",
+      "title": "隔离环境完成真实集成链",
+      "description": "改动位置：集成测试脚本与证据，不写真实用户配置。。实施：创建临时 DSH_HOME/userData/magpie 配置和空闲回环端口。；启动 magpie，裸 boot DSH 生成 profile，在隔离环境选择测试模型并 wire。；启动 Harness，嵌入对话 Surface，完成一次最小真实会话。；执行 unwire/default 和停止，验证临时配置恢复与进程回收。；另跑无 magpie、无 DSH 的降级冒烟，纯壳功能仍可使用。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.6"
+      ],
+      "acceptance": [
+        "真实链路和降级链路分别通过；证据不含 key/token，临时目录清理。",
+        "gateway→wire→chat 全链路真实通过，失败路径显式可诊断。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.7）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W2.8",
+      "parentId": "E-W2",
+      "title": "全量回归与运行时交接",
+      "description": "改动位置：文档、工具、证据。。实施：",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.7"
+      ],
+      "acceptance": [
+        "W0/W1 行为不回退，W2.1 矩阵每项有结果。",
+        "W2.1–W2.8 全绿后与 W3 合流，再开始 W4。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W2-runtime.md（W2.8）",
+        "验收记录：docs/susu/plan2/evidence/W2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-W3",
+      "parentId": null,
+      "title": "W3：只读工作区与共享项目上下文",
+      "description": "将现有工作区从单一 dev 页面拆成右栏常驻文件/Git Panel 与中栏文档标签，保留全部只读安全边界，并提供 WorkspaceContext 供 W4 terminal 使用。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W3 的全部叶子任务完成且阶段证据齐全",
+        "将现有工作区从单一 dev 页面拆成右栏常驻文件/Git Panel 与中栏文档标签，保留全部只读安全边界，并提供 WorkspaceContext 供 W4 terminal 使用。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W3-workspace.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W3/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.1",
+      "parentId": "E-W3",
+      "title": "固定 WorkspaceService 安全与行为契约",
+      "description": "改动位置：plugins/workspace/src/main/index.test.ts、shared 类型与集成夹具。。实施：为 get/set root、list、read、gitStatus、gitDiff 建立当前行为基线。；覆盖空路径、绝对路径、..、NUL、符号链接逃逸、非文件读取和不存在 root。；固定文本 2 MB、图片 5 MB、diff 500K 字符、status 500 条等现有限制。；Git 测试覆盖 rename/copy、detached HEAD、非 repo、超时和参数注入尝试。；本任务只补测试和必要安全修复，不增加写入 API。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W1.7"
+      ],
+      "acceptance": [
+        "所有正/负路径在迁入实现上通过。",
+        "后续 UI 拆分不能绕过或削弱这些契约。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.1）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.2",
+      "parentId": "E-W3",
+      "title": "建立 WorkspaceContext 与窄 IPC",
+      "description": "改动位置：workspace shared、desktop main/preload、kernel 服务注册。。实施：定义 WorkspaceContext { workspaceId, root, name }，root 只代表用户选定上下文，不代表调用方已获任意文件权限。；main 统一持有当前 WorkspaceService，root 变更发布类型化事件。；preload 继续只暴露六个只读方法及必要的 root 变更订阅，不暴露 Node path/fs。；每次 list/read/Git 仍在 main 做 canonical root 校验，不能因 context 已选而跳过。；为 W4 提供 main 内部受信 root 解析，不提供 renderer 任意 cwd 执行接口。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.1"
+      ],
+      "acceptance": [
+        "root 切换事件、旧 root 请求、跨 root 路径和伪造 workspaceId 均被正确处理。",
+        "文件树、文档和未来 terminal 可引用同一 root，权限语义没有扩大。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.2）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.3",
+      "parentId": "E-W3",
+      "title": "将文件树与 Git 拆为右栏 Panel",
+      "description": "改动位置：workspace renderer、desktop RightPanelHost、workspace UI plugin。。实施：通过 workbench.registerPanel 注册文件/Git Panel，保留 DI 获取 WorkspaceApi。；文件树支持目录懒加载、展开/收起、选中与刷新；Git Panel 显示分支和变更。；Panel 可在 dev 右栏常驻或收起，不抢占中栏 Surface 身份。；simple 模式不暴露开发工作区 Panel；无 root 时显示选择目录动作。；使用 @innate/ui primitive 和语义 token，业务状态留在 workspace 插件。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.2"
+      ],
+      "acceptance": [
+        "注册/卸载 Panel、目录加载、错误提示、模式门控和右栏 resize 测试。",
+        "右栏不依赖 App.tsx 内工作区实现，禁用插件只移除自身 Panel。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.3）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.4",
+      "parentId": "E-W3",
+      "title": "将文件和 diff 接入中栏文档标签",
+      "description": "改动位置：workspace renderer FilePreview/GitPanel、W1 SurfaceTabs。。实施：文件选中打开 document descriptor，id 由 workspaceId 与规范化相对路径稳定派生。；重复选择同一文档激活已有标签，不重复读取；关闭标签不关闭文件树或整个工作区。；Git diff 作为只读 document，支持 staged/unstaged 视图，不提供 apply/stage/commit。；文档标签 deactivate 保留安全 UI 状态，重新激活时按需要刷新内容。；文件不存在、超出大小、不支持二进制等错误只影响当前文档。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.3"
+      ],
+      "acceptance": [
+        "多文档打开/切换/关闭、重复激活、跨 root 同路径 id、错误隔离和 Git 只读测试。",
+        "文件树是 Panel，文件/diff 是中栏 Document，没有为每文件创建 WebContentsView。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.4）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.5",
+      "parentId": "E-W3",
+      "title": "适配 Markdown、高亮与主题",
+      "description": "改动位置：FilePreview、Markdown/renderer 样式、syntax-highlighting 主题适配。。实施：保留 GFM、相对文档链接、相对图片和文档根包含检查。；外部 HTTP(S) 链接经系统浏览器，其他协议默认拒绝。；Shiki 明暗跟随宿主 .dark 状态，语言按需加载，失败/超大文件回退纯文本。；将旧硬编码颜色替换为语义 token；不为 Markdown 另建主题事实源。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.4"
+      ],
+      "acceptance": [
+        "明暗截图、代码高亮、纯文本回退、链接/图片逃逸和恶意协议负路径。",
+        "预览效果可用且主题统一，安全规则与源基线一致。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.5）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.6",
+      "parentId": "E-W3",
+      "title": "恢复 root、展开状态与文档快照",
+      "description": "改动位置：WorkspaceService 状态存储、renderer snapshot、版本迁移测试。。实施：root 继续存用户数据目录，采用原子写入并处理损坏文件。；保存版本化安全快照：root 引用、展开目录、打开文档 descriptor、activeId；不存文件内容或 diff 全文。；重载后 root 失效时显示重新选择，不静默访问旧路径。；snapshot 版本不兼容时保留旧文件并安全回退空布局，给出提示。；WorkspaceContext root 与 W4 将要消费的值一致。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.5"
+      ],
+      "acceptance": [
+        "正常恢复、部分文件已删除、root 已移动、损坏 JSON、旧版本/未来版本、原子写失败。",
+        "重载恢复可用工作区，无敏感内容和静默数据覆盖。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.6）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W3.7",
+      "parentId": "E-W3",
+      "title": "完成只读工作区端到端验收",
+      "description": "改动位置：tools/smoke-desktop 与证据。。实施：选择测试 root，展开目录，打开文本/Markdown/图片和 Git diff。；切换 Harness/console/document，验证各 Surface 状态不互相销毁。；重载恢复 root、展开项和文档；切换 root 后旧文档按策略关闭或标记不可用。；运行路径安全、全量门禁、overlay 和便携冒烟。；记录 WorkspaceContext 输出，供 W4.1 验证 cwd；本阶段不伪造 terminal 已存在。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W3.6"
+      ],
+      "acceptance": [
+        "上述流程真实 Electron 通过，源基线安全测试不回退。",
+        "W3.1–W3.7 全绿，与 W2 合流后可开始 W4。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W3-workspace.md（W3.7）",
+        "验收记录：docs/susu/plan2/evidence/W3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-W4",
+      "parentId": null,
+      "title": "W4：主进程 PTY Terminal",
+      "description": "新增第一个高权限本地执行 Surface。terminal 由主进程持有 PTY，renderer 只处理终端展示和类型化输入/输出/resize/exit；默认绑定当前工作区 root，simple 模式不可见。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W4 的全部叶子任务完成且阶段证据齐全",
+        "新增第一个高权限本地执行 Surface。terminal 由主进程持有 PTY，renderer 只处理终端展示和类型化输入/输出/resize/exit；默认绑定当前工作区 root，simple 模式不可见。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W4-terminal.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W4/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.1",
+      "parentId": "E-W4",
+      "title": "验证 PTY 与 Electron 打包技术链",
+      "description": "改动位置：plugins/terminal 新包的最小技术 spike、desktop 打包配置。。实施：选择支持当前 Electron/Node 的 PTY 实现，记录原生模块、ABI 和 rebuild 要求。；用最小 main 进程会话验证 Windows 默认 shell、输入/输出、resize 和退出。；验证 electron-builder asarUnpack/extraResources 与便携目录加载，不以开发成功代替打包成功。；若技术链不成立，记录阻塞并保持 terminal 入口隐藏；禁止改成 renderer 任意 child_process IPC。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W2.8",
+        "W3.7"
+      ],
+      "acceptance": [
+        "开发和便携目录各运行一次只读命令并正常退出。",
+        "技术选型、打包方式和回退条件有真实证据后才继续 UI。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.1）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.2",
+      "parentId": "E-W4",
+      "title": "定义 terminal 与 process capability 契约",
+      "description": "改动位置：terminal shared、packages/core/surface 必要类型、preload 类型。。实施：定义 create/input/output/resize/exit/close 的独立通道和会话 id。；create 参数只接受受信 workspaceId、受控 shell/profile、初始尺寸；renderer 不提交拼接后的 shell 命令。；SurfaceCapability process:execute 与 workspace:read 分离，terminal 不继承文件写权限。；为 Q3 预留结构化 ProcessRequest/Result，但不把交互 terminal 输入当成任务审批。；所有事件包含 terminalId/runId 必要关联，终态后忽略后续事件。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.1"
+      ],
+      "acceptance": [
+        "TypeScript 契约、非法 id、非法尺寸、未知 shell、伪造 capability、重复 close 测试。",
+        "renderer 无通用 shell/string execute 通道，任务与交互两种入口边界明确。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.2）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.3",
+      "parentId": "E-W4",
+      "title": "实现主进程 TerminalService",
+      "description": "改动位置：plugins/terminal/src/main/、desktop main 组合。。实施：按 terminalId 管理 PTY 会话，cwd 从 W3 main 内部 WorkspaceContext 解析并重新 canonical 校验。；shell 使用显式配置和参数数组；环境变量只注入必要项，不输出 secret env。；实现 input/write、resize、close、dispose；Windows 关闭回收进程树。；设置输出缓冲、事件批量与背压上限；限制历史大小，防止长时间输出耗尽内存。；deactivate 不杀会话，close 才终止；应用退出统一回收。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.2"
+      ],
+      "acceptance": [
+        "真命令输出、中文/大数据输出、resize、进程退出、重复 id、无 root、root 被替换、关闭与孤儿进程检查。",
+        "会话生命周期、资源上限和 cwd 安全均有自动测试。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.3）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.4",
+      "parentId": "E-W4",
+      "title": "实现 renderer Terminal Surface",
+      "description": "改动位置：terminal renderer、W1 SurfaceTabs、桌面底部/中栏组合。。实施：使用成熟终端 renderer 与 fit 能力，不在内容区用普通 <pre> 冒充交互终端。；支持键盘输入、滚动、复制、resize、清屏和关闭；快捷键不破坏全局窗口快捷键。；terminal 作为独立 provider 接入 Surface 标签，切换只隐藏视图，进程和 scrollback 按策略保留。；断开会话显示 exited 状态和重开动作，不自动无限重启。；UI 使用 @innate/ui 与语义 token；simple/dev 注册表只在 dev 显示。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.3"
+      ],
+      "acceptance": [
+        "输入/输出、中文、复制、resize、标签切换、退出提示和 simple 不可见。",
+        "真实交互终端可用，未把 Node/PTY 对象带入 renderer。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.4）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.5",
+      "parentId": "E-W4",
+      "title": "接通工作区 root 与变更语义",
+      "description": "改动位置：terminal main、WorkspaceContext 订阅、UI 状态。。实施：新建 terminal 默认 cwd 为当前 root，并显示目标工作区。；已运行会话在 root 切换时不自动更改 cwd；新会话使用新 root。；无 root 时要求先选择目录，或明确使用用户批准的受控默认目录。；root 被删除/不可访问时创建失败并给 hint，不回退到任意系统目录。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.4"
+      ],
+      "acceptance": [
+        "两个 root 连续创建会话、切换 root、旧会话保持、无 root/失效 root 负路径。",
+        "W3“共享 root”在真实 terminal 中验证，行为无隐式越界。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.5）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.6",
+      "parentId": "E-W4",
+      "title": "实现受控 process:execute 首片",
+      "description": "改动位置：terminal task executor 或独立 capability adapter，供 Q3 复用。。实施：定义只允许注册 profile/可执行配置的结构化请求，cwd 必须属于已授权 workspace。；高影响执行需要显式 capability；本阶段先提供受控开发入口和审计结果，不自动运行项目任务。；收集 exitCode、开始/结束时间、截断后的安全输出摘要；完整输出默认不进快照。；超时、取消、非零退出和输出超限均返回显式状态。；Q3 前的自动调用保持关闭，避免未经项目审批触发命令。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.5"
+      ],
+      "acceptance": [
+        "允许/未注册 profile、cwd 逃逸、超时、取消、非零退出、输出截断与审计脱敏。",
+        "后续 Q3 可调用受控 executor，而不是重新发明通用 shell IPC。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.6）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W4.7",
+      "parentId": "E-W4",
+      "title": "安全、便携与故障回收验收",
+      "description": "改动位置：tools/smoke-desktop、package 配置、证据。。实施：运行真实交互命令、受控 process 请求、resize 和标签生命周期。；伪造 renderer 调用未知 profile/capability，确认 main 拒绝。；构建便携目录，重复验证 PTY 加载和进程树回收。；检查 simple 无入口，无 DSH/magpie 时受控 terminal 仍按设计可用。；全量门禁与证据检查，日志不含环境 secret。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.6"
+      ],
+      "acceptance": [
+        "上述全部通过，W2/W3 行为不回退。",
+        "W4.1–W4.7 全绿才允许开始 W5。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W4-terminal.md（W4.7）",
+        "验收记录：docs/susu/plan2/evidence/W4/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-W5",
+      "parentId": null,
+      "title": "W5：独立 Browser Surface",
+      "description": "新增普通网页 browser Surface，与 Harness/magpie 的受管 WebContents 区分。使用独立分区和显式导航、下载、权限策略；不在 DSH 内再嵌浏览器，不实现通用自动化。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "W5 的全部叶子任务完成且阶段证据齐全",
+        "新增普通网页 browser Surface，与 Harness/magpie 的受管 WebContents 区分。使用独立分区和显式导航、下载、权限策略；不在 DSH 内再嵌浏览器，不实现通用自动化。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/W5-browser.md",
+        "阶段证据目录：docs/susu/plan2/evidence/W5/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.1",
+      "parentId": "E-W5",
+      "title": "定义 browser provider 与安全策略",
+      "description": "改动位置：plugins/browser shared/main、Surface capability 契约。。实施：定义 open/navigate/back/forward/reload/activate/deactivate/close 的最小接口。；network:navigate 只表示导航，不自动授予下载、摄像头、麦克风、通知、剪贴板或任意 JS 执行。；明确允许 http/https；file、data、javascript、chrome 等协议默认拒绝，后续需要另立评审。；browser 与 Harness/console 使用不同 providerId、partition 和快照策略，认证 URL 不能转普通书签。；Q3 只消费受控 navigate，不开放页面脚本注入。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W4.7"
+      ],
+      "acceptance": [
+        "协议白名单、provider 隔离、非法 descriptor/capability 单测。",
+        "安全默认值和公开接口在实现前固定。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.1）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.2",
+      "parentId": "E-W5",
+      "title": "实现独立 WebContents 生命周期",
+      "description": "改动位置：browser main provider、W1 SurfaceHost/provider registry。。实施：使用独立 WebContentsView 和明确持久 partition，contextIsolation、nodeIntegration: false、sandbox: true。；browser view 复用 W1 attach/detach/bounds/close，不为每页新建 BrowserWindow。；标签切换不销毁会话，close 清除本 Surface 的 view 与监听器。；页面崩溃、无响应和加载失败只影响当前 browser Surface，提供重试/关闭。；禁止宿主持有或调用通用 executeJavaScript 通道。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.1"
+      ],
+      "acceptance": [
+        "多浏览器标签、切换不重载、关闭回收、加载失败、崩溃隔离和窗口关闭。",
+        "browser 与既有 WebContents 客人共存且互不替换分区或状态。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.2）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.3",
+      "parentId": "E-W5",
+      "title": "实现导航与外链规则",
+      "description": "改动位置：browser renderer、main navigation guard、preload。。实施：提供地址栏、前进/后退/刷新和加载状态；URL 输入在 main 再次解析和校验。；当前标签导航与“新窗口打开”分开处理；新窗口请求默认拒绝。；用户明确选择的外链交系统浏览器，仅允许 http/https。；重定向后的最终协议与地址同样校验，不只检查初始输入。；错误页不暴露认证 query 或内部堆栈。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.2"
+      ],
+      "acceptance": [
+        "普通 URL、非法协议、重定向、window.open、外链、错误页和返回历史测试。",
+        "导航可控且用户可理解，未创建任意新窗口或协议绕过。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.3）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.4",
+      "parentId": "E-W5",
+      "title": "默认拒绝敏感权限",
+      "description": "改动位置：browser main session permission handlers。。实施：对摄像头、麦克风、通知、地理位置、剪贴板、MIDI、USB 等请求默认拒绝。；权限事件记录 origin、类型和结果，不记录页面敏感内容。；如未来开放某权限，必须按 origin+类型独立审批并新增任务，不在本阶段预留自动允许。；Harness/console 的 session 不继承 browser handler，反之亦然。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.3"
+      ],
+      "acceptance": [
+        "测试页面逐类请求权限均为拒绝，其他 Surface 不受影响。",
+        "browser 无隐式敏感权限，拒绝结果可诊断。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.4）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.5",
+      "parentId": "E-W5",
+      "title": "实现受控下载",
+      "description": "改动位置：browser main session download handler、renderer 状态提示。。实施：下载不自动写入默认目录，调用系统保存路径选择器由用户确认。；显示文件名、来源 origin、进度、完成/取消/失败状态；不自动执行下载内容。；取消或关闭 Surface 时按定义取消下载并清理临时状态。；路径选择和写入只由 main/session 处理，renderer 不获得任意文件写 API。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.4"
+      ],
+      "acceptance": [
+        "用户取消、正常完成、下载失败、重复文件名、关闭 Surface、恶意文件名等路径。",
+        "下载只进入用户明确选择的位置，无自动执行和隐式路径。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.5）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.6",
+      "parentId": "E-W5",
+      "title": "保存安全浏览布局状态",
+      "description": "改动位置：browser snapshot、Surface snapshot 恢复。。实施：快照可保存普通 http/https URL、标题、activeId 和必要 workspace 引用。；对带 token/key 等敏感参数的 URL 默认拒绝持久化或安全剥离，并明确提示不能恢复认证状态。；不保存 cookie、session、页面 DOM、表单、下载内容或 WebContents 对象。；重载恢复需用户可见地重新导航；失败不影响其他 Surface。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.5"
+      ],
+      "acceptance": [
+        "普通页面恢复、敏感 URL、版本不兼容、失效网站和隐私扫描。",
+        "布局可恢复但不把浏览器变成凭据快照。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.6）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "W5.7",
+      "parentId": "E-W5",
+      "title": "完成端到端与便携验收",
+      "description": "改动位置：tools/smoke-browser/desktop、证据。。实施：用本地受控 HTTP 测试站验证导航、外链、权限、下载和恢复，避免依赖公网不稳定页面。；与 Harness、console、terminal、文档交替切换，验证 bounds 和生命周期。；运行便携目录，检查独立 partition、无孤儿 view/进程和敏感信息。；全量门禁、W4 回归与证据归档。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.6"
+      ],
+      "acceptance": [
+        "W5.1–W5.6 的每条规则有自动或真实桌面结果。",
+        "browser 全链路安全可用，才允许开始 Q1。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/W5-browser.md（W5.7）",
+        "验收记录：docs/susu/plan2/evidence/W5/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-Q1",
+      "parentId": null,
+      "title": "Q1：一句话生成经审计的本地项目快照",
+      "description": "用户输入一句项目目的，规划 Agent 只能输出符合 project-snapshot Schema 的候选 JSON。宿主完成完整 Schema 校验、语义 audit、路径检查和人工确认后才原子落盘；失败不覆盖已有有效快照。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Q1 的全部叶子任务完成且阶段证据齐全",
+        "用户输入一句项目目的，规划 Agent 只能输出符合 project-snapshot Schema 的候选 JSON。宿主完成完整 Schema 校验、语义 audit、路径检查和人工确认后才原子落盘；失败不覆盖已有有效快照。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/Q1-plan.md",
+        "阶段证据目录：docs/susu/plan2/evidence/Q1/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.1",
+      "parentId": "E-Q1",
+      "title": "固定项目快照输入与编号映射",
+      "description": "改动位置：innate-project-canvas schema/types、Plan2 导入配置与夹具。。实施：复用 project-snapshot.schema.json v1.0.0，不为规划 Agent 创建第二种自由 JSON 格式。；明确 W/Q 只是 Plan2 展示编号；导入快照时 W0–W5 映射 S10–S15，Q1–Q3 映射 S21–S23。；任务 id 使用 T10.x–T15.x、T21.x–T23.x，title/summary 可保留 W/Q 别名。；固定 sources、sprints、tasks、modules、moduleEdges、blockedBy、evidence 的生成责任和禁止字段。；对未来任务允许预期 evidence 路径；todo 不得伪造 verified evidence。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "W5.7"
+      ],
+      "acceptance": [
+        "完整 Plan2 示例可通过映射和 Schema；W0/TW0.1 等非法原生 id 被明确转换或拒绝。",
+        "规划输入输出契约和编号规则无歧义。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.1）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.2",
+      "parentId": "E-Q1",
+      "title": "增加完整 JSON Schema 运行时校验",
+      "description": "改动位置：project-canvas snapshot/validate、新 validator 测试。。实施：在 readSnapshot 的对象/数组预检之外，增加对 Agent 原始输出的完整 Schema 校验。；拒绝 additionalProperties、非法 schemaVersion、缺字段、错误类型、重复依赖和非法 id。；校验前限制输入字节数、任务/模块/边数量与文本长度，防止超大结果消耗资源。；输出可读错误路径和原因，但不把 secret 或整段未知输入写入日志。；保留 validateSnapshot 作为第二层语义 audit，不用其中之一替代另一个。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.1"
+      ],
+      "acceptance": [
+        "有效夹具、缺字段、额外字段、非法版本、超长输入、错误 discriminator 等测试。",
+        "任何未通过完整 Schema 的 Agent 输出都不能进入文件系统或正式 UI 状态。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.2）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.3",
+      "parentId": "E-Q1",
+      "title": "建立规划 Agent 的受限适配器",
+      "description": "改动位置：新 planning adapter、W2 Agent runtime 接口、desktop main/preload。。实施：输入只包含用户目的、选定 workspace 引用、允许的模块摘要和规划指令；不默认发送整个文件树或密钥。；规划 Agent 只返回 JSON 文本，无 shell、文件写、审批或任务执行工具。；DSH 可作为真实规划运行时，mock 只用于契约测试；无 DSH 时显示不可用，不伪造计划成功。；从模型回复中提取唯一 JSON 对象，Markdown 多余说明按协议视为失败或显式剥离，不猜测拼接多个片段。；设置超时、取消和 requestId，终态后忽略重复回复。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.2"
+      ],
+      "acceptance": [
+        "有效 JSON、非 JSON、多个 JSON、超时、取消、重复事件、无运行时与敏感上下文检查。",
+        "模型能力被限制为“生成候选快照”，没有任何隐式执行权限。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.3）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.4",
+      "parentId": "E-Q1",
+      "title": "执行语义 audit 与安全路径检查",
+      "description": "改动位置：project-canvas validate、planning service。。实施：运行 validateSnapshot/createAuditReport，拒绝 unknown dependency、dependency cycle、duplicate id、unknown module edge 等 error。；检查当前模块 source 存在性与目标模块 current/target 规则，不让模型虚构已存在模块。；所有 source/evidence 路径必须是受控相对路径，拒绝绝对路径、..、NUL 和越界符号链接。；done 任务必须有存在且 verified 的证据；规划新任务默认 todo，不能自行声明 done。；warning 与 error 分开展示；任何 error 均 fail closed。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.3"
+      ],
+      "acceptance": [
+        "坏依赖、环、伪造模块、伪造证据、越界路径和不存在文件等负路径。",
+        "语义错误明确返回，未生成正式快照文件。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.4）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.5",
+      "parentId": "E-Q1",
+      "title": "提供计划预览与人工确认",
+      "description": "改动位置：desktop planning Surface、PurposeBar/计划预览 UI。。实施：用户输入目的后显示生成中、取消、失败原因和重试。；预览项目、Sprint、任务数、frontier、模块变化和 audit 结果；标明“候选草稿”。；人工确认前不写正式快照，不把候选加入 Q2 正式列表。；用户可返回修改目的重新生成；编辑功能若未实现，不提供假保存按钮。；UI 使用 @innate/ui，错误显式可达。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.4"
+      ],
+      "acceptance": [
+        "生成→预览→确认、拒绝、重新生成、取消和错误显示。",
+        "人清楚知道将要保存的内容，模型不能直接确认自己的输出。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.5）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.6",
+      "parentId": "E-Q1",
+      "title": "原子保存本地快照",
+      "description": "改动位置：planning storage、用户数据目录与窄 IPC。。实施：仅接收已通过 Schema+audit 且经人确认的候选，服务端重新校验，不信任 renderer 标记。；保存到应用数据目录的项目存储或用户明确选择的位置；路径由宿主解析。；使用临时文件+flush+rename 的原子写策略，保留上一有效版本。；写失败、权限不足或磁盘错误时显示失败，不留下新半成品。；记录 snapshotHash、生成时间和来源 requestId，不记录模型密钥。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.5"
+      ],
+      "acceptance": [
+        "重复保存、写失败、进程中断、旧有效快照保护、路径逃逸和重载读取。",
+        "本地快照可恢复，失败不落盘且不破坏上一版本。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.6）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q1.7",
+      "parentId": "E-Q1",
+      "title": "完成真实规划与负路径验收",
+      "description": "改动位置：tools/smoke-project-plan、证据。。实施：用真实规划运行时从一句目的生成一个小型项目快照，完成预览、确认、保存和重载。；用 mock/故障注入验证非 JSON、坏 Schema、坏依赖、伪造证据、路径越界和写失败均不落盘。；验证快照可被现有 deriveState 计算下一任务，并被 Q2 的只读 adapter 消费。；全量门禁、便携冒烟和敏感信息检查。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.6"
+      ],
+      "acceptance": [
+        "真实成功链与全部负路径各有结果，未自动执行任何任务。",
+        "Q1.1–Q1.7 全绿才允许开始 Q2。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q1-plan.md（Q1.7）",
+        "验收记录：docs/susu/plan2/evidence/Q1/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-Q2",
+      "parentId": null,
+      "title": "Q2：给人看的项目看板",
+      "description": "把 project-canvas 接入中栏 Surface。正式视图只消费经审计的 project-snapshot JSON，展示项目、任务 frontier、模块图和证据；HTML 与 localStorage 草稿都不是正式事实源。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Q2 的全部叶子任务完成且阶段证据齐全",
+        "把 project-canvas 接入中栏 Surface。正式视图只消费经审计的 project-snapshot JSON，展示项目、任务 frontier、模块图和证据；HTML 与 localStorage 草稿都不是正式事实源。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/Q2-canvas.md",
+        "阶段证据目录：docs/susu/plan2/evidence/Q2/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.1",
+      "parentId": "E-Q2",
+      "title": "建立只读 ProjectSnapshotStore",
+      "description": "改动位置：plugins/project-canvas main/shared、innate-project-canvas snapshot/validate。。实施：按 projectId 读取 Q1 已保存快照，main 重新解析路径并执行 Schema+audit。；提供只读 list/get/audit IPC，renderer 不传任意文件路径。；返回安全快照和派生状态所需数据，过滤本机绝对路径和不应展示的来源信息。；文件变化采用显式刷新或受控 watch，防止读取半写文件；无效新版本保留上一有效视图并提示。；store 不调用 HTML renderer，也不从 HTML/localStorage 重建任务。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q1.7"
+      ],
+      "acceptance": [
+        "有效读取、无效 JSON、半写、路径伪造、错误版本、刷新失败与上一有效快照保留。",
+        "中栏只有一条可信快照读取路径。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.1）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.2",
+      "parentId": "E-Q2",
+      "title": "实现项目总览 Surface",
+      "description": "改动位置：project-canvas renderer、SurfaceTabs、@innate/ui 组合。。实施：展示项目名、Sprint 状态、任务统计、audit summary 和下一项。；使用 deriveState 实时计算 readyTaskIds/nextTaskId，不在 UI 另行保存 frontier。；项目 Surface 使用 document/canvas 类 React provider，不新建 WebContents。；无项目、无下一项、全部完成和存在 audit error 都有明确状态。；禁用 project-canvas 插件只移除自身 Surface，不影响其他工作台。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.1"
+      ],
+      "acceptance": [
+        "空/进行中/完成/错误快照、依赖变更后 frontier、插件卸载。",
+        "用户能看到当前真正可执行的下一项，数据完全来自快照和 derive。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.2）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.3",
+      "parentId": "E-Q2",
+      "title": "实现任务与依赖视图",
+      "description": "改动位置：project-canvas renderer task/board 视图。。实施：按 Sprint 和状态展示任务，支持按可执行/阻塞/完成/optional/debt 筛选。；任务详情展示 summary、purpose、verification、estimate、blockedBy、evidence 和 source。；阻塞关系以列表或轻量图展示，点击依赖可定位对应任务。；状态文案使用 deriveState/taskStateLabel，避免 UI 与执行器各自判断。；本阶段不提供自动运行；Q3 入口可先保持不可用或不显示。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.2"
+      ],
+      "acceptance": [
+        "循环依赖被 audit 拦截、跨 Sprint 阻塞、筛选、任务定位和大数据量虚拟化/性能检查。",
+        "任务状态可追溯到快照和依赖，不由卡片本地状态决定。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.3）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.4",
+      "parentId": "E-Q2",
+      "title": "实现模块与审计视图",
+      "description": "改动位置：project-canvas renderer module/audit 视图。。实施：展示 current/target 模块、层级、路径摘要和 moduleEdges。；区分 current 与 target，不把规划模块显示为已存在。；展示 audit errors/warnings/drift，支持定位到相关任务或模块。；evidence 只显示状态和安全引用；打开本地产物需独立受控动作和权限检查。；不把生成 HTML 内嵌后当作这些视图的实现。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.3"
+      ],
+      "acceptance": [
+        "未知边、target-as-current、证据缺失、审计错误定位和源码路径脱敏。",
+        "人能发现计划漂移和证据问题，而不是只看到美观看板。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.4）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.5",
+      "parentId": "E-Q2",
+      "title": "隔离草稿与正式状态",
+      "description": "改动位置：project-canvas draft storage、编辑 UI。。实施：若保留任务编辑，草稿按 projectId+snapshotHash 存储，显著标记“草稿”。；草稿只改变本地展示，不写 snapshot、Sprint、任务状态或 evidence。；正式快照更新后，旧草稿标记过期并要求人工处理，不能自动覆盖新内容。；正式任务状态只能由 Q3 证据流程或用户明确确认改变；本阶段无隐式勾选完成。；localStorage 不可用时显示未保存，不假报成功。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.4"
+      ],
+      "acceptance": [
+        "草稿保存/恢复/重置、快照更新过期、存储失败、正式 JSON 不变。",
+        "任何草稿操作都不会污染 Q3 的正式任务输入。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.5）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.6",
+      "parentId": "E-Q2",
+      "title": "恢复项目 Surface 与安全引用",
+      "description": "改动位置：Surface snapshot、project store、workspace 关联。。实施：布局只保存 projectId、Surface descriptor、active view 等安全状态。；重载后重新读取并审计快照，不能直接把旧序列化任务当最新事实。；项目被删除或快照无效时显示选择/重试，不白屏。；workspaceId 只是上下文引用，读取证据或源文档时服务端重新授权。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.5"
+      ],
+      "acceptance": [
+        "正常重载、项目删除、快照变坏、版本升级、跨项目切换和权限变化。",
+        "看板可恢复且始终重新以当前有效快照为准。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.6）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q2.7",
+      "parentId": "E-Q2",
+      "title": "完成人侧看板端到端验收",
+      "description": "改动位置：tools/smoke-project-canvas、证据。。实施：从 Q1 快照打开项目，检查总览、frontier、任务、模块、audit 和证据状态。；修改快照依赖并刷新，确认 frontier 按 derive 更新。；创建草稿并重载，确认正式快照哈希和内容不变。；与其他 Surface 切换、便携运行、全量门禁和敏感信息检查。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.6"
+      ],
+      "acceptance": [
+        "所有视图由同一快照驱动，HTML 文件缺失不影响 React 正式视图。",
+        "Q2.1–Q2.7 全绿才允许开始 Q3。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q2-canvas.md（Q2.7）",
+        "验收记录：docs/susu/plan2/evidence/Q2/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "E-Q3",
+      "parentId": null,
+      "title": "Q3：一次执行一条任务",
+      "description": "从经审计快照的 derive frontier 选择一条任务，按 capabilities 路由到受控 process、可选 DSH Agent 或 browser 执行器，收集运行事实和证据后回写。任何时刻最多一个活跃项目任务，失败或取消不自动推进。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [],
+      "acceptance": [
+        "Q3 的全部叶子任务完成且阶段证据齐全",
+        "从经审计快照的 derive frontier 选择一条任务，按 capabilities 路由到受控 process、可选 DSH Agent 或 browser 执行器，收集运行事实和证据后回写。任何时刻最多一个活跃项目任务，失败或取消不自动推进。"
+      ],
+      "evidence": [
+        "阶段任务卡：docs/susu/plan2/phases/Q3-task.md",
+        "阶段证据目录：docs/susu/plan2/evidence/Q3/"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.1",
+      "parentId": "E-Q3",
+      "title": "定义最小任务执行契约",
+      "description": "改动位置：packages/sdk 独立 task-run 子入口、project-canvas task adapter。。实施：定义 TaskInput：requestId、taskId、snapshotHash、capability、受控 input、workspaceId/surfaceId 引用。；定义 RunEvent：runId、单调 seq、timestamp、started/output/approval/completed/failed/cancelled 等本闭环需要的事件。；定义 RunResult：succeeded/failed/cancelled、summary、安全输出、artifacts/evidence 引用和 retryable error。；snapshotHash 防止执行期间计划悄悄改变；runId 由宿主生成，不能由模型或 renderer 指定。；只实现本闭环契约，不顺带完成完整 Agentic UI/Annotation 计划。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q2.7"
+      ],
+      "acceptance": [
+        "版本、重复/乱序 seq、终态后事件、伪造 runId/taskId、哈希不匹配、敏感字段测试。",
+        "UI、调度器和执行器共享同一运行事实契约。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.1）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.2",
+      "parentId": "E-Q3",
+      "title": "建立 capability registry 与执行路由",
+      "description": "改动位置：task execution service、terminal/DSH/browser adapters。。实施：注册 process:execute、agent:tools、network:navigate 三类 capability 及输入 Schema、所需权限和执行器。；任务只声明已注册 capability；未注册、输入不合法、上下文越权均 fail closed。；process 路由 W4 受控 executor；agent 路由 W2 DSH adapter；network 路由 W5 browser provider。；执行端重新检查 workspace、surface 和用户授权，不信任快照或模型中的 context。；DSH 不可用只禁用 agent 类任务，不阻塞纯 process 任务。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.1"
+      ],
+      "acceptance": [
+        "三类路由、未知 capability、Schema 错误、越权 context、运行时不存在和降级测试。",
+        "没有绕过 registry 的直接执行路径。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.2）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.3",
+      "parentId": "E-Q3",
+      "title": "实现单运行调度器",
+      "description": "改动位置：项目 RunCoordinator、持久运行状态。。实施：从当前有效快照调用 deriveState，只取 nextTaskId 或用户明确选择的一个 ready task。；创建 run 前再次校验 snapshotHash、任务状态、依赖和 capability。；全局或项目级互斥锁保证一次一条；重复点击返回现有 run，不创建第二个。；支持取消；暂停/恢复只有执行器真实支持时才显示。；终态后释放锁但不自动启动下一条，由用户查看结果后决定。；应用重载可恢复运行记录；无法确认外部进程状态时标记 unknown/failed，不伪造成功。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.2"
+      ],
+      "acceptance": [
+        "并发点击、依赖在执行前变化、快照变化、取消、重复事件、重载和孤儿运行恢复。",
+        "任何时刻最多一个活跃 run，frontier 不会被并发或陈旧状态绕过。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.3）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.4",
+      "parentId": "E-Q3",
+      "title": "接通 process 执行任务",
+      "description": "改动位置：W4 process executor、RunCoordinator、审批 UI。。实施：将任务输入映射到已注册 ProcessRequest，可执行 profile 和参数由受控任务定义校验。；cwd 必须来自当前授权 WorkspaceContext，执行前再次 canonical 检查。；高影响命令展示应用、目的、命令摘要、cwd 和风险，审批超时/拒绝不启动进程。；收集 exitCode、时间、截断输出和产物引用；非零退出为 failed。；取消/超时回收 Windows 进程树，结果标记 cancelled/failed，不写成功证据。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.3"
+      ],
+      "acceptance": [
+        "成功只读命令、非零退出、审批拒绝/超时、取消、输出超限、cwd 逃逸和无 DSH 环境。",
+        "没有 magpie/DSH 时，一条纯 terminal 项目任务仍可真实完成。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.4）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.5",
+      "parentId": "E-Q3",
+      "title": "接通可选 DSH Agent 任务",
+      "description": "改动位置：W2 Harness/Agent adapter、RunCoordinator。。实施：只把 agent:tools 任务发送到 DSH，使用明确 profile/session 和受限输入。；将 DSH 原生事件适配为公共 RunEvent，私有对象和认证 URL 不泄露到 UI/快照。；工具权限仍由宿主 capability 与审批策略决定，DSH 返回内容不能关闭审批。；模型输出只能是受控摘要、结构化结果或 artifact 引用；不接受可执行 HTML/JS。；DSH 未安装/未接线时任务明确 blocked/failed，不回退成 shell 执行。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.4"
+      ],
+      "acceptance": [
+        "真实最小 Agent 任务、工具审批、运行时缺失、会话失败、取消、事件乱序和敏感信息检查。",
+        "一条真实 Agent 任务可从看板运行并生成可审计结果。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.5）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.6",
+      "parentId": "E-Q3",
+      "title": "接通 browser 导航任务",
+      "description": "改动位置：W5 browser provider、network capability adapter。。实施：任务只提供经 Schema 限制的 http/https URL 和展示目标，main 再校验协议与重定向。；打开或激活对应 browser Surface 并记录最终安全 URL、加载状态和错误。；不自动授予页面权限、不执行脚本、不自动下载；这些行为需要独立用户动作。；网络失败、非法 URL、权限拒绝均为显式结果，不标记成功。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.5"
+      ],
+      "acceptance": [
+        "本地测试站成功、404/超时、非法协议、重定向、下载请求和权限请求。",
+        "一条 network 任务可经真实 browser Surface 完成且权限没有扩大。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.6）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.7",
+      "parentId": "E-Q3",
+      "title": "证据回写与人工确认",
+      "description": "改动位置：RunResult store、project snapshot writer、Q2 任务详情。。实施：RunEvent/RunResult 先存运行记录，任务正式状态不随流式文本即时改变。；succeeded 只生成候选 evidence，包含路径、kind、status 和 runId 关联；证据内容由验证器检查。；只有验证通过或用户明确确认后，原子更新任务状态与 evidence；写失败保留原快照。；failed/cancelled 不写 verified evidence、不标 done、不自动执行下一项。；证据路径由宿主生成并限制在受控运行目录，模型不能指定任意写路径。；Q2 刷新后重新 derive frontier，旧草稿标过期。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.6"
+      ],
+      "acceptance": [
+        "成功确认、验证失败、人工拒绝、快照写失败、路径注入、重复回写和重载 derive。",
+        "正式状态可追溯到真实 run 和证据，无“模型说完成即完成”。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.7）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    },
+    {
+      "id": "Q3.8",
+      "parentId": "E-Q3",
+      "title": "完成三类任务与全系统验收",
+      "description": "改动位置：tools/smoke-project-run、便携工具与证据。。实施：从同一测试项目分别执行一条 process、agent、network 任务，逐项检查结果和证据。；验证第二个并发请求不启动、失败后不推进、取消后无进程残留。；验证无 DSH 的 process 降级、无 browser 的 agent/process 隔离和插件失败隔离。；重载恢复项目、run 记录和看板；执行便携目录全流程。；运行全量门禁、overlay、安全扫描并保存最终迁移证据。",
+      "moduleIds": [
+        "innate-desktop"
+      ],
+      "dependsOn": [
+        "Q3.7"
+      ],
+      "acceptance": [
+        "三类真实执行链与全部负路径通过，W0–Q2 行为不回退。",
+        "Q3.1–Q3.8 全绿，才可按总计划第 8 节评审本轮迁移完成。"
+      ],
+      "evidence": [
+        "任务来源：docs/susu/plan2/phases/Q3-task.md（Q3.8）",
+        "验收记录：docs/susu/plan2/evidence/Q3/commands.md 与 behavior.md"
+      ],
+      "execution": {
+        "status": "not_started",
+        "automationId": null,
+        "runId": null,
+        "conversationId": null
+      },
+      "githubIssue": null
+    }
+  ]
+}
