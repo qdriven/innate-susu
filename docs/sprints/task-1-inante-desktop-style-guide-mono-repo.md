@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-1-inante-desktop-style-guide-mono-repo
 title: inante-desktop 初始化：style guide 对齐 + mono repo 骨架
 createdAt: 2026-10-28T06:39:43.117694Z
-updatedAt: 2026-10-28T07:18:36.295721Z
-status: in_progress
+updatedAt: 2026-10-28T07:21:55.961352Z
+status: done
 branch: qdriven/inante-desktop
 repository: qdriven/innate-susu
 sourceKind: issue
@@ -14,11 +14,11 @@ issueUrl: https://github.com/qdriven/innate-susu/issues/1
 issueState: OPEN
 issueTitle: inante-desktop：初始化
 issueUpdatedAt: 2026-10-28T06:28:12Z
-prNumber: 
-prUrl: 
-prState: 
-prTitle: 
-prUpdatedAt: 
+prNumber: 2
+prUrl: https://github.com/qdriven/innate-susu/pull/2
+prState: OPEN
+prTitle: feat: monorepo 骨架 + UI 基座接入 + style guide 对齐
+prUpdatedAt: 2026-10-28T07:21:31Z
 ---
 
 ## 任务上下文
@@ -251,13 +251,14 @@ Spec：S2
 - 2026-10-28：逐 token 核对 orca 与 `@innate/ui` 基础中性色，确认相等（暗色 4 处刻意差异），并据此修正默认主题变体为 `default`。
 - 2026-10-28：重写 STYLEGUIDE.md 与 styleguide/ 六篇，新增 toolbar.md 的三方对照规格；对照表落在 style-guide-alignment.md。
 - 2026-10-28：新增 tools/compare-palette.mjs，使中性色对齐结论可重复复核。
+- PR #2 已开：feat: monorepo 骨架 + UI 基座接入 + style guide 对齐（qdriven/inante-desktop → main）
 
 ## 来源原文
 
 ### Issue #1
 
-> tasks\[0-setup.md，](http://0-setup.md) ```markdown # Setup Project ## Setup Style Guide 1. 使用innate-labs/references 里把 orca 的 style guide 和壳的 toolbar 对上 2. 需要和innate-fe 部分对上，如果对不上需要给出解决方案 ## Setup Mono Repo 1. 基于innate-fe-cli和innate-fe 构建mono repo 2. 检查当前是否已经可以满足了 ``` 完成这个任务
+> tasks\\[0-setup.md，](http://0-setup.md) ```markdown # Setup Project ## Setup Style Guide 1. 使用innate-labs/references 里把 orca 的 style guide 和壳的 toolbar 对上 2. 需要和innate-fe 部分对上，如果对不上需要给出解决方案 ## Setup Mono Repo 1. 基于innate-fe-cli和innate-fe 构建mono repo 2. 检查当前是否已经可以满足了 ``` 完成这个任务
 
-### PR
+### PR #2
 
-> （未同步）
+> 关联 Closes #1 —— `tasks/0-setup.md` 的两半：**Setup Style Guide** 与 **Setup Mono Repo**。 交付记录（task 文件）：`docs/sprints/task-1-inante-desktop-style-guide-mono-repo.md` --- ## 一、Setup Mono Repo ### 骨架 | 文件 | 作用 | | --- | --- | | `pnpm-workspace.yaml` | workspace 范围 `apps/*` + `packages/*`；构建白名单 `allowBuilds: { electron, esbuild }`；`minimumReleaseAgeExclude` 豁免内部包的发版年龄限制 | | `tsconfig.base.json` | 全仓 strict 基座（`noUncheckedIndexedAccess` / `noImplicitOverride` / `noFallthroughCasesInSwitch` / `verbatimModuleSyntax` 等） | | `package.json` | 统一 `build` / `typecheck` / `test` / `lint` / `verify` 入口 + `ui:sync` 三态；`packageManager: pnpm@12.14.0` 锁版本 | | `pnpm-lock.yaml` | 解析出 `@innate/ui@0.1.2` | | `apps/README.md` | 应用槽位说明（`@innate-desktop/desktop` 留到 W1，本次不建包、不写应用代码） | ### 基座接入 `tools/ui-sync.mjs` 定位 innate-fe 基础仓后调 `innate-fe-cli install`（发布 `@innate/*` → 写 `.npmrc` → 改写 `workspace:` 依赖 → `pnpm install`）。 定位优先级与 `innate-fe-cli` 内部一致：`--root` > `INNATE_FE_ROOT` > `.innate-fe-cli.json`（仓库根 / home）> 向上自动发现 `framework/innate-fe` / `base/innate-fe` / `innate-fe`。**不再有写死的绝对路径**；机器本地路径写在 `.innate-fe-cli.json` 并已 gitignore。 ### 「检查当前是否已经可以满足了」的结论 **骨架层已满足，应用层尚未开始。** 逐项核对结果见 `docs/build-path/1-monorepo-init/README.md`：workspace、锁文件、`ui:sync` 链路全部可用并验证过；剩余项属于 W1 应用实现。 --- ## 二、Setup Style Guide ### 对齐方法：不凭印象，逐 token 解析比对 对照对象是三份事实源——orca 的 `main.css`（`:root` / `.dark`）、`@innate/ui` 的 `tokens.css` 与 `themes/*.css`、innate-fe webshell 的 `app-shell.tsx`。新增 `tools/compare-palette.mjs` 把 `hsl()` / `oklch()` / `rgb()` 统一换算成 hex 再比，只读、可重复，使结论可复核。 ### 结论 **`@innate/ui` 基础 `:root` / `.dark`（shadcn Neutral）与 orca 的中性色逐 token 相等** —— 亮色全等；暗色只有 4 处刻意差异： | token | orca | `@innate/ui` 基础 | 处置 | | --- | --- | --- | --- | | `accent` | `#404040` | `#262626` | 固定 orca 值：基础仓值与 `muted` 同值，ghost 按钮与列表行 hover 会几乎不可见 | | `border` | 白 7% | 白 10% | 固定 orca 值：发丝线而非可见描边，符合「外壳退后」的定位 | | `sidebar-border` | 白 7% | 白 10% | 同上 | | `sidebar-ring` | `#525252` | `#737373` | 固定 orca 值：侧栏 focus 环更收敛 | **据此把默认主题变体从 `shadcn-zinc` 纠正为 `default`** —— `shadcn-zinc` 的中性色带 240 色相的淡蓝偏移，与 orca 的纯中性灰不等值（`muted-foreground` 差到 7），选它当默认值会让桌面端系统性偏离 orca 观感。 其余对齐项： | 项 | 结论 | | --- | --- | | 主题变体 | orca 无变体机制；`@innate/ui` 有 10 个 `data-theme` 变体，机制归基础仓，切换入口只有 `ThemeSelector` | | 字体 | orca 用 Geist / SF Mono，`@innate/ui` 基础层是 Inter → 产品层覆盖 `--font-sans` / `--font-mono`，Geist 字库随包分发 | | primitive | orca 自建 38 个（Radix 底座）vs `@innate/ui` 58 个（**Base UI** 底座）→ 唯一来源 = `@innate/ui`；触发器用 `render` prop，不用 `asChild` | | 按钮尺度 | orca 宽松（default h-9 / 14px）vs `@innate/ui` 紧凑（h-7 / 13px）→ 取 `@innate/ui`；顶栏内统一 `icon-sm` / `icon-xs` | | `destructive` | orca 实心 vs `@innate/ui` 淡底 → 取 `@innate/ui` | | `ghost` hover | orca `bg-accent` vs `@innate/ui` `bg-muted` → 顶栏图标按钮改用本仓 `shell.css` 的 `.titlebar-icon-button`（壳 chrome 层的正确归属） | | 滚动条 / 列表选中配方 | 属壳 chrome 不是 primitive → 迁到本仓 `packages/theme/src/shell.css` | ### 壳的 toolbar 三方对齐 orca titlebar（36px 物理壳 + 自绘窗口控件）↔ innate-fe webshell header（`h-12` 内容语义）↔ 桌面顶栏，结论是**物理壳用 orca、内容语义用 webshell**：窗口控件只有桌面端有，但「左标题 / 右 `Badge` + `LocaleSelector` + `ThemeSelector`」的分区是 innate 家族共有的交互语言，桌面端应保持一致。 新增 `styleguide/toolbar.md` 给出实现级规格（36px / 46×36 / 80px / 138px / `h-12` 二级 header / rail 64px / 子菜单 256px），并列出对齐带来的具体改动。 ### 「对不上给方案」 orca 专属能力逐项给出**过渡方案 + 正式方案**，本仓不现造 primitive： | orca 能力 | `@innate/ui` 现状 | 过渡方案 | 正式方案 | | --- | --- | --- | --- | | 安全表面 `SecuritySurface` / `DialogContent surface="security"` | 无 `surface` prop | 产品层加 `--security-*` token 家族 + `DialogContent` 的 `className` | 基础仓 `pnpm ui:add` 加 `surface` 变体 | | `ShortcutKeyCombo`（Win/Linux 的 `+` 分隔） | 有 `Kbd`，无分隔符 | `Kbd` + 调用方按平台给字形 | 基础仓 `ui:add` | | `repo-multi-combobox` | 有 `command` + `popover` + `checkbox` | `Command` in `Popover` 自管多选态 | 基础仓 `ui:add` | | `pane-title` 等按钮变体 | 无 | 不迁移成 primitive；用 `shell.css` 类名 | 不需要 | | `--chat-*` / `--terminal-pane-title-on-*` | 无 | 未实现，随功能落地 | 不需要 | > **红线**：要求用户信任、批准、执行或移除代码的对话框必须走安全面。基础仓补齐前不得用普通 `Dialog` 顶替。 --- ## 三、设计 / Spec 变化（单列） | Spec | 变化 | | --- | --- | | `docs/build-path/1-monorepo-init/README.md` | **新增** —— 骨架与接入的交付记录 | | `docs/build-path/1-monorepo-init/style-guide-alignment.md` | **新增** —— orca ↔ innate-fe 对齐结论、差异处置与未决项 | | `.agents/skills/susu-overview/STYLEGUIDE.md` | **修改** —— 从 orca 原文副本改为面向本仓基座（`@innate/ui` + `packages/theme`）的执行副本 | | `.agents/skills/susu-overview/SKILL.md` | **修改** —— token 三层规则、style guide 索引、执法现状 | | `packages/theme/README.md` | **修改** —— 分层、主题变体、门禁 | 新增 `packages/theme`（`@innate-desktop/theme`）：产品 token 层（**本仓唯一允许出现字面量的文件**，明暗成对声明）+ 壳 chrome 层（不写字面量）+ 机器可读契约 + 8 项 token 纪律测试。 --- ## 四、验证 | 命令 | 结果 | | --- | --- | | `pnpm install` | `Already up to date / Done in 5ms using pnpm v12.14.0` | | `pnpm typecheck` | 通过（根 + `packages/theme`，`tsc --noEmit` 无错误） | | `pnpm test` | `packages/theme` **8 tests passed** | | `pnpm build` | 通过 | | `pnpm -r list --depth -1` | `innate-desktop@0.1.0` + `@innate-desktop/theme@0.1.0` | | `pnpm ui:sync` | `@innate/ui@0.1.2` 发布到本地 Verdaccio 并重装成功 | | `node tools/compare-palette.mjs` | 结构性差异仅 4 处（`accent` / `border` / `sidebar-border` / `sidebar-ring`），其余全部 SAME | | `task.py validate --phase review` | `ok: true`，无 error / warning | --- ## 五、未决（不阻塞本 PR） - 安全表面基础仓补齐（补齐前用产品层 `--security-*` token 过渡）。 - `ShortcutKeyCombo` 分隔符、多选 combobox 是否提 `ui:add`，取决于实际需求密度。 - Base UI 浮层的 Portal 是否落在 Electron 拖拽区内 —— 桌面壳落地时逐个验证。 - `--window-controls-width`（138px）与 `--ui-zoom-factor` 由主进程注入 —— 待桌面端接上。 🤖 Generated with [Claude Code](https://claude.com/claude-code)
