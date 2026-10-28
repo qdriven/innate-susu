@@ -1,6 +1,6 @@
 # plan1（已归档）
 
-> **2026-10-28 起本计划已合并入 docs/susu/plan2/ 并停止维护。**
+> **2026-10-28 起本计划已合并入 docs/susu/plan/ 并停止维护。**
 > 合并采纳了本目录 reviews/2026-10-28-plan-review.md 的全部修改（W1 拆 a/b/c、视觉规范指向 susu-overview STYLEGUIDE 副本、组件来源三分法、字体决策门）。
 > 以下正文写作于 susu-web 删除前，部分事实（双轨 dev、改名坏点清单）已过时，仅作历史参考。
 

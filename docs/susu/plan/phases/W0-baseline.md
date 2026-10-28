@@ -10,7 +10,7 @@
 
 ## W0.1 冻结源基线并建立迁移清单
 
-- **改动位置**：`docs/susu/plan2/evidence/W0/`；不改产品代码。
+- **改动位置**：`docs/susu/plan/evidence/W0/`；不改产品代码。
 - **实施**：
   1. 记录 labs 与 innate-desktop 的 commit、工作区状态和 Node/pnpm 版本。
   2. 在 labs 运行现有 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop，记录实测测试数，而非照抄历史 83。
@@ -98,7 +98,7 @@
   1. 标记 Plan2 为 labs→innate-desktop 的 W/Q 迁移执行源，旧 P 系列标为后续 backlog。
   2. 保留 M4/M5 等历史文档链接，但明确不是本阶段任务。
   3. 保存 W0 全部命令、截图、测试数、版本和已知限制。
-  4. 核对已迁入技能（.agents/skills/innate-dsh-playbook、module-kit）的路径与命令在本仓全部有效，innate-desktop-context 的「当前状态/命令」节更新为 W0 后事实。
+  4. 核对本仓技能组（susu-overview、module-kit、task-workflow）在 W0 后的路径与命令全部有效；把 innate-labs 的 innate-dsh-playbook 排障手册迁回本仓并适配（场景 G 已指向本计划）。
   4. 创建可回退的 W0 基线工作点；此后 labs 只收关键 bugfix，目标仓承担前向开发。
 - **验证**：新会话从目标 README 能唯一找到 W1 任务，不会同时被引导执行 P0。
 - **完成标准**：W0.1–W0.8 均有证据，W0 便携包保留，才允许开始 W1。

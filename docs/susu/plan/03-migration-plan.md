@@ -72,7 +72,7 @@ pnpm package:portable
 
 ### 3.4 证据
 
-每阶段在 `docs/susu/plan2/evidence/<PHASE>/` 保存：
+每阶段在 `docs/susu/plan/evidence/<PHASE>/` 保存：
 
 - `environment.md`：OS、Node/pnpm、Electron、magpie/DSH 版本与隔离目录说明。
 - `commands.md`：实际执行命令、退出码、测试数量和时间。

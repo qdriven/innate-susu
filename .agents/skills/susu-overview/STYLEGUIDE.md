@@ -16,7 +16,7 @@ UI 规则。本文件描述**角色与规则**，不承载数值——数值在 
 | --- | --- | --- | --- |
 | primitive 与主题机制 | `@innate/ui`（基础仓 innate-fe，`packages/ui/src/tokens.css` + `src/themes/`） | 语义 token 定义面、明暗 `.dark` 机制、`data-theme` 变体、58 个 primitive（Base UI 底座） | 基础仓 `fe-ui` 技能 |
 | 产品 token 层 | 本仓 `packages/theme/src/tokens.css` | orca 观感冻结 + 产品扩展 token：git 装饰、状态色、壳 chrome 尺寸 | 本仓（成对声明 `:root` + `.dark`） |
-| 壳 chrome 层 | 本仓 `packages/theme/src/shell.css` | titlebar / 窗口控件 / 图标按钮 / 滚动条的类名 | 本仓（只引用 token，不写字面量） |
+| 壳 chrome 层 | 本仓 `packages/theme/src/shell.css` | titlebar / 窗口控件 / 滚动条的类名（**按钮不在这一层**，按钮归 `@innate/ui` 的 Button） | 本仓（只引用 token，不写字面量） |
 
 消费方的 CSS 入口顺序固定为：
 

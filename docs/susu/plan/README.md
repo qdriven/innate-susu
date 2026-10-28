@@ -2,7 +2,7 @@
 
 > 状态：待执行。本文档集只完成分析与计划，不代表任何迁移任务已经完成。
 >
-> 版本：v2.0（合并版）· 2026-10-28。本目录由三方合并而成：原 plan2 全文为基座；吸收 plan1 的模块量化基线、harness 单测前置与 canvas 状态板机制；采纳 [`archive/plan1/reviews/2026-10-28-plan-review.md`](../archive/plan1/reviews/2026-10-28-plan-review.md) 的全部修改（W1 拆分、视觉规范指向、组件来源、字体决策门）。plan1 已归档，不再维护。
+> 版本：v2.1（合并版，目录由 plan2 更名为 plan）· 2026-10-28。本目录由三方合并而成：原 plan2 全文为基座；吸收 plan1 的模块量化基线、harness 单测前置与 canvas 状态板机制；采纳 [`archive/plan1/reviews/2026-10-28-plan-review.md`](../archive/plan1/reviews/2026-10-28-plan-review.md) 的全部修改（W1 拆分、视觉规范指向、组件来源、字体决策门）。plan1 已归档，不再维护。
 >
 > 范围：以 `innate-labs` 的 M0–M2 可运行桌面基线为源，以本仓 `innate-desktop` 为唯一前向目标仓，按 W0 → W1a/W1b/W1c →（W2∥W3）→ W4 → W5 → R1 → Q1 → Q2 → Q3 逐段迁移。
 >
@@ -89,7 +89,7 @@ flowchart LR
 2. 真实 magpie 只跑只读命令；wire/default/unwire 使用 mock 或隔离临时 `DSH_HOME`。
 3. 认证 URL、token、key 不进入日志、快照、测试夹具或证据截图。
 4. 新 UI primitive 只从 `@innate/ui` 单入口导入；颜色、间距、字号使用语义 token；明暗使用 `.dark` class。组件来源三分法见 [01 §5](./01-project-analysis.md)。
-5. 每个阶段结束保存命令结果、测试数、截图和已知限制到 `docs/susu/plan2/evidence/<PHASE>/`。
+5. 每个阶段结束保存命令结果、测试数、截图和已知限制到 `docs/susu/plan/evidence/<PHASE>/`。
 6. 一个阶段未全绿，不开始依赖它的下一阶段；修复不得通过删除旧测试或降低安全断言完成。
 7. 并发会话纪律：动手前重读目标文件与状态板；同一文件不双头修改。
 

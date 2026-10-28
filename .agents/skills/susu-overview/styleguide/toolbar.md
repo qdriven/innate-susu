@@ -11,6 +11,7 @@
 1. **窗口控件只有桌面端有。** webshell 是网页，它的 `sticky` header（h-12）不可能承载最小化/最大化/关闭，也不需要拖拽区。orca 的 36px titlebar 是桌面形态的正解。
 2. **内容语义是 innate 家族共有的交互语言。** webshell header 的「左标题、右工具区」分区在桌面端应保持一致，否则同一个产品在网页形态与桌面形态下头部布局不同，用户会重新学习。
 3. **两者的物理参数不冲突。** 36px 能装下 webshell 那套右侧控件（Badge + Locale + Theme 都是 24–28px 的小件），不需要为了塞进去把顶栏抬到 48px。
+4. **控件本身按规范取 `@innate/ui`，不拷 orca 的裸 class。** plan W1a.3 与 plan1 评审（2026-10-28）已定：toolbar 用 Button `outline`、图标按钮用 `ghost`，不把 orca 那段 `titlebar-icon-button` class 搬过来。
 
 ## 三方对照
 
@@ -23,14 +24,14 @@
 | 拖拽 | `-webkit-app-region: drag` + `user-select: none` | 无（网页） | 同 orca；交互元素显式 `no-drag` |
 | 左侧分区 | `.titlebar-left`：底色 `--worktree-sidebar`，用 `inset 0 -1px 0 var(--border)` 代替 border（保住 36px 内容高度与红绿灯 y 轴对齐） | 图标 rail 64px + 子菜单 256px | 左侧栏由桌面布局定；rail 64px / 子菜单 256px 的**宽度**可沿用 webshell |
 | 中间分区 | `flex-1` 中央区（workspace chrome） | 标题 + `Badge variant="secondary"` | 当前视图标题（面包屑 / 视图名） |
-| 右侧分区 | `.titlebar-icon-button` 一组 | `LocaleSelector` + `ThemeSelector` | **同样三项**：`Badge` + `LocaleSelector` + `ThemeSelector` |
+| 右侧分区 | 裸 `button.titlebar-icon-button` 一组 | `LocaleSelector` + `ThemeSelector` | **同样三项**：`Badge` + `LocaleSelector` + `ThemeSelector`（按钮本身用 `@innate/ui` Button `ghost`） |
 | 窗口控件 | 右侧 `position: fixed`，3 × 46px = 138px | 无 | 同 orca（Windows/Linux）；macOS 用原生红绿灯 |
 | 交通灯 | `.titlebar-traffic-light-pad` 占 80px | 无 | 同 orca |
 | 整条内边距 | 无（由子元素自带 padding） | `px-4` | **顶栏不加整体 padding**；内容区二级 header 用 `px-4` |
 
 ## 物理壳规格（实现级）
 
-类名与取值都在本仓 `packages/theme/src/shell.css`，这里只写**为什么**。
+类名与取值都在本仓 `packages/theme/src/shell.css`，这里只写**为什么**。注意本层**只放不是按钮的 chrome**（titlebar 布局、窗口控件、红绿灯占位、滚动条）——按钮归 `@innate/ui` 的 Button，不在本层复制 orca 的裸 class。
 
 ```css
 .titlebar {
@@ -105,7 +106,7 @@
 | --- | --- | --- |
 | `Button` 默认高 `h-7`（orca 是 `h-9`） | 36px 顶栏里塞 h-9 会顶满；h-7 则上下各留 4px | **顶栏内的按钮统一用 `size="icon-sm"`（24px）或 `icon-xs`（22px）**；顶栏不放文字主按钮 |
 | `Button` 把内部 svg 压到 `size-3`（orca 用 16px） | 顶栏图标偏小 | 顶栏图标**显式**写 `size-4` |
-| `Button variant="ghost"` 的 hover 是 `hover:bg-muted`（orca 用 `accent`） | 基础仓 ghost 走 muted，与 orca 的观感不同 | **顶栏内的图标按钮不用 `Button variant="ghost"`**，改用本仓 `shell.css` 的 `.titlebar-icon-button` / `.sidebar-toggle` 类（hover 是 `bg-accent`）。这是壳 chrome 层，不是 primitive——归属正确 |
+| `Button variant="ghost"` 的 hover 是 `hover:bg-muted`（orca 用 `accent`） | 基础仓 ghost 走 muted，与 orca 的观感略有差异 | **顶栏内的图标按钮就用 `Button variant="ghost"`**——plan W1a.3 与 plan1 评审已定「壳控件按规范取 `@innate/ui` Button（toolbar 用 `outline`、图标用 `ghost`），不拷 orca 的裸 `titlebar-icon-button` class；不造 Toolbar 原语」。观感差异靠基础仓后续调 `ghost` 的 hover 色解决，桌面端不私自加壳级按钮 class |
 | `TooltipProvider` 默认 `delay={0}`（orca 400ms） | 鼠标扫过顶栏就闪 | 顶栏区域包一层 `<TooltipProvider delay={400}>` |
 | Base UI 的 `render` prop | orca 的 `asChild` 写法不适用 | 见 [components.md](./components.md#primitive-约定) |
 | `Kbd` 不做平台分隔符 | 顶栏 tooltip 里的快捷键 chip | 见 [components.md](./components.md#快捷键-chip) |

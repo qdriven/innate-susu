@@ -16,7 +16,7 @@ description: innate-desktop 产品 monorepo 总控技能:锁 UI 基座来源(@in
 2. **token 分三层,各层归属固定**(详见 [packages/theme/README.md](../../../packages/theme/README.md)):
    - **primitive 与主题机制 = 基础仓 `@innate/ui`**(`packages/ui/src/tokens.css` + `src/themes/`):语义 token 定义面、`.dark` 机制、`data-theme` 变体、10 个变体样式。改这里要去基础仓。
    - **产品 token 层 = 本仓 `packages/theme/src/tokens.css`**:orca 观感冻结(与 `@innate/ui` 基础 `:root` 逐 token 相等)+ 产品扩展 token(git 装饰、状态色、工作项状态、壳 chrome 尺寸)。**本仓唯一允许出现字面量的文件**;新增 token 必须在 `:root` 与 `.dark` 中**成对**声明(测试会校验)。
-   - **壳 chrome 层 = 本仓 `packages/theme/src/shell.css`**:titlebar / 窗口控件 / 图标按钮 / 滚动条的类名。**不写字面量**,只引用 token。
+   - **壳 chrome 层 = 本仓 `packages/theme/src/shell.css`**:titlebar / 窗口控件 / 滚动条的类名。**不写字面量**,只引用 token。**按钮不在这一层**——顶栏等壳内按钮按规范取 `@innate/ui` 的 Button(toolbar 用 `outline`、图标按钮用 `ghost`),不拷 orca 的裸 class。
    - 组件代码里不写 hex、不写字号、不写像素间距。组件只用语义 token(`--background` / `--card` / `--muted` / `--destructive` / `--ring` / `--border` / `--sidebar-*` …)与 Tailwind 刻度。
    - 优先级:`[data-theme]` 变体选择器 > 本仓产品层 `:root`/`.dark` > `@innate/ui` 基础 `:root`。默认变体是 `default`(基础仓基础 `:root`,即 shadcn Neutral),它的中性色与 orca 逐 token 相等。
 3. **颜色只给状态**(选中 / 错误 / 警告 / git 增删);壳面保持单色安静铬面;surface/foreground **成对使用**(`--card` 配 `--card-foreground`),不跨对混搭;品牌色只允许出现在主按钮、链接与焦点环。

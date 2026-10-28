@@ -136,7 +136,7 @@ orca 只有明暗两态。`@innate/ui` 有 10 个变体：
 | icon | `size-9` | `size-7` | 同上。 |
 | 内部 svg | `size-4` | `size-3` | 需要 16px 时显式 `size-4`。 |
 | `destructive` | 实心 `bg-destructive text-white` | 淡底 `bg-destructive/10 text-destructive` | 取 `@innate/ui`；需要实心时用 `variant="default"` + `className` 局部覆盖。 |
-| `ghost` hover | `bg-accent` | `bg-muted` | 取 `@innate/ui`。**壳 chrome 层例外**：titlebar 内的图标按钮用本仓 `.titlebar-icon-button` / `.sidebar-toggle`（hover 是 `bg-accent`）。 |
+| `ghost` hover | `bg-accent` | `bg-muted` | 取 `@innate/ui`。顶栏图标按钮就用 `Button variant="ghost"`——按 plan W1a.3 与 plan1 评审，壳控件按规范取 `@innate/ui` Button，不拷 orca 的裸 class；观感差异交给基础仓调 `ghost` 的 hover 色。 |
 | `outline` | 带 `shadow-xs` | 无 shadow | 取 `@innate/ui`。 |
 | 额外变体 | `pane-title`、`pane-title-close`、`destructive-chip` | 无 | **不迁移成 primitive**。面板标题栏是壳 chrome，用 `shell.css` 的类名实现。 |
 | 额外尺寸 | `chip`（h-4） | 无 | 用 `Badge` 或 `text-3xs`，不新造尺寸档。 |
@@ -184,7 +184,7 @@ orca 的 `.jump-palette-item[data-selected='true']`（`color-mix` 前景入背�
 | 拖拽 | `-webkit-app-region: drag` | 无 | 同 orca；交互元素显式 `no-drag` |
 | 左区 | `.titlebar-left`（`--worktree-sidebar` 底 + inset 阴影） | 图标 rail 64px + 子菜单 256px | 栏宽沿用 webshell；`.titlebar-left` 沿用 orca |
 | 中区 | `flex-1` 中央区 | 标题 + `Badge` | 当前视图标题 |
-| 右区 | `.titlebar-icon-button` | `Badge` + `LocaleSelector` + `ThemeSelector` | **webshell 那三项**，主题切换只有 `ThemeSelector` 一个入口 |
+| 右区 | 裸 `button.titlebar-icon-button` 一组 | `Badge` + `LocaleSelector` + `ThemeSelector` | **webshell 那三项**，主题切换只有 `ThemeSelector` 一个入口；按钮本身用 `@innate/ui` Button `ghost` |
 | 窗口控件 | 右侧 fixed，3 × 46px = 138px | 无 | 同 orca（Windows/Linux）；macOS 用原生红绿灯 + 80px 占位 |
 
 **为什么是「物理壳用 orca、内容语义用 webshell」**：窗口控件只有桌面端有，webshell 的 48px sticky header 承载不了；反过来，「左标题 / 右工具区」的分区是 innate 家族共有的交互语言，桌面端应当一致，否则同一产品两种形态下头部布局不同，用户要重新学习。36px 装得下右侧那三件 24–28px 的小件。
@@ -195,7 +195,7 @@ orca 的 `.jump-palette-item[data-selected='true']`（`color-mix` 前景入背�
 | --- | --- |
 | `@innate/ui` 的 `Button` 默认 h-7（orca h-9），36px 顶栏里偏小 | 顶栏按钮统一 `icon-sm` / `icon-xs` |
 | `@innate/ui` 把内部 svg 压到 `size-3`（orca 用 16px） | 顶栏图标显式 `size-4` |
-| `@innate/ui` 的 `ghost` hover 是 `bg-muted`（orca 用 `accent`） | 顶栏图标按钮用 `shell.css` 的 `.titlebar-icon-button` / `.sidebar-toggle`，不用 `Button variant="ghost"` |
+| `@innate/ui` 的 `ghost` hover 是 `bg-muted`（orca 用 `accent`） | 顶栏图标按钮仍用 `Button variant="ghost"`（plan W1a.3 + plan1 评审已定「壳控件按规范，不拷 orca 的裸 class」）；观感差异由基础仓调 `ghost` hover 色解决 |
 | `@innate/ui` 的 `TooltipProvider` 缺省 `delay=0` | 顶栏区域包 `<TooltipProvider delay={400}>` |
 | orca 的关闭按钮 hover 写死 `#c42b1c`；`--destructive` 是 `#e7000b` 级别 | 产品层新增 `--window-control-close-hover` / `--window-control-close-foreground`（明暗成对） |
 | Base UI 浮层的 Portal 是否落在 Electron 拖拽区内 | 实现时逐个验证；可能需要在浮层根加 `no-drag` |
@@ -221,3 +221,4 @@ orca 的 `.jump-palette-item[data-selected='true']`（`color-mix` 前景入背�
 | 对话区 `--chat-*` token | 未实现 | 对话区落地时 |
 | 终端标题 token | 未实现 | 终端落地时 |
 | Electron 拖拽区与 Base UI 浮层的层级 | 未验证 | 桌面壳落地时 |
+| 顶栏图标按钮 hover 观感（`ghost` 的 `bg-muted` vs orca 的 `bg-accent`） | 取 `@innate/ui`，桌面端不加壳级按钮 class | 若观感不可接受，提 `pnpm ui:update` 调基础仓 `ghost` 的 hover 色 |

@@ -108,4 +108,12 @@ describe("产品 token 层", () => {
       /\.titlebar-traffic-light-pad\s*\{[^}]*width:\s*calc\(80px/,
     )
   })
+
+  it("壳 chrome 层不复制 orca 的按钮类", () => {
+    // plan W1a.3 / plan1 评审：壳控件按规范取 @innate/ui Button
+    // （toolbar 用 outline、图标按钮用 ghost），不把 orca 那段裸 class 搬过来。
+    for (const forbidden of ["titlebar-icon-button", "sidebar-toggle"]) {
+      expect(shellCss).not.toMatch(new RegExp(`\\.${forbidden}\\s*\\{`))
+    }
+  })
 })

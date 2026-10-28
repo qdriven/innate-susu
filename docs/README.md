@@ -1,7 +1,7 @@
 # Innate 平台总体计划(文档归档入口)
 
 > 本目录自 `innate-labs/docs/` 迁入(2026-10-27),是 Innate 体系全部设计文档的归档处。
-> **当前唯一执行源是 [`susu/plan2/`](./susu/plan2/README.md)（labs→innate-desktop 迁移与产品化计划,W0 起）**;P 系列平台计划已后置为 backlog(见 §4/§5);本文只做总纲摘要与文档地图。
+> **当前唯一执行源是 [`susu/plan/`](./susu/plan/README.md)（labs→innate-desktop 迁移与产品化计划,W0 起）**;P 系列平台计划已后置为 backlog(见 §4/§5);本文只做总纲摘要与文档地图。
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## 3. 平台化重启方向(2026-10-27 提出;P 系列现为 backlog)
 
-> 本节与 §4 的 P 系列自 2026-10-28 起**后置**:迁移主线(W0–W5/Q1–Q3/R1)完成后另做依赖评审再重启。详见 [susu/plan2/03-migration-plan.md](./susu/plan2/03-migration-plan.md) §5 后置清单。
+> 本节与 §4 的 P 系列自 2026-10-28 起**后置**:迁移主线(W0–W5/Q1–Q3/R1)完成后另做依赖评审再重启。详见 [susu/plan/03-migration-plan.md](./susu/plan/03-migration-plan.md) §5 后置清单。
 
 ### 底座五类共享服务
 
@@ -49,7 +49,7 @@
 
 ## 4. 里程碑状态
 
-**当前主线(唯一执行源:[susu/plan2/](./susu/plan2/README.md))**:W0 基线迁入 → W1a/W1b/W1c 桌面壳 → (W2 网关收口 ∥ W3 工作区) → W4 terminal → W5 browser → R1 Harness 收敛 → Q1 快照 → Q2 看板 → Q3 单任务执行。状态板与机读投影见 plan2 README §4 与 [plan2/canvas/](./susu/plan2/canvas/docs/sprints/README.md)。
+**当前主线(唯一执行源:[susu/plan/](./susu/plan/README.md))**:W0 基线迁入 → W1a/W1b/W1c 桌面壳 → (W2 网关收口 ∥ W3 工作区) → W4 terminal → W5 browser → R1 Harness 收敛 → Q1 快照 → Q2 看板 → Q3 单任务执行。状态板与机读投影见 plan README §4 与 [plan/canvas/](./susu/plan/canvas/docs/sprints/README.md)。
 
 已后置的 P 系列(2026-10-28 起不再排期,保留 backlog):
 
@@ -59,7 +59,7 @@
 | M4/M5 | 方向 B:DSH 侧插件 / 双向设置 | 后置 backlog |
 | S5/S6 | mini-gateway 决策门 / 代码健康 | 不变,穿插 |
 
-DoD:全量门禁绿 + 任务卡「如何验证」逐条通过 + 证据入 `docs/susu/plan2/evidence/<阶段>/` + 文档同步。
+DoD:全量门禁绿 + 任务卡「如何验证」逐条通过 + 证据入 `docs/susu/plan/evidence/<阶段>/` + 文档同步。
 
 ## 5. 旧主线处置
 
@@ -84,7 +84,7 @@ DoD:全量门禁绿 + 任务卡「如何验证」逐条通过 + 证据入 `docs/
 | Issue/PR、需求文件或本地任务的分析、验证证据与 Canvas | [task-workflow](../.agents/skills/task-workflow/SKILL.md)；事实源为 `docs/sprints/task-*-*.md` |
 | **仓库现状的 build-path 记录**（任务驱动基线、monorepo 骨架与 UI 基座接入） | [build-path/0-setup/](./build-path/0-setup/README.md)、[build-path/1-monorepo-init/](./build-path/1-monorepo-init/README.md) |
 | orca ↔ innate-fe 的对齐结论与差异处置 | [build-path/1-monorepo-init/style-guide-alignment.md](./build-path/1-monorepo-init/style-guide-alignment.md) |
-| **当前迁移执行计划(唯一执行源)** | [susu/plan2/](./susu/plan2/README.md)；看板投影 [susu/plan2/canvas/](./susu/plan2/canvas/docs/sprints/README.md) |
+| **当前迁移执行计划(唯一执行源)** | [susu/plan/](./susu/plan/README.md)；看板投影 [susu/plan/canvas/](./susu/plan/canvas/docs/sprints/README.md) |
 | 已合并归档的旧迁移计划(plan1)与评审 | [susu/archive/plan1/](./susu/archive/plan1/README.md)(含 reviews/) |
 | 并发会话画布预览产物(非事实源) | [susu/archive/project-canvas-preview/](./susu/archive/project-canvas-preview/) |
 | 平台化方向总纲(P 系列 backlog) | [original/innate-dogic/CONTEXT.md](./original/innate-dogic/CONTEXT.md) |
@@ -102,4 +102,4 @@ DoD:全量门禁绿 + 任务卡「如何验证」逐条通过 + 证据入 `docs/
 
 ## 8. 阅读顺序
 
-新会话先读本文件 → [`susu/plan2/README.md`](./susu/plan2/README.md)（唯一执行源）→ 对应阶段任务卡;执行任务只看 plan2,做完按 DoD 回写证据与状态板。UI 任务另读 `.agents/skills/susu-overview`;场景操作读 `.agents/skills/innate-dsh-playbook`。
+新会话先读本文件 → [`susu/plan/README.md`](./susu/plan/README.md)（唯一执行源）→ 对应阶段任务卡;执行任务只看 plan,做完按 DoD 回写证据与状态板。UI 任务另读 `.agents/skills/susu-overview`;任务工作流读 `.agents/skills/task-workflow`;dsh/magpie 排障手册暂在 innate-labs 仓 `.agents/skills/innate-dsh-playbook`（W0 时迁回,见 plan W0.8）。

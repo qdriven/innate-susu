@@ -14,7 +14,7 @@ innate-desktop/
 └── .agents/skills/    susu-overview 总控技能（UI 纪律与路由）
 ```
 
-旧 `apps/susu-web` 验证应用已废弃删除，不再作为产品基线。桌面实现与迁移任务见 [Plan2](docs/susu/plan2/README.md)。
+旧 `apps/susu-web` 验证应用已废弃删除，不再作为产品基线。桌面实现与迁移任务见 [plan](docs/susu/plan/README.md)。
 
 ## UI 基座分层
 

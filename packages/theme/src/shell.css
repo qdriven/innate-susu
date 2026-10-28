@@ -1,7 +1,7 @@
 /* innate-desktop 壳 chrome 层
  *
  * 来源：innate-labs/references/orca `src/renderer/src/assets/main.css` 的壳 chrome 段落
- *       （titlebar / window-controls / sidebar-toggle / editor-header / scrollbar）。
+ *       （titlebar / window-controls / editor-header / scrollbar）。
  * 改动规则：
  *   - 只引用语义 token（--background/--card/--border/--accent/--muted-foreground…）
  *     或本包 tokens.css 里声明的产品 token；
@@ -114,46 +114,14 @@
   width: var(--window-controls-width, 0px);
 }
 
-/* ── titlebar 图标按钮 ────────────────────────────────────────────────── */
-
-.sidebar-toggle {
-  -webkit-app-region: no-drag;
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background 150ms;
-}
-
-.sidebar-toggle:hover {
-  background: var(--accent);
-  color: var(--foreground);
-}
-
-/* 前进/后退箭头成组，间距比其他 titlebar 动作更紧。 */
-.sidebar-toggle-compact {
-  padding: 4px 5px;
-  color: var(--foreground);
-}
-
-.sidebar-toggle-compact:disabled {
-  color: var(--muted-foreground);
-}
-
-.sidebar-toggle:disabled {
-  cursor: default;
-  opacity: 0.45;
-}
-
-.sidebar-toggle:disabled:hover {
-  background: none;
-  color: var(--muted-foreground);
-}
+/* ── titlebar 内的控件 ────────────────────────────────────────────────────
+ * orca 的裸 `button.titlebar-icon-button` / `.sidebar-toggle` **不迁移**。
+ * 依据 plan W1a.3 与 plan1 评审（2026-10-28）：壳控件按规范取
+ * `@innate/ui` 的 Button——toolbar 用 `outline`、图标按钮用 `ghost`，
+ * 不把 orca 那段 class 拷过来，也不造 Toolbar 原语。
+ *
+ * 因此本层只保留**不是按钮**的 chrome：titlebar 布局、窗口控件、
+ * 红绿灯占位、滚动条。 */
 
 .titlebar-app-name {
   -webkit-app-region: no-drag;
@@ -182,36 +150,6 @@
 
 .titlebar-app-name-main {
   flex: 0 0 auto;
-}
-
-.titlebar-icon-button {
-  -webkit-app-region: no-drag;
-  background: none;
-  border: none;
-  color: var(--muted-foreground);
-  cursor: pointer;
-  padding: 4px;
-  margin-right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background 150ms;
-}
-
-.titlebar-icon-button:hover {
-  background: var(--accent);
-  color: var(--foreground);
-}
-
-.titlebar-icon-button:disabled {
-  cursor: default;
-  opacity: 0.5;
-}
-
-.titlebar-icon-button:disabled:hover {
-  background: none;
-  color: var(--muted-foreground);
 }
 
 /* ── 编辑器面板 header ────────────────────────────────────────────────── */

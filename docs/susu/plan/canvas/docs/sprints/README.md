@@ -1,6 +1,6 @@
-# plan2 执行看板（project-canvas 机读投影）
+# plan 执行看板（project-canvas 机读投影）
 
-> 本目录是 `docs/susu/plan2/` 的机读投影，供 project-canvas 派生看板与审计。任务卡细节以 [../phases/](../../phases/) 为准；两处同步修改，plan2 正文优先。
+> 本目录是 `docs/susu/plan/` 的机读投影，供 project-canvas 派生看板与审计。任务卡细节以 [../phases/](../../phases/) 为准；两处同步修改，plan 正文优先。
 > 段映射：S0=W0、S1=W1a、S2=W1b、S3=W1c、S4=W2、S5=W3、S6=W4、S7=W5、S8=R1、S9=Q1、S10=Q2、S11=Q3。任务标题保留源编号（W/Q/R 别名）。
 > 改任务卡后：canvas_audit → canvas_sync → canvas_board（root 传本 canvas/ 目录），不手改 out/。
 

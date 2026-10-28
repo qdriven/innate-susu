@@ -6,7 +6,7 @@ description: orca（stablyai/orca 并行 Agent IDE）的模块与组件化通用
 # orca 模块通用知识
 
 > 2026-10-28 自 `innate-labs/.agents/skills/orca-module-kit` 迁入本仓，技能名现为 `module-kit`。参考源码留在 `D:\innate-workspace\framework\innate-labs\references\orca`（只读，不在本仓）；完整取舍分析在本仓 `docs/original/architecture/orca-module-review.md`（canonical，改动先改它）。
-> 视觉规则以 `susu-overview` 为准。本仓产品的 Surface / 终端 / 文件树归属在 `docs/susu/plan2/`，不在本技能。
+> 视觉规则以 `susu-overview` 为准。本仓产品的 Surface / 终端 / 文件树归属在 `docs/susu/plan/`，不在本技能。
 
 ## 可直接借鉴
 

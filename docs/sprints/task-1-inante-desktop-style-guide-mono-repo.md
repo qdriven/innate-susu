@@ -118,7 +118,7 @@ style guide 是 orca 原文的**未修改副本**加一张替换表：它假定 
 - **产品层覆写共享 token，用同值冻结。** 不是另造一套中性色，而是防止基础仓改 Neutral 时桌面端观感漂移，并用测试钉住快照。
 - **暗色 4 处差异固定 orca 值**：`accent`（`#404040`，基础仓值与 `muted` 同值会让 hover 几乎不可见）、`border` / `sidebar-border`（7% 而非 10%，发丝线更符合「外壳退后」的定位）、`sidebar-ring`（`#525252`，侧栏 focus 环更收敛）。
 - **按钮取 `@innate/ui` 的紧凑尺度**（default h-7 / 13px），顶栏内的按钮统一 `icon-sm` / `icon-xs`。
-- **顶栏图标按钮不直接用 `Button variant="ghost"`**：`@innate/ui` 的 ghost hover 是 `bg-muted`，orca 是 `bg-accent`；顶栏用本仓 `shell.css` 的 `.titlebar-icon-button` / `.sidebar-toggle`（壳 chrome 层的正确归属）。
+- **顶栏图标按钮用 `Button variant="ghost"`，不拷 orca 的裸 class。** 依据 plan W1a.3 与 plan1 评审（2026-10-28）：壳控件按规范取 `@innate/ui` Button——toolbar 用 `outline`、图标按钮用 `ghost`，不把 orca 的 `titlebar-icon-button` / `sidebar-toggle` 搬进 `shell.css`，也不造 Toolbar 原语。`@innate/ui` 的 ghost hover 是 `bg-muted`、orca 是 `bg-accent`，这一处观感差异留给基础仓调 `ghost` 的 hover 色解决。
 - **关闭按钮 hover 单开 token**（`--window-control-close-hover` / `--window-control-close-foreground`）：orca 写死 `#c42b1c`，`@innate/ui` 的 `--destructive` 是 `#e7000b` 级别，hover 观感会跳。
 - **orca 专属能力不在本仓现造**：安全表面、快捷键 chip 平台分隔、多选 combobox 逐项给出过渡方案 + 正式方案（去基础仓 `ui:add`）。
 - **中性色对照做成可复核脚本**（`tools/compare-palette.mjs`）：把 `hsl()` / `oklch()` / `rgb()` 统一换算成 hex 再比，避免「凭印象对齐」。
@@ -235,6 +235,7 @@ Spec：S2
 - M6 [add] apps — 应用槽位说明（README），标注 W1 约定；不建包
 - M7 [modify] docs/README.md — 文档地图补 build-path 与对齐结论入口
 - M8 [modify] README.md — 仓库结构、UI 基座分层、常用命令与文档入口
+- M9 [modify] docs/susu/plan/phases/W1-shell.md — W1a.0 字体决策门补记产品层接管；W1a.2 入口 CSS 改引产品层主题入口；顶栏控件规则与本任务对齐（唯一执行源的同步更新）
 
 ## Spec 关联
 
@@ -243,6 +244,7 @@ Spec：S2
 - S3 [modify/done] .agents/skills/susu-overview/STYLEGUIDE.md — 视觉规范执行副本改为面向本仓基座
 - S4 [modify/done] .agents/skills/susu-overview/SKILL.md — token 三层规则与 style guide 索引
 - S5 [modify/done] packages/theme/README.md — token 分层、主题变体与门禁说明
+- S6 [modify/done] docs/susu/plan/phases/W1-shell.md — W1a.0 字体决策落定、W1a.2 入口 CSS 改为 `@import "@innate-desktop/theme/index.css"`
 
 ## 交付记录
 
@@ -251,6 +253,8 @@ Spec：S2
 - 2026-10-28：逐 token 核对 orca 与 `@innate/ui` 基础中性色，确认相等（暗色 4 处刻意差异），并据此修正默认主题变体为 `default`。
 - 2026-10-28：重写 STYLEGUIDE.md 与 styleguide/ 六篇，新增 toolbar.md 的三方对照规格；对照表落在 style-guide-alignment.md。
 - 2026-10-28：新增 tools/compare-palette.mjs，使中性色对齐结论可重复复核。
+- 2026-10-28：合并 `origin/main` 后按唯一执行源 `docs/susu/plan/phases/W1-shell.md` 复核顶栏规则——W1a.3 与 plan1 评审已定「壳控件按规范取 `@innate/ui` Button，不拷 orca 的裸 class」。据此从 `packages/theme/src/shell.css` 移除 `.titlebar-icon-button` / `.sidebar-toggle`，同步改写 `styleguide/toolbar.md` 与 `style-guide-alignment.md` 的对应结论。
+- 2026-10-28：回写唯一执行源：W1a.0 字体决策门落定为「产品层接管」（`packages/theme/src/tokens.css` 声明 Geist / SF Mono，字库随包分发，基础仓不改）；W1a.2 入口 CSS 改为 `@import "@innate-desktop/theme/index.css"`。
 - PR #2 已开：feat: monorepo 骨架 + UI 基座接入 + style guide 对齐（qdriven/inante-desktop → main）
 
 ## 来源原文
