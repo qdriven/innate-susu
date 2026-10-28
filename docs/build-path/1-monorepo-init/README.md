@@ -25,7 +25,7 @@ innate-desktop/
 │       ├── src/shell.css        # 壳 chrome 类名（不写字面量）
 │       ├── src/index.css        # 入口：tokens.css + shell.css
 │       ├── src/theme.ts         # 机器可读契约
-│       ├── src/theme.test.ts    # token 纪律测试（8 项）
+│       ├── src/theme.test.ts    # token 纪律测试（9 项）
 │       └── src/fonts/Geist-Variable.woff2
 ├── apps/
 │   └── README.md                # 应用槽位说明（W1 才建 @innate-desktop/desktop）
@@ -50,6 +50,7 @@ innate-desktop/
 | 基础仓源码 | **不并入**，走私有 Verdaccio 的**源码包**（`main: ./src/index.ts`） | 基础仓独立演进；消费方 bundler 负责编译 |
 | TS 基座 | 根 `tsconfig.base.json`，strict + `noUncheckedIndexedAccess` 等 | 全仓一条基线，包只做增量 |
 | token 分层 | 基础仓（primitive + 主题机制）/ 本仓产品层（字面量唯一出口）/ 本仓壳 chrome 层 | 见 [style-guide-alignment.md §2](./style-guide-alignment.md#2-中性色对照) |
+| 壳 chrome 层的范围 | 只放**不是按钮**的 chrome：titlebar 布局、窗口控件、红绿灯占位、滚动条 | 顶栏按钮按 plan W1a.3 取 `@innate/ui` Button（toolbar 用 `outline`、图标用 `ghost`），不拷 orca 的裸 class；测试会拦住 |
 | 构建脚本白名单 | `allowBuilds: { electron: true, esbuild: true }` | 只放行需要的原生构建 |
 | 发版年龄豁免 | `minimumReleaseAgeExclude: ["@innate/ui@0.1.2"]` | 私有源的内部包不等公开发布节奏 |
 | 应用槽位 | `apps/*` 先留空，`@innate-desktop/desktop` 留到 W1 | 本次只交付骨架，不写应用代码 |
@@ -80,10 +81,10 @@ node tools/compare-palette.mjs   # 中性色对照复核（只读）
 | --- | --- | --- |
 | workspace 成员 | `pnpm -r list --depth -1` | `innate-desktop@0.1.0` + `@innate-desktop/theme@0.1.0` |
 | 类型检查 | `pnpm typecheck` | 通过（根 + `packages/theme`） |
-| 测试 | `pnpm test` | `packages/theme` 8 项全通过 |
+| 测试 | `pnpm test` | `packages/theme` 9 项全通过 |
 | 构建 | `pnpm build` | 通过（theme 包为纯 CSS，无构建步骤） |
 | 基座接入 | `pnpm ui:sync` | `@innate/ui@0.1.2` 发布到本地 Verdaccio 并重装成功 |
-| token 纪律 | `pnpm --filter @innate-desktop/theme test` | 覆盖：import 顺序、产品 token 明暗成对、共享 token 快照、无 `prefers-color-scheme`、壳 chrome 不写字面量、壳 chrome 尺寸与 orca 一致 |
+| token 纪律 | `pnpm --filter @innate-desktop/theme test` | 覆盖：import 顺序、产品 token 明暗成对、共享 token 快照、无 `prefers-color-scheme`、壳 chrome 不写字面量、壳 chrome 尺寸与 orca 一致、壳 chrome 不复制 orca 的按钮类 |
 | 中性色对齐 | `node tools/compare-palette.mjs` | 亮色全等；暗色 4 处结构性差异（已在产品层固定） |
 
 ## 「检查当前是否已经可以满足了」的结论

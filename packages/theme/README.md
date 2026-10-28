@@ -10,6 +10,10 @@ innate-desktop 的**产品 token 层 + 壳 chrome 层**，建立在 `@innate/ui`
 | 产品 token 层 | `src/tokens.css` | 本仓 | 是（本仓唯一允许出现字面量的地方） |
 | 壳 chrome 层 | `src/shell.css` | 本仓 | 否（只引用 token） |
 
+壳 chrome 层只放**不是按钮**的 chrome：titlebar 布局、窗口控件、红绿灯占位、滚动条。
+**按钮不在这一层**——顶栏等壳内按钮按 plan W1a.3 取 `@innate/ui` 的 Button（toolbar 用
+`outline`、图标按钮用 `ghost`），不拷 orca 的裸 class。
+
 明暗机制统一为 `.dark` class（`@innate/ui` 的 `@custom-variant dark`）；主题变体统一为
 `:root[data-theme="…"]`。**不要**写 `prefers-color-scheme` 媒体查询。
 
@@ -52,4 +56,5 @@ innate-desktop 的**产品 token 层 + 壳 chrome 层**，建立在 `@innate/ui`
 - 每个产品扩展 token 在 `:root` 与 `.dark` 中成对声明；
 - 共享语义 token 的亮色值与快照一致；
 - 全包不出现 `prefers-color-scheme`；
-- 壳 chrome 层不写死颜色值，尺寸与 orca 一致。
+- 壳 chrome 层不写死颜色值，尺寸与 orca 一致；
+- 壳 chrome 层不复制 orca 的按钮类（`.titlebar-icon-button` / `.sidebar-toggle`）。

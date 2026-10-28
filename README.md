@@ -22,7 +22,7 @@ innate-desktop/
 | --- | --- | --- |
 | primitive 与主题机制 | `@innate/ui`（`packages/ui/src/tokens.css` + `themes/`） | 基础仓 innate-fe |
 | 产品 token 层 | `packages/theme/src/tokens.css` | 本仓（**唯一允许出现字面量的文件**） |
-| 壳 chrome 层 | `packages/theme/src/shell.css` | 本仓（只引用 token） |
+| 壳 chrome 层 | `packages/theme/src/shell.css` | 本仓（只引用 token；**按钮不在这一层**，顶栏按钮取 `@innate/ui` 的 Button） |
 
 明暗统一走 `.dark` class，主题变体统一走 `data-theme`。`@innate/ui` 的基础 `:root`（shadcn Neutral）与 orca 的中性色**逐 token 相等**，产品层把这套值冻结在仓里并固定 4 处刻意差异——对照表见 [style-guide-alignment.md](docs/build-path/1-monorepo-init/style-guide-alignment.md)。
 
