@@ -1,6 +1,6 @@
 # UX rules: rationale
 
-The reasoning behind the UX rules in [`docs/STYLEGUIDE.md`](../STYLEGUIDE.md#ux-rules). Read when a rule's application is unclear or you need to justify a divergence.
+The reasoning behind the UX rules in [`../STYLEGUIDE.md`](../STYLEGUIDE.md#ux-rules). Read when a rule's application is unclear or you need to justify a divergence.
 
 ## 1. Match in-flight feedback to perceived duration
 

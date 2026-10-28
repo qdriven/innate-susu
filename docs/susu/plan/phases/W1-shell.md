@@ -11,10 +11,12 @@
 
 ### W1a.0 字体决策（决策门，不开工不写码）
 
-- **改动位置**：innate-fe `packages/ui/src/tokens.css`（若选 Geist）或本仓技能替换表（若选 Inter 例外）；记录写入本阶段证据。
-- **实施**：二选一拍板——(a) innate-fe `--font-sans` 由 Inter 改 Geist（orca STYLEGUIDE 要求，技能替换表当前记录的做法），改完 `pnpm ui:sync -- --bump patch`；(b) 在技能替换表把「桌面例外、沿用 Inter」写成正式产品决定。产品代码禁止另写 `font-family`。
-- **验证**：决策记录在案；选 (a) 则基础仓发版、本仓消费成功。
-- **完成标准**：W1a.2 开工前字体有唯一事实源。
+> **已拍板（2026-10-28，setup 任务交付时一并落地）**：选 **(c) 产品层接管**——桌面端字体的事实源是本仓产品 token 层，基础仓保持 Inter 默认不动。
+
+- **改动位置**：本仓 `packages/theme/src/tokens.css`（产品 token 层，本仓唯一允许字面量的地方）+ `packages/theme/src/fonts/`（字库随包分发）。基础仓 `innate-fe packages/ui/src/tokens.css` **不改**。
+- **实施**：原二选一之外补第三种落法——产品层在 `:root` 声明 `--font-sans: "Geist", …` 与 `--font-mono`，并用 `@font-face` 加载随包分发的 Geist 可变字重（100–900）；产品层先 `@import "@innate/ui/tokens.css"` 再声明同名 token，靠源码顺序覆盖基础层的 Inter 默认。基础仓的 Inter 默认服务其它消费方，不为桌面端单方面改动。**产品代码禁止另写 `font-family`**，一律走 `--font-sans` / `--font-mono`。
+- **验证**：决策记录在案；产品层已含字库与 token 声明；桌面 renderer 消费 `@innate-desktop/theme/index.css` 后字体生效。
+- **完成标准**：W1a.2 开工前字体有唯一事实源（桌面端 = `packages/theme/src/tokens.css`）。
 - **回退**：不适用（纯决策）。
 
 ### W1a.1 固定现有页面与 Surface 行为基线
@@ -33,7 +35,7 @@
 
 - **改动位置**：`apps/desktop/package.json`、electron-vite renderer 配置、renderer 入口 CSS。
 - **实施**：
-  1. 添加 `@innate/ui`、`tailwindcss`、`@tailwindcss/vite`（app devDependencies；只挂 renderer 配置）；`globals.css` 按已验证模式：`@import "tailwindcss"` + `@import "@innate/ui/tokens.css"` + 两条 `@source`（本仓源码与 `@innate/ui/src`，`@source` 写在入口文件、放所有 `@import` 之后）。
+  1. 添加 `@innate/ui`、`@innate-desktop/theme`、`tailwindcss`、`@tailwindcss/vite`（app devDependencies；只挂 renderer 配置）；`globals.css` 按已验证模式：`@import "tailwindcss"` + `@import "@innate-desktop/theme/index.css"` + 两条 `@source`（本仓源码与 `@innate/ui/src`，`@source` 写在入口文件、放所有 `@import` 之后）。入口**只引产品层入口**这一个主题入口——`@innate-desktop/theme/index.css` 内部已按「基础 token → 产品 token → 壳 chrome」的顺序串好，不必（也不应）在入口再单独引 `@innate/ui/tokens.css`，否则产品层的覆盖会被顺序打乱。
   2. 引入宿主 ThemeProvider，明暗只经 `.dark` class，禁写 `prefers-color-scheme` 媒体查询。
   3. 建立旧 CSS 到语义 token 的映射，先桥接壳样式，不要求一次重写所有业务页。
   4. 禁止深引 `@innate/ui` 内部路径，不在本仓复制 primitive。

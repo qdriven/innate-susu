@@ -1,0 +1,288 @@
+/* innate-desktop 壳 chrome 层
+ *
+ * 来源：innate-labs/references/orca `src/renderer/src/assets/main.css` 的壳 chrome 段落
+ *       （titlebar / window-controls / editor-header / scrollbar）。
+ * 改动规则：
+ *   - 只引用语义 token（--background/--card/--border/--accent/--muted-foreground…）
+ *     或本包 tokens.css 里声明的产品 token；
+ *   - 不写 hex；需要新色值先在 tokens.css 里加 token；
+ *   - 尺寸沿用 orca：titlebar 36px、窗口按钮 46×36、traffic light 占位 80px。
+ */
+
+.theme-transition-disabled *,
+.theme-transition-disabled *::before,
+.theme-transition-disabled *::after {
+  /* 主题变量切换不同步会拖出半程色；保留 spinner 动画。 */
+  transition: none !important;
+}
+
+/* ── titlebar（壳的 toolbar 主体） ─────────────────────────────────────── */
+
+.titlebar {
+  height: 36px;
+  min-height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* --bg-titlebar 目前未声明，恒定回落到 --card；保留钩子位。 */
+  background: var(--bg-titlebar, var(--card));
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-left {
+  height: 36px;
+  min-height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--worktree-sidebar);
+  /* 用内阴影代替 border，保住 36px 内容高度与 macOS 红绿灯的 y 轴对齐。 */
+  box-shadow: inset 0 -1px 0 var(--border);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+/* 侧栏收起时该 header 浮在标签条上，改回 titlebar 面色。 */
+.titlebar-left-floating {
+  background: var(--bg-titlebar, var(--card));
+}
+
+/* macOS 红绿灯占位：80px / 缩放因子，与侧栏 chrome 对齐。 */
+.titlebar-traffic-light-pad {
+  width: calc(80px / var(--ui-zoom-factor, 1));
+  flex-shrink: 0;
+}
+
+/* 自绘 titlebar 时没有原生应用标识，浅色下把白色 SVG 反相保证对比。 */
+.titlebar-logo {
+  height: 16px;
+  flex-shrink: 0;
+  margin: 0 4px 0 10px;
+  opacity: 0.75;
+}
+
+/* .dark 在根上；后代 :not(.dark) 在暗色下也会命中。 */
+:root:not(.dark) .titlebar-logo {
+  filter: invert(1);
+}
+
+/* ── 窗口控件（Windows / Linux 自绘 chrome） ──────────────────────────── */
+
+.window-controls {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: row;
+  height: 36px;
+  -webkit-app-region: no-drag;
+}
+
+.window-controls-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition:
+    background 100ms,
+    color 100ms;
+}
+
+.window-controls-btn:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+.window-controls-close:hover {
+  background: var(--window-control-close-hover);
+  color: var(--window-control-close-foreground);
+}
+
+/* 预留 3 × 46px，避免固定窗口控件盖住 titlebar 上其它内容。 */
+.window-controls-titlebar-spacer {
+  flex-shrink: 0;
+  width: var(--window-controls-width, 0px);
+}
+
+/* ── titlebar 内的控件 ────────────────────────────────────────────────────
+ * orca 的裸 `button.titlebar-icon-button` / `.sidebar-toggle` **不迁移**。
+ * 依据 plan W1a.3 与 plan1 评审（2026-10-28）：壳控件按规范取
+ * `@innate/ui` 的 Button——toolbar 用 `outline`、图标按钮用 `ghost`，
+ * 不把 orca 那段 class 拷过来，也不造 Toolbar 原语。
+ *
+ * 因此本层只保留**不是按钮**的 chrome：titlebar 布局、窗口控件、
+ * 红绿灯占位、滚动条。 */
+
+.titlebar-app-name {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  max-width: min(280px, 32vw);
+  margin-left: 2px;
+  margin-right: 4px;
+  padding: 0 6px;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* 应用名落在工作树侧栏 header 内时，继承该面板的对比度。 */
+.titlebar-left:not(.titlebar-left-floating) .titlebar-app-name {
+  color: var(--worktree-sidebar-foreground);
+}
+
+.titlebar-app-name-main {
+  flex: 0 0 auto;
+}
+
+/* ── 编辑器面板 header ────────────────────────────────────────────────── */
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  /* 与 app 紧凑 toolbar 间距对齐。 */
+  gap: 4px;
+  min-height: 32px;
+  padding: 3px 14px;
+  background: var(--editor-surface);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--border) 72%, transparent);
+  flex-shrink: 0;
+}
+
+.editor-header-path {
+  font-size: 12px;
+  line-height: 1.2;
+  font-family: var(--font-mono);
+}
+
+/* ── 滚动条：只有这三种，不写第四种 ───────────────────────────────────── */
+
+.scrollbar-sleek,
+:where([data-innate-scrollbars="sleek"] *) {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 34%,
+    transparent
+  )
+    transparent;
+}
+
+.scrollbar-sleek::-webkit-scrollbar,
+:where([data-innate-scrollbars="sleek"] *)::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-track,
+:where([data-innate-scrollbars="sleek"] *)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb,
+:where([data-innate-scrollbars="sleek"] *)::-webkit-scrollbar-thumb {
+  background: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 28%,
+    transparent
+  );
+  border: 3px solid transparent;
+  border-radius: 0;
+  background-clip: padding-box;
+  min-height: 28px;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb:hover,
+:where([data-innate-scrollbars="sleek"] *)::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 48%,
+    transparent
+  );
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb:active,
+:where([data-innate-scrollbars="sleek"] *)::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(
+    in srgb,
+    var(--foreground, #171717) 36%,
+    transparent
+  );
+}
+
+.scrollbar-sleek-parent:hover .scrollbar-sleek,
+.scrollbar-sleek:hover,
+:where([data-innate-scrollbars="sleek"] *:hover) {
+  scrollbar-color: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 48%,
+    transparent
+  )
+    transparent;
+}
+
+/* 侧栏专用：8px，不占位，静止时透明。 */
+.worktree-sidebar-scrollbar {
+  padding-right: 4px;
+  scrollbar-color: transparent transparent;
+}
+
+.worktree-sidebar-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.worktree-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-width: 3px 0 3px 0;
+}
+
+.scrollbar-sleek-parent:hover .worktree-sidebar-scrollbar,
+.worktree-sidebar-scrollbar:hover {
+  scrollbar-color: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 48%,
+    transparent
+  )
+    transparent;
+}
+
+.scrollbar-sleek-parent:hover .worktree-sidebar-scrollbar::-webkit-scrollbar-thumb,
+.worktree-sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(
+    in srgb,
+    var(--muted-foreground, #737373) 28%,
+    transparent
+  );
+}
+
+/* 编辑器/数据表：更粗，密集数据好抓。 */
+.scrollbar-editor {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(121, 121, 121, 0.4) transparent;
+}
+
+.scrollbar-editor::-webkit-scrollbar {
+  width: 14px;
+}
+
+.scrollbar-editor::-webkit-scrollbar-track {
+  background: transparent;
+}

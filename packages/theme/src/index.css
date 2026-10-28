@@ -1,0 +1,14 @@
+/* innate-desktop 主题入口
+ *
+ * 消费方（未来的桌面 renderer）这样用：
+ *
+ *   // src/globals.css
+ *   @import "tailwindcss";
+ *   @import "@innate-desktop/theme/index.css";
+ *   @source "./";
+ *   @source "../../../node_modules/@innate/ui/src";
+ *
+ * 顺序约束：token 层先于壳 chrome 层，壳 chrome 依赖 token 里的语义变量。
+ */
+@import "./tokens.css";
+@import "./shell.css";
