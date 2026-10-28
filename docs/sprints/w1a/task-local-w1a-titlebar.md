@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1a-titlebar
 title: W1a.3 替换窗口 titlebar 并保留状态空槽
 createdAt: 2026-10-28T08:42:58.087378Z
-updatedAt: 2026-10-28T08:46:57.622580Z
-status: blocked
+updatedAt: 2026-10-28T10:21:58.154339Z
+status: in_progress
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ UI 基座就位后，需要只替换窗口 titlebar，而不带入 W1b/W2 范围
 
 ### 依赖
 
-- W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。
+- W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 - T2 全绿
 
 ### 假设
@@ -59,7 +59,7 @@ UI 基座就位后，需要只替换窗口 titlebar，而不带入 W1b/W2 范围
 
 ### 摘要
 
-仅改变 apps/desktop renderer titlebar 组合，沿用现有窗口 IPC 与 @innate/ui Button primitive。
+仅改变 innate-dogic/apps/desktop renderer titlebar 组合，沿用现有窗口 IPC 与 @innate/ui Button primitive。
 
 ### 来源
 
@@ -135,8 +135,8 @@ Spec：S1
 
 ## 涉及模块
 
-- M1 [add] apps/desktop/src/renderer/shell/TitlebarStrip.tsx — 新增三区顶栏组合
-- M2 [modify] apps/desktop/src/renderer/Titlebar.tsx — 收敛到 TitlebarStrip，保留现有窗口 API
+- M1 [add] innate-dogic/apps/desktop/src/renderer/shell/TitlebarStrip.tsx — 新增三区顶栏组合
+- M2 [modify] innate-dogic/apps/desktop/src/renderer/Titlebar.tsx — 收敛到 TitlebarStrip，保留现有窗口 API
 
 ## Spec 关联
 
@@ -146,6 +146,7 @@ Spec：S1
 ## 交付记录
 
 - 计划已完成；等待 W0 全绿后按依赖实施
+- W1a.2 构建、类型、基线与明暗真机全绿，开始替换顶栏
 
 ## 来源原文
 

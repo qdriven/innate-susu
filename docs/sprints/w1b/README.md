@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: sprint-w1b
 title: W1b Sidebar ContentArea 与 App 拆分
 createdAt: 2026-10-28T08:21:17.991448Z
-updatedAt: 2026-10-28T08:24:53.693693Z
-status: analyzed
+updatedAt: 2026-10-28T10:08:20.639075Z
+status: done
 repository: 
 sourceKind: file
 sourcePath: docs/susu/plan/phases/W1-shell.md
@@ -113,12 +113,13 @@ pages.ts 同时声明 slot/mode；App 组合 Sidebar、ContentArea 与可拆卸 
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施后补充页面元数据、壳组合与验收证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1b 实施+验收完成（2026-10-28，证据 evidence/W1b/smoke/）。
 - S2 [none/-] docs/CONTEXT.md — 全局架构、协议与模块职责不因本次内部组合重构而变化。
 
 ## 交付记录
 
 - W1b 已拆解为 4 个子 task；仅完成计划，等待 W0/W1a 全绿后选择子 task
+- 四子任务全 done：注册表元数据+壳组合抽取+右栏挂载点+回归；desktop 19 测试/根 128/128/smoke with-harness 全绿（2026-10-28）
 
 ## 来源原文
 

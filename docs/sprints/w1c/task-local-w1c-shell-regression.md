@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: task-local-w1c-shell-regression
 title: W1c.4 壳与便携回归及 W1 出口证据
 createdAt: 2026-10-28T08:43:03.622085Z
-updatedAt: 2026-10-28T08:47:03.297439Z
+updatedAt: 2026-10-28T09:36:50.235988Z
 status: blocked
 branch: 
 repository: 

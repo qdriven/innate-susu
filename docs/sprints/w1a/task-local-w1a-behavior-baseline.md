@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1a-behavior-baseline
 title: W1a.1 固定页面与 Surface 行为基线
 createdAt: 2026-10-28T08:42:55.466189Z
-updatedAt: 2026-10-28T08:46:54.261479Z
-status: blocked
+updatedAt: 2026-10-28T09:59:21.507824Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ prUpdatedAt:
 
 ### 依赖
 
-- W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。
+- W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 
 ### 假设
 
@@ -58,7 +58,7 @@ prUpdatedAt:
 
 ### 摘要
 
-只新增行为测试和证据，固定 apps/desktop 与 tools/smoke-desktop 当前契约。
+只新增行为测试和证据，固定 innate-dogic/apps/desktop 与 tools/smoke-desktop 当前契约。
 
 ### 来源
 
@@ -112,12 +112,12 @@ simple/dev 页面、默认页、模式切换、Harness 状态与两个 Surface �
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] simple/dev 页面集合、默认页、模式切换和 Harness 启动状态与 W0 一致
+- F1-V1 [passed] simple/dev 页面集合、默认页、模式切换和 Harness 启动状态与 W0 一致
   - 方法：运行 renderer/main 基线测试并保存结果
-  - 证据：-
-- F1-V2 [pending] 离开对话再返回且 URL 未变时不 reload，显式停止才 close
+  - 证据：docs/susu/plan/evidence/W1a/baseline.md：2 文件 7 测试通过；真机 simple/dev 与 Harness 启动/恢复通过
+- F1-V2 [passed] 离开对话再返回且 URL 未变时不 reload，显式停止才 close
   - 方法：用 WebContents 生命周期测试记录 reload/close 调用
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W1a/baseline.md：同 URL 不 reload、显式停止才 close，Harness 存活标记与重新附着真机通过
 
 ### F2 · 控制台与窗口基线
 
@@ -125,23 +125,27 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] 控制台 show/hide/bounds/close 与窗口 resize 行为有真实证据
+- F2-V1 [passed] 控制台 show/hide/bounds/close 与窗口 resize 行为有真实证据
   - 方法：运行桌面测试与 smoke，保存窗口尺寸和 bounds 摘要
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W1a/baseline-smoke/window-bounds.json；console-bounds.json；harness-bounds.json；控制台 hide/show 真机通过
 
 ## 涉及模块
 
-- M1 [modify] apps/desktop/src/ — 新增 W0 行为基线测试
-- M2 [modify] tools/smoke-desktop/ — 保存窗口与 Surface 真机基线
+- M1 [modify] innate-dogic/apps/desktop/src/ — 新增 W0 行为基线测试
+- M2 [modify] tools/smoke-desktop.ts — 保存窗口与 Surface 真机基线
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — 对应 W1 阶段任务卡；实施完成后登记实际行为与证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — 对应 W1 阶段任务卡；实施完成后登记实际行为与证据。
 - S2 [none/-] docs/CONTEXT.md — 全局 Context 已定义模式门控、壳 IPC 与 Surface 安全约束，本任务按既有边界实施。
 
 ## 交付记录
 
 - 计划已完成；等待 W0 全绿后按依赖实施
+- W0 已全绿，开始固定 W0 页面、Surface 与窗口行为基线
+- W1b 门禁前置：执行 W1a T1
+- 验证与 Spec 证据完成，进入 done 门禁
+- 2 文件 7 测试与完整真机基线通过，证据和 Spec 已完成
 
 ## 来源原文
 

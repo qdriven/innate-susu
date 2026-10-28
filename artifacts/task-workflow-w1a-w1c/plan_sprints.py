@@ -84,26 +84,26 @@ NON_GOALS = ["不重写 magpie/DSH 启动协议，不实现 terminal/browser。"
 W1A_NON_GOALS = NON_GOALS + ["W1a 不重写 Sidebar、不拆页面、不接 W2 pill，也不改变 Surface 多标签语义。"]
 W1C_NON_GOALS = NON_GOALS + ["不改变 W1b 已定壳组合，不新增无功能 provider 占位入口。"]
 NON_GOALS = W1A_NON_GOALS
-W0_DEP = "W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。"
+W0_DEP = "W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。"
 FONT_DEP = "W1a.0 已拍板产品层字体方案，由 packages/theme 提供 Geist 与产品 token。"
 W1A_DATA = {
-    "context": tc("W0 桌面基线尚未迁入，无法直接接入 UI 基座或替换 titlebar；需要先固定行为，再按既定产品主题层完成 W1a。",
-                  "在 W0 全绿后依次建立行为基线、接入 Tailwind/ThemeProvider、只替换 titlebar，并保存真实明暗与行为证据。",
+    "context": tc("W0 桌面基线已迁入并通过六门禁；需要先固定现有行为，再按既定产品主题层完成 W1a。",
+                  "依次建立行为基线、接入 Tailwind/ThemeProvider、只替换 titlebar，并保存真实明暗与行为证据。",
                   ["W1a.1 行为基线", "W1a.2 产品主题接入", "W1a.3 titlebar 替换"],
                   [W0_DEP, FONT_DEP, "T1 → T2 → T3 顺序执行"],
-                  ["W0 完成后提供 apps/desktop 与 tools/smoke-desktop；当前缺失路径仅为依赖警告。"]),
-    "global": "W1a 属于 apps/desktop renderer 的 UI 基座与窗口铬面改造；字体事实源已固定为本仓 packages/theme，基础仓保持 Inter 默认。",
-    "design": da("目标仓尚无桌面实现；W1a.0 已在 packages/theme 落地产品字体与 token 分层。",
+                  ["实际产品路径为 innate-dogic/apps/desktop 与 tools/smoke-desktop。"]),
+    "global": "W1a 属于 innate-dogic/apps/desktop renderer 的 UI 基座与窗口铬面改造；字体事实源已固定为本仓 packages/theme，基础仓保持 Inter 默认。",
+    "design": da("W0 桌面实现已迁入，W1a.0 已在 packages/theme 落地产品字体与 token 分层。",
                  "W0 行为先由测试固定，renderer 经唯一产品主题入口消费 @innate/ui 与 ThemeProvider，titlebar 三区结构保持窗口控制行为。",
                  ["严格使用 @innate-desktop/theme/index.css 唯一主题入口。", "明暗只经 .dark，Sidebar 与页面在 W1a 保持原样。", "状态槽仅留空节点，不接 W2 数据。"],
-                 ["在 W0 前实施会失去行为对照与源码落脚点；主题顺序错误会覆盖产品 token。"]),
+                 ["行为基线不足会让壳回归难以定位；主题顺序错误会覆盖产品 token。"]),
     "tasks": {
         "task-local-w1a-behavior-baseline": {
             "context": tc("后续壳重构需要可重复的 simple/dev、Harness、控制台与窗口行为基线。",
                           "在未经 UI 改造的 W0 实现上补齐公开页面与两个 WebContents Surface 的回归断言。",
                           ["renderer/main 行为测试", "窗口尺寸、resize 与 bounds 证据"], [W0_DEP],
                           ["真实 DSH/Electron 环境不可用时记录 failed，不用 mock 结果冒充真机通过。"]),
-            "global": "只新增行为测试和证据，固定 apps/desktop 与 tools/smoke-desktop 当前契约。",
+            "global": "只新增行为测试和证据，固定 innate-dogic/apps/desktop 与 tools/smoke-desktop 当前契约。",
             "design": da("W0 行为由真实桌面实现提供，但尚缺 W1 重构专用回归断言。",
                          "simple/dev 页面、默认页、模式切换、Harness 状态与两个 Surface 生命周期均有可重复基线。",
                          ["先测旧行为再改 UI。", "URL 未变不 reload，显式停止才 close。"], ["环境差异可能导致真机验证失败，必须显式收口。"]),
@@ -112,14 +112,14 @@ W1A_DATA = {
                 ("离开对话再返回且 URL 未变时不 reload，显式停止才 close", "用 WebContents 生命周期测试记录 reload/close 调用")]),
                          ft("F2", "控制台与窗口基线", "固定 show/hide/bounds/close 和 resize 行为", [
                 ("控制台 show/hide/bounds/close 与窗口 resize 行为有真实证据", "运行桌面测试与 smoke，保存窗口尺寸和 bounds 摘要")])],
-            "modules": [md("apps/desktop/src/", "新增 W0 行为基线测试"), md("tools/smoke-desktop/", "保存窗口与 Surface 真机基线", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/src/", "新增 W0 行为基线测试"), md("tools/smoke-desktop/", "保存窗口与 Surface 真机基线", mid="M2")],
         },
         "task-local-w1a-theme-foundation": {
             "context": tc("renderer 需要消费统一 UI 基座，同时保持已固定的 simple/dev 行为。",
                           "接入 Tailwind、产品主题入口和 ThemeProvider，完成语义 token 桥接。",
                           ["app 依赖与 renderer 构建配置", "globals.css、ThemeProvider 与旧样式桥接"], [W0_DEP, FONT_DEP, "T1 基线全绿"],
                           ["@innate/ui 经私有 registry 消费，不复制或深引源码。"]),
-            "global": "只改变 apps/desktop 的 UI 构建与主题消费；packages/theme 已是产品 token 和 Geist 字体事实源。",
+            "global": "只改变 innate-dogic/apps/desktop 的 UI 构建与主题消费；packages/theme 已是产品 token 和 Geist 字体事实源。",
             "design": da("W0 使用旧 CSS，尚无 Tailwind 与宿主 ThemeProvider 的统一接入。",
                          "globals.css 以固定顺序引入 tailwindcss 和 @innate-desktop/theme/index.css，壳样式使用语义 token。",
                          ["@source 位于所有 import 后。", "不引用 @innate/ui/globals.css，不在组件写 font-family。"], ["插件或 import 顺序错误会导致裸样式或 token 覆盖失效。"]),
@@ -128,14 +128,14 @@ W1A_DATA = {
                 ("ThemeProvider 通过 .dark 切换明暗，代表页面无裸样式", "运行主题测试并保存明暗截图")]),
                          ft("F2", "旧行为保持", "主题接入不改变公开行为", [
                 ("T1 simple/dev、默认页与 Harness 基线全部保持通过", "重跑 T1 同一组断言，不修改旧断言口径")])],
-            "modules": [md("apps/desktop/package.json", "声明 UI、产品主题和 Tailwind 依赖"), md("apps/desktop/src/renderer/", "接入入口 CSS、ThemeProvider 与语义 token", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/package.json", "声明 UI、产品主题和 Tailwind 依赖"), md("innate-dogic/apps/desktop/src/renderer/", "接入入口 CSS、ThemeProvider 与语义 token", mid="M2")],
         },
         "task-local-w1a-titlebar": {
             "context": tc("UI 基座就位后，需要只替换窗口 titlebar，而不带入 W1b/W2 范围。",
                           "实现三区 TitlebarStrip，保留窗口控制、拖拽、双击最大化，并预留空状态槽。",
                           ["Titlebar.tsx 到 shell/TitlebarStrip 的替换", "三区 DOM、窗口行为与明暗验证"], [W0_DEP, "T2 全绿"],
                           ["W1b 的 Sidebar/页面和 W2 的 pill 均不在本任务修改。"]),
-            "global": "仅改变 apps/desktop renderer titlebar 组合，沿用现有窗口 IPC 与 @innate/ui Button primitive。",
+            "global": "仅改变 innate-dogic/apps/desktop renderer titlebar 组合，沿用现有窗口 IPC 与 @innate/ui Button primitive。",
             "design": da("W0 Titlebar 提供窗口控制和拖拽行为。",
                          "左侧品牌、中间空 tabs 槽、右侧窗口控制/右栏开关位与空状态槽组成唯一新顶栏。",
                          ["toolbar 用 outline Button，图标用 ghost Button。", "状态槽无数据、无假 pill。"], ["顶栏改造可能破坏拖拽区与窗口控制，需 DOM 和真机双重验证。"]),
@@ -145,7 +145,7 @@ W1A_DATA = {
                          ft("F2", "窗口行为与视觉回归", "替换顶栏不改变现有行为", [
                 ("拖拽、双击最大化及窗口控制行为不回退", "运行窗口控制测试与真实 Electron 冒烟"),
                 ("明暗截图和 T1/T2 行为基线均通过", "保存截图并重跑全部 W1a 基线")])],
-            "modules": [md("apps/desktop/src/renderer/shell/TitlebarStrip.tsx", "新增三区顶栏组合", "add"), md("apps/desktop/src/renderer/Titlebar.tsx", "收敛到 TitlebarStrip，保留现有窗口 API", mid="M2")],
+            "modules": [md("innate-dogic/apps/desktop/src/renderer/shell/TitlebarStrip.tsx", "新增三区顶栏组合", "add"), md("innate-dogic/apps/desktop/src/renderer/Titlebar.tsx", "收敛到 TitlebarStrip，保留现有窗口 API", mid="M2")],
         },
     },
 }
@@ -158,7 +158,7 @@ W1C_DATA = {
                   ["W1c.1 标签模型", "W1c.2 统一 Surface IPC", "W1c.3 运行时降级", "W1c.4 便携回归"],
                   [W0_DEP, "W1a 全绿", W1B_DEP, "T1 → T2 → T3 → T4 顺序执行"],
                   ["前置阶段提供 packages/core、desktop main/preload/renderer 与便携工具；当前不伪造实现。"]),
-    "global": "W1c 复用 packages/core Surface 契约，在 apps/desktop 增加 provider 中立适配；main 独占运行时私有类型，renderer 只保存安全 descriptor。",
+    "global": "W1c 复用 packages/core Surface 契约，在 innate-dogic/apps/desktop 增加 provider 中立适配；main 独占运行时私有类型，renderer 只保存安全 descriptor。",
     "design": da("目标实现尚未迁入；W0 文档基线描述 Harness 与控制台由专用 show/hide/bounds/close IPC 管理。",
                  "两类 WebContents 与 renderer document/panel 经统一标签槽组合，切换只 detach，显式 close 才销毁；单个 provider 失败不影响壳。",
                  ["标签状态仅含安全字段，provider 私有句柄留在 main。", "保留旧快照 v1 兼容与非法版本安全回退。", "认证 URL 只在对应 runtime provider 内解析。"],
@@ -169,42 +169,42 @@ W1C_DATA = {
                           "实现安全、provider 中立的 Surface 标签状态和注册接口，兼容 snapshot v1。",
                           ["core Surface 契约复用", "renderer surfaces 标签状态与 provider 注册"], [W1B_DEP],
                           ["terminal/browser 只保留 kind，不创建空 provider。"]),
-            "global": "安全标签模型位于 packages/core 与 apps/desktop renderer，不引用 Electron WebContents 或 ChildProcess。",
+            "global": "安全标签模型位于 packages/core 与 innate-dogic/apps/desktop renderer，不引用 Electron WebContents 或 ChildProcess。",
             "design": da("Harness/控制台各自维护页面状态，标签模型与私有 runtime 类型耦合。",
                          "统一标签只保存 id/kind/providerId/title/workspaceId/capabilities，并提供 open/activate/deactivate/close。",
                          ["新增元数据可选，旧 snapshot v1 可读。", "重复 ID、非法 descriptor 与版本均显式处理。"], ["不安全字段进入 renderer 或快照会破坏 token 与进程边界。"]),
             "features": [ft("F1", "安全标签状态机", "统一 Surface 生命周期且保持快照安全", [
                 ("open/activate/deactivate/close、activeId 恢复和重复 ID 行为正确", "运行 surface 状态单测覆盖全部转换"),
                 ("旧快照可读，非法 descriptor/版本安全回退，token 与私有对象不进入状态", "运行兼容、安全负路径单测并检查快照字段")])],
-            "modules": [md("packages/core/src/surface.ts", "复用并扩展安全 Surface 契约"), md("apps/desktop/src/renderer/surfaces/", "实现 provider 中立标签状态和注册接口", "add", "M2")],
+            "modules": [md("packages/core/src/surface.ts", "复用并扩展安全 Surface 契约"), md("innate-dogic/apps/desktop/src/renderer/surfaces/", "实现 provider 中立标签状态和注册接口", "add", "M2")],
         },
         "task-local-w1c-surface-ipc": {
             "context": tc("专用 Harness/console IPC 导致重复状态与生命周期逻辑，需要统一窄接口。",
                           "把 Harness 与控制台迁移到 provider 中立 show/hide/bounds/close，并保留 runtime 启动 API。",
                           ["main surface-host/IPC、preload 与 renderer 适配", "双 Surface 切换、resize、close 与伪造 provider 验证"], [W1B_DEP, "T1 全绿"],
                           ["通用 renderer 不提交认证 URL，私有解析限制在对应 main runtime provider。"]),
-            "global": "只调整 apps/desktop 壳层 IPC 与适配；packages/core 安全契约不变，runtime 启动流程不重写。",
+            "global": "只调整 innate-dogic/apps/desktop 壳层 IPC 与适配；packages/core 安全契约不变，runtime 启动流程不重写。",
             "design": da("Harness 与控制台使用专用 IPC 和 renderer 状态。",
                          "统一 Surface IPC 接收安全 descriptor/provider 句柄/bounds，切换 detach，显式 close 销毁。",
                          ["旧通道仅作临时适配，无调用后删除。", "认证 URL 永不进入通用 renderer 请求。"], ["迁移可能出现重复 listener、误 close 或 provider 越权，需 CDP 与负路径验证。"]),
             "features": [ft("F1", "统一 Surface IPC", "两个 WebContents 客人共用同一中栏槽", [
                 ("交替切换不 reload，resize/maximize bounds 正确，关闭一个不影响另一个", "运行真实 Electron CDP 生命周期与 bounds 断言"),
                 ("伪造 providerId 被拒绝，通用 renderer 请求不含认证 URL/token", "运行 main/preload 安全负路径测试并检查日志快照")])],
-            "modules": [md("apps/desktop/src/main/", "实现统一 Surface host/IPC 并保持 provider 私有解析"), md("apps/desktop/src/preload/", "暴露窄安全 API", mid="M2"), md("apps/desktop/src/renderer/", "迁移 Harness/Console 到统一标签槽", mid="M3")],
+            "modules": [md("innate-dogic/apps/desktop/src/main/", "实现统一 Surface host/IPC 并保持 provider 私有解析"), md("innate-dogic/apps/desktop/src/preload/", "暴露窄安全 API", mid="M2"), md("innate-dogic/apps/desktop/src/renderer/", "迁移 Harness/Console 到统一标签槽", mid="M3")],
         },
         "task-local-w1c-runtime-degradation": {
             "context": tc("外部 DSH 或控制台 provider 失败不能拖垮整个桌面壳。",
                           "实现可摘除 provider 注册与明确错误/重试界面，隔离单个客人的失败。",
                           ["provider 注册失败、DSH 缺失与控制台失败降级", "壳和其他本地页面可用性验证"], [W1B_DEP, "T2 全绿"],
                           ["不新增 terminal/browser 等无功能入口。"]),
-            "global": "降级只影响 apps/desktop renderer 组合与 provider dispose，runtime 服务仍由 main 管理。",
+            "global": "降级只影响 innate-dogic/apps/desktop renderer 组合与 provider dispose，runtime 服务仍由 main 管理。",
             "design": da("专用组合可能让单个运行时失败扩散为 App 白屏或停止其他 Surface。",
                          "DSH 缺失显示启动/重试/提示；控制台禁用只移除自身贡献，Harness 与其他页面继续可用。",
                          ["错误常驻且恢复动作显式可达。", "provider dispose 只清理自身 listener/Surface。"], ["共享 dispose 或全局错误边界可能误停其他 provider。"]),
             "features": [ft("F1", "运行时故障隔离", "单个 provider 失败不破坏壳", [
                 ("模拟 DSH 缺失/未启动/注册失败时壳、导航和其他页面仍可用", "运行三类故障注入测试并断言错误与重试动作"),
                 ("禁用控制台只移除其标签和贡献，不停止 Harness；dispose 不影响其他 provider", "运行 provider 隔离与 dispose 测试")])],
-            "modules": [md("apps/desktop/src/renderer/", "实现 provider 错误页、重试与可摘除组合")],
+            "modules": [md("innate-dogic/apps/desktop/src/renderer/", "实现 provider 错误页、重试与可摘除组合")],
         },
         "task-local-w1c-shell-regression": {
             "context": tc("W1c 出口必须证明真实桌面与便携形态下行为、安全和旧功能均未回退。",

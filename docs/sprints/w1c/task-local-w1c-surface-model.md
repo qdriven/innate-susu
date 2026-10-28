@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: task-local-w1c-surface-model
 title: W1c.1 provider 中立的 Surface 标签模型
 createdAt: 2026-10-28T08:43:00.286065Z
-updatedAt: 2026-10-28T08:46:59.004242Z
+updatedAt: 2026-10-28T09:36:50.212636Z
 status: blocked
 branch: 
 repository: 
@@ -58,7 +58,7 @@ prUpdatedAt:
 
 ### 摘要
 
-安全标签模型位于 packages/core 与 apps/desktop renderer，不引用 Electron WebContents 或 ChildProcess。
+安全标签模型位于 packages/core 与 innate-dogic/apps/desktop renderer，不引用 Electron WebContents 或 ChildProcess。
 
 ### 来源
 
@@ -122,7 +122,7 @@ Spec：S1
 ## 涉及模块
 
 - M1 [modify] packages/core/src/surface.ts — 复用并扩展安全 Surface 契约
-- M2 [add] apps/desktop/src/renderer/surfaces/ — 实现 provider 中立标签状态和注册接口
+- M2 [add] innate-dogic/apps/desktop/src/renderer/surfaces/ — 实现 provider 中立标签状态和注册接口
 
 ## Spec 关联
 

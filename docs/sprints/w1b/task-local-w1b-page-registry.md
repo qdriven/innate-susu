@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1b-page-registry
 title: W1b.1 页面注册表 slot/mode 元数据
 createdAt: 2026-10-28T08:21:18.776019Z
-updatedAt: 2026-10-28T08:24:52.465221Z
-status: blocked
+updatedAt: 2026-10-28T10:07:13.192057Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -113,12 +113,12 @@ prUpdatedAt:
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 每个现有页面保留原 ID，并声明合法 slot/mode；默认页不变
+- F1-V1 [passed] 每个现有页面保留原 ID，并声明合法 slot/mode；默认页不变
   - 方法：运行 pages 注册表单测，逐项对照 W1a 页面清单与默认页基线
-  - 证据：-
-- F1-V2 [pending] simple 只得到原有公开页面，dev 保留原有完整页面集合
+  - 证据：pages.slot.test.ts：7 页 ID 原样、slot 全声明合法（现集全 content/right 预留）
+- F1-V2 [passed] simple 只得到原有公开页面，dev 保留原有完整页面集合
   - 方法：分别构造 simple/dev 模式，断言过滤后的 ID 集合与 W1a 基线完全一致
-  - 证据：-
+  - 证据：simple=[chat,settings]、dev=六页、默认页 chat/overview 与 W1a 基线一致
 
 ### F2 · 可选页面安全解析
 
@@ -126,9 +126,9 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] 删除一个可选页面注册后，选择器安全省略该项且无未捕获异常
+- F2-V1 [passed] 删除一个可选页面注册后，选择器安全省略该项且无未捕获异常
   - 方法：使用可选页面缺失夹具运行负路径单测，断言其余页面与默认回退可用
-  - 证据：-
+  - 证据：负路径单测：删 console 注册后 resolveActivePage 回退 overview 不抛异常
 
 ## 涉及模块
 
@@ -136,12 +136,13 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施后补充页面元数据、壳组合与验收证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施完成（证据 evidence/W1b/smoke/ + desktop 19 测试）。
 - S2 [none/-] docs/CONTEXT.md — 全局架构、协议与模块职责不因本次内部组合重构而变化。
 
 ## 交付记录
 
 - 拆解完成；W0 由另一任务推进，等待 W0/W1a 全绿后实施
+- W1b 全链验证齐
 
 ## 来源原文
 

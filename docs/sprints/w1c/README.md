@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w1c
 title: W1c 中栏多 Surface 标签与降级
 createdAt: 2026-10-28T08:42:59.178754Z
-updatedAt: 2026-10-28T08:47:05.591259Z
+updatedAt: 2026-10-28T09:36:50.204450Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -41,7 +41,7 @@ W1c 要在统一中栏槽承载 Harness、控制台与本地页面，但 W0/W1a/
 
 ### 依赖
 
-- W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。
+- W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 - W1a 全绿
 - W1b 全绿；当前四个 W1b 子 task 均为 blocked。
 - T1 → T2 → T3 → T4 顺序执行
@@ -57,7 +57,7 @@ W1c 要在统一中栏槽承载 Harness、控制台与本地页面，但 W0/W1a/
 
 ### 摘要
 
-W1c 复用 packages/core Surface 契约，在 apps/desktop 增加 provider 中立适配；main 独占运行时私有类型，renderer 只保存安全 descriptor。
+W1c 复用 packages/core Surface 契约，在 innate-dogic/apps/desktop 增加 provider 中立适配；main 独占运行时私有类型，renderer 只保存安全 descriptor。
 
 ### 来源
 

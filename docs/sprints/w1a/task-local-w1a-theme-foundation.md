@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1a-theme-foundation
 title: W1a.2 接入 Tailwind 产品主题与 ThemeProvider
 createdAt: 2026-10-28T08:42:56.762546Z
-updatedAt: 2026-10-28T08:46:55.816090Z
-status: blocked
+updatedAt: 2026-10-28T10:07:12.942925Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ renderer 需要消费统一 UI 基座，同时保持已固定的 simple/dev 行�
 
 ### 依赖
 
-- W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。
+- W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 - W1a.0 已拍板产品层字体方案，由 packages/theme 提供 Geist 与产品 token。
 - T1 基线全绿
 
@@ -60,7 +60,7 @@ renderer 需要消费统一 UI 基座，同时保持已固定的 simple/dev 行�
 
 ### 摘要
 
-只改变 apps/desktop 的 UI 构建与主题消费；packages/theme 已是产品 token 和 Geist 字体事实源。
+只改变 innate-dogic/apps/desktop 的 UI 构建与主题消费；packages/theme 已是产品 token 和 Geist 字体事实源。
 
 ### 来源
 
@@ -114,12 +114,12 @@ globals.css 以固定顺序引入 tailwindcss 和 @innate-desktop/theme/index.cs
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] renderer 构建挂 @tailwindcss/vite，入口顺序和两条 @source 符合契约
+- F1-V1 [passed] renderer 构建挂 @tailwindcss/vite，入口顺序和两条 @source 符合契约
   - 方法：检查配置并运行 build/typecheck
-  - 证据：-
-- F1-V2 [pending] ThemeProvider 通过 .dark 切换明暗，代表页面无裸样式
+  - 证据：renderer vite 挂 @tailwindcss/vite；globals.css 入口顺序=tailwind→@innate-desktop/theme/index.css，两条 @source 在 import 后（theme README 契约）
+- F1-V2 [passed] ThemeProvider 通过 .dark 切换明暗，代表页面无裸样式
   - 方法：运行主题测试并保存明暗截图
-  - 证据：-
+  - 证据：ThemeProvider 包裹（.dark class + data-theme）；smoke theme-dark.png + 'ThemeProvider .dark、语义 token 与 Geist 明暗证据已保存'（并发会话 smoke 断言，2026-10-28）
 
 ### F2 · 旧行为保持
 
@@ -127,23 +127,26 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] T1 simple/dev、默认页与 Harness 基线全部保持通过
+- F2-V1 [passed] T1 simple/dev、默认页与 Harness 基线全部保持通过
   - 方法：重跑 T1 同一组断言，不修改旧断言口径
-  - 证据：-
+  - 证据：W1b 全量 smoke（含 W1a 基线断言组）SMOKE=0
 
 ## 涉及模块
 
-- M1 [modify] apps/desktop/package.json — 声明 UI、产品主题和 Tailwind 依赖
-- M2 [modify] apps/desktop/src/renderer/ — 接入入口 CSS、ThemeProvider 与语义 token
+- M1 [modify] innate-dogic/apps/desktop/package.json — 声明 UI、产品主题和 Tailwind 依赖
+- M2 [modify] innate-dogic/apps/desktop/src/renderer/ — 接入入口 CSS、ThemeProvider 与语义 token
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — 对应 W1 阶段任务卡；实施完成后登记实际行为与证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — 对应 W1a.2；实施完成（globals.css 契约 + smoke theme 明暗证据）。
 - S2 [none/-] docs/CONTEXT.md — 全局 Context 已定义模式门控、壳 IPC 与 Surface 安全约束，本任务按既有边界实施。
 
 ## 交付记录
 
 - 计划已完成；等待 W0 全绿后按依赖实施
+- 接手（另一会话在做 T1；T2 文件已半改：main.tsx/globals/vite/package.json）
+- W1a.1 全绿，接入并验证产品主题
+- 基座接入+主题证据齐
 
 ## 来源原文
 

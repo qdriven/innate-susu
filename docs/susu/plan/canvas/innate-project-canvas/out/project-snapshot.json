@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "project": "innate-labs",
-  "generatedAt": "2026-10-28T09:32:03.492Z",
+  "generatedAt": "2026-10-28T10:09:14.995Z",
   "sources": [
     {
       "path": "docs/sprints/S0-w0-baseline.md",
@@ -13,7 +13,7 @@
     },
     {
       "path": "docs/sprints/S2-w1b-shell.md",
-      "sha256": "393718880e859a2a533dd4eccdd9d1275163a98c27231cf94808278771855974"
+      "sha256": "48622a210c767a8e76753a13995c7f2d546d286d02bc5cb3d2d67959aae9447c"
     },
     {
       "path": "docs/sprints/S3-w1c-tabs.md",
@@ -80,7 +80,7 @@
       "declaredStatus": "待执行",
       "source": {
         "path": "docs/sprints/S2-w1b-shell.md",
-        "sha256": "393718880e859a2a533dd4eccdd9d1275163a98c27231cf94808278771855974"
+        "sha256": "48622a210c767a8e76753a13995c7f2d546d286d02bc5cb3d2d67959aae9447c"
       }
     },
     {
@@ -458,18 +458,24 @@
       "id": "T2.1",
       "sprintId": "S2",
       "title": "W1b.1 Sidebar/ContentArea 抽取与 App 拆分",
-      "status": "todo",
+      "status": "done",
       "summary": "Sidebar 直接消费 @innate/ui 的 Sidebar primitive（不重写），承载导航注册与底部状态位；ContentArea 承载页面；右栏放可拆卸空容器（W3 填充）；App 只留组合与顶层状态；pages.ts 注册表扩展 slot/mode 元数据、id 与门控不变；simple 隐藏开发入口；组合只用 @innate/ui primitive 与语义 token。",
       "purpose": "三栏可运行，App 不再实现每块壳 UI。",
-      "verification": "导航/模式切换/窗口控制/状态轮询与旧行为一致；删一个可选页面注册壳仍启动（负路径）；W0 冒烟全绿。",
+      "verification": "导航/模式切换/窗口控制/状态轮询与旧行为一致；删一个可选页面注册壳仍启动（负路径）；W0 冒烟全绿。；证据 `docs/susu/plan/evidence/W1b/smoke/`。",
       "estimate": "1–2 天",
       "blockedBy": [
         "S1"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W1b/smoke/",
+          "kind": "directory",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S2-w1b-shell.md",
-        "sha256": "393718880e859a2a533dd4eccdd9d1275163a98c27231cf94808278771855974",
+        "sha256": "48622a210c767a8e76753a13995c7f2d546d286d02bc5cb3d2d67959aae9447c",
         "line": 3
       }
     },

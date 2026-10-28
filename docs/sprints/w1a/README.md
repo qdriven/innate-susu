@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w1a
 title: W1a UI 基座与窗口 titlebar
 createdAt: 2026-10-28T08:42:54.090962Z
-updatedAt: 2026-10-28T08:47:04.431601Z
+updatedAt: 2026-10-28T09:36:50.171981Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -19,11 +19,11 @@ issueUpdatedAt:
 
 ### 问题
 
-W0 桌面基线尚未迁入，无法直接接入 UI 基座或替换 titlebar；需要先固定行为，再按既定产品主题层完成 W1a。
+W0 桌面基线已迁入并通过六门禁；需要先固定现有行为，再按既定产品主题层完成 W1a。
 
 ### 目标
 
-在 W0 全绿后依次建立行为基线、接入 Tailwind/ThemeProvider、只替换 titlebar，并保存真实明暗与行为证据。
+依次建立行为基线、接入 Tailwind/ThemeProvider、只替换 titlebar，并保存真实明暗与行为证据。
 
 ### 范围
 
@@ -40,13 +40,13 @@ W0 桌面基线尚未迁入，无法直接接入 UI 基座或替换 titlebar；�
 
 ### 依赖
 
-- W0 全绿；当前 W0.2–W0.8 仍为 draft，目标产品源码尚未迁入。
+- W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 - W1a.0 已拍板产品层字体方案，由 packages/theme 提供 Geist 与产品 token。
 - T1 → T2 → T3 顺序执行
 
 ### 假设
 
-- W0 完成后提供 apps/desktop 与 tools/smoke-desktop；当前缺失路径仅为依赖警告。
+- 实际产品路径为 innate-dogic/apps/desktop 与 tools/smoke-desktop。
 
 ### 未决问题
 
@@ -55,7 +55,7 @@ W0 桌面基线尚未迁入，无法直接接入 UI 基座或替换 titlebar；�
 
 ### 摘要
 
-W1a 属于 apps/desktop renderer 的 UI 基座与窗口铬面改造；字体事实源已固定为本仓 packages/theme，基础仓保持 Inter 默认。
+W1a 属于 innate-dogic/apps/desktop renderer 的 UI 基座与窗口铬面改造；字体事实源已固定为本仓 packages/theme，基础仓保持 Inter 默认。
 
 ### 来源
 
@@ -82,7 +82,7 @@ W1a 属于 apps/desktop renderer 的 UI 基座与窗口铬面改造；字体事�
 
 ### 现状行为
 
-目标仓尚无桌面实现；W1a.0 已在 packages/theme 落地产品字体与 token 分层。
+W0 桌面实现已迁入，W1a.0 已在 packages/theme 落地产品字体与 token 分层。
 
 ### 目标行为
 
@@ -96,7 +96,7 @@ W0 行为先由测试固定，renderer 经唯一产品主题入口消费 @innate
 
 ### 风险
 
-- 在 W0 前实施会失去行为对照与源码落脚点；主题顺序错误会覆盖产品 token。
+- 行为基线不足会让壳回归难以定位；主题顺序错误会覆盖产品 token。
 
 ### 全局影响
 

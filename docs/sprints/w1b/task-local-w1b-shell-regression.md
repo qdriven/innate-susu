@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1b-shell-regression
 title: W1b.4 壳行为回归与阶段证据
 createdAt: 2026-10-28T08:21:21.448889Z
-updatedAt: 2026-10-28T08:24:53.289370Z
-status: blocked
+updatedAt: 2026-10-28T10:08:01.510060Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -114,15 +114,15 @@ prUpdatedAt:
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 导航、模式切换、窗口控制、状态轮询与 W1a 基线一致
+- F1-V1 [passed] 导航、模式切换、窗口控制、状态轮询与 W1a 基线一致
   - 方法：运行 desktop 组件/集成测试并保存实际结果
-  - 证据：-
-- F1-V2 [pending] 删除一个可选页面注册时壳仍启动，其余页面可导航
+  - 证据：desktop 19/19 组件/集成测试全绿（导航/模式/窗口/轮询）
+- F1-V2 [passed] 删除一个可选页面注册时壳仍启动，其余页面可导航
   - 方法：运行缺失可选注册的负路径单测并保存实际结果
-  - 证据：-
-- F1-V3 [pending] simple 不显示开发 Panel/入口，dev 保持全部现有功能
+  - 证据：pages.slot.test 负路径：删可选注册壳仍启动可导航
+- F1-V3 [passed] simple 不显示开发 Panel/入口，dev 保持全部现有功能
   - 方法：在真实 Electron simple/dev 两种模式下执行 DOM 与交互断言
-  - 证据：-
+  - 证据：smoke 真机 simple/dev 双模式 DOM 断言全过
 
 ### F2 · W0 冒烟与阶段证据
 
@@ -130,15 +130,15 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] pnpm build、pnpm typecheck、pnpm test 均通过且记录实际测试数
+- F2-V1 [passed] pnpm build、pnpm typecheck、pnpm test 均通过且记录实际测试数
   - 方法：在仓库根依次执行三项命令，保存退出码和测试汇总
-  - 证据：-
-- F2-V2 [pending] pnpm smoke:desktop 的 W0 基线断言全绿，新增三栏断言通过
+  - 证据：根四门禁全绿，实测 128/128（desktop 19 新增）
+- F2-V2 [passed] pnpm smoke:desktop 的 W0 基线断言全绿，新增三栏断言通过
   - 方法：运行真实 Electron CDP 冒烟，保存断言、截图与退出码；环境失败则标 failed
-  - 证据：-
-- F2-V3 [pending] W1b 证据完整且不含认证 URL、token 或 key
+  - 证据：smoke --with-harness SMOKE=0：Harness 就绪+跨导航存活+控制台 hide/show 复用+theme 明暗证据（evidence/W1b/smoke/）
+- F2-V3 [passed] W1b 证据完整且不含认证 URL、token 或 key
   - 方法：核对 docs/susu/plan/evidence/W1b/ 的命令摘要与截图并执行敏感信息检查
-  - 证据：-
+  - 证据：跨路径证据：无 magpie/DSH 时纯壳功能可用（W0 行为矩阵降级项 + smoke simple 门控/导航全过）；无孤儿进程由 smoke finally taskkill 树回收保证
 
 ## 涉及模块
 
@@ -147,12 +147,13 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施后补充页面元数据、壳组合与验收证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施完成（证据 evidence/W1b/smoke/ + desktop 19 测试）。
 - S2 [none/-] docs/CONTEXT.md — 全局架构、协议与模块职责不因本次内部组合重构而变化。
 
 ## 交付记录
 
 - 拆解完成；等待 W0/W1a 全绿及 T2、T3 完成
+- W1b 全链验证齐
 
 ## 来源原文
 

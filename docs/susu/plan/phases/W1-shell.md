@@ -30,6 +30,7 @@
 - **验证**：测试在 W0 实现上通过；后续重构使用同一组断言。
 - **完成标准**：行为基线覆盖现有公开页面和两个 WebContents Surface。
 - **回退**：纯新增测试，无回退。
+- **完成记录（2026-10-28）**：新增 2 个测试文件、7 条基线测试；真机记录窗口 resize/恢复、控制台与 Harness bounds、Surface 复用和显式停止。基线发现 renderer reload 后 Harness 状态未恢复，已补初始状态读取并由同一真机脚本复验通过。证据：`docs/susu/plan/evidence/W1a/baseline.md` 与 `baseline-smoke/`。
 
 ### W1a.2 接入 Tailwind + token + ThemeProvider
 

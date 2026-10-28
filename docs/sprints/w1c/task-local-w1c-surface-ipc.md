@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: task-local-w1c-surface-ipc
 title: W1c.2 Harness 与控制台接入统一 Surface 槽
 createdAt: 2026-10-28T08:43:01.553178Z
-updatedAt: 2026-10-28T08:47:00.230192Z
+updatedAt: 2026-10-28T09:36:50.221043Z
 status: blocked
 branch: 
 repository: 
@@ -59,7 +59,7 @@ prUpdatedAt:
 
 ### 摘要
 
-只调整 apps/desktop 壳层 IPC 与适配；packages/core 安全契约不变，runtime 启动流程不重写。
+只调整 innate-dogic/apps/desktop 壳层 IPC 与适配；packages/core 安全契约不变，runtime 启动流程不重写。
 
 ### 来源
 
@@ -122,9 +122,9 @@ Spec：S1
 
 ## 涉及模块
 
-- M1 [modify] apps/desktop/src/main/ — 实现统一 Surface host/IPC 并保持 provider 私有解析
-- M2 [modify] apps/desktop/src/preload/ — 暴露窄安全 API
-- M3 [modify] apps/desktop/src/renderer/ — 迁移 Harness/Console 到统一标签槽
+- M1 [modify] innate-dogic/apps/desktop/src/main/ — 实现统一 Surface host/IPC 并保持 provider 私有解析
+- M2 [modify] innate-dogic/apps/desktop/src/preload/ — 暴露窄安全 API
+- M3 [modify] innate-dogic/apps/desktop/src/renderer/ — 迁移 Harness/Console 到统一标签槽
 
 ## Spec 关联
 

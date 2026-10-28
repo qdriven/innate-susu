@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1b-shell-layout
 title: W1b.2 Sidebar ContentArea 与 App 壳组合
 createdAt: 2026-10-28T08:21:19.677426Z
-updatedAt: 2026-10-28T08:24:52.810154Z
-status: blocked
+updatedAt: 2026-10-28T10:07:13.428133Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -114,12 +114,12 @@ App 只组合 shell 与维护顶层状态；Sidebar 承载导航及底部状态�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] Sidebar 从 @innate/ui 单入口消费 primitive，未在本仓复制 primitive 或硬编码视觉 token
+- F1-V1 [passed] Sidebar 从 @innate/ui 单入口消费 primitive，未在本仓复制 primitive 或硬编码视觉 token
   - 方法：静态检查 import 与样式，并运行 shell 组件测试
-  - 证据：-
-- F1-V2 [pending] 点击导航只切换既有页面；simple 隐藏开发入口，dev 显示完整入口
+  - 证据：ShellSidebar 消费 @innate/ui Sidebar 原语（data-sidebar 铬面），nav-item[title] DOM 契约保持；无复制 primitive/无硬编码 token
+- F1-V2 [passed] 点击导航只切换既有页面；simple 隐藏开发入口，dev 显示完整入口
   - 方法：以 simple/dev 两种模式渲染 App，触发导航并断言活动页面及入口集合
-  - 证据：-
+  - 证据：App.shell.test：simple 入口 2/dev 入口 6，点击导航切换既有页面
 
 ### F2 · App 顶层行为保持
 
@@ -127,12 +127,12 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] 窗口控制仍调用原有 API，状态轮询只启动一次且卸载时清理
+- F2-V1 [passed] 窗口控制仍调用原有 API，状态轮询只启动一次且卸载时清理
   - 方法：mock window.innate，断言窗口调用、轮询订阅数量及 unmount 清理
-  - 证据：-
-- F2-V2 [pending] W1a titlebar 结构及默认页行为不回退
+  - 证据：mock window.innate：窗口控制走原 API（winMin 等），轮询卸载后停止
+- F2-V2 [passed] W1a titlebar 结构及默认页行为不回退
   - 方法：复用 W1a DOM 与默认页回归断言，对照基线结果
-  - 证据：-
+  - 证据：smoke --with-harness 全绿（W1a 顶栏断言+默认页行为不回退）
 
 ## 涉及模块
 
@@ -141,12 +141,13 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施后补充页面元数据、壳组合与验收证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施完成（证据 evidence/W1b/smoke/ + desktop 19 测试）。
 - S2 [none/-] docs/CONTEXT.md — 全局架构、协议与模块职责不因本次内部组合重构而变化。
 
 ## 交付记录
 
 - 拆解完成；等待 W0/W1a 全绿及 T1 完成
+- W1b 全链验证齐
 
 ## 来源原文
 

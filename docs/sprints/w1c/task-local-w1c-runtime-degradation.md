@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: task-local-w1c-runtime-degradation
 title: W1c.3 可摘除的运行时降级
 createdAt: 2026-10-28T08:43:02.613464Z
-updatedAt: 2026-10-28T08:47:01.542374Z
+updatedAt: 2026-10-28T09:36:50.227666Z
 status: blocked
 branch: 
 repository: 
@@ -59,7 +59,7 @@ prUpdatedAt:
 
 ### 摘要
 
-降级只影响 apps/desktop renderer 组合与 provider dispose，runtime 服务仍由 main 管理。
+降级只影响 innate-dogic/apps/desktop renderer 组合与 provider dispose，runtime 服务仍由 main 管理。
 
 ### 来源
 
@@ -122,7 +122,7 @@ Spec：S1
 
 ## 涉及模块
 
-- M1 [modify] apps/desktop/src/renderer/ — 实现 provider 错误页、重试与可摘除组合
+- M1 [modify] innate-dogic/apps/desktop/src/renderer/ — 实现 provider 错误页、重试与可摘除组合
 
 ## Spec 关联
 

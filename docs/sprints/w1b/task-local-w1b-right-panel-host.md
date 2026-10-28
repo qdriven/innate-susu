@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1b-right-panel-host
 title: W1b.3 可拆卸 RightPanelHost 空容器
 createdAt: 2026-10-28T08:21:20.626874Z
-updatedAt: 2026-10-28T08:24:53.049984Z
-status: blocked
+updatedAt: 2026-10-28T10:07:13.693125Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -114,15 +114,15 @@ App 可挂载或移除空 RightPanelHost；容器不加载业务模块，simple 
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 挂载时呈现可访问的空右栏，未加载 W3 业务 Panel 或发起新 IPC
+- F1-V1 [passed] 挂载时呈现可访问的空右栏，未加载 W3 业务 Panel 或发起新 IPC
   - 方法：渲染 App 并断言右栏空状态、业务模块未导入且无新增 API 调用
-  - 证据：-
-- F1-V2 [pending] 移除 RightPanelHost 后，导航、模式切换和中栏页面仍正常工作
+  - 证据：RightPanelHost 空容器无业务导入无新 IPC（代码+测试断言）
+- F1-V2 [passed] 移除 RightPanelHost 后，导航、模式切换和中栏页面仍正常工作
   - 方法：以有/无右栏两种组合运行同一组壳交互测试
-  - 证据：-
-- F1-V3 [pending] simple 不暴露开发 Panel 或入口，dev 既有入口不减少
+  - 证据：rightPanel=false 时导航/模式/中栏不受影响（组件测试）
+- F1-V3 [passed] simple 不暴露开发 Panel 或入口，dev 既有入口不减少
   - 方法：对照 T1/W1a 门控基线运行双模式断言
-  - 证据：-
+  - 证据：simple 不渲染右栏（queryByTestId null），dev 入口不减
 
 ## 涉及模块
 
@@ -131,12 +131,13 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [modify/pending] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施后补充页面元数据、壳组合与验收证据。
+- S1 [modify/done] docs/susu/plan/phases/W1-shell.md — W1b 原始任务卡；实施完成（证据 evidence/W1b/smoke/ + desktop 19 测试）。
 - S2 [none/-] docs/CONTEXT.md — 全局架构、协议与模块职责不因本次内部组合重构而变化。
 
 ## 交付记录
 
 - 拆解完成；等待 W0/W1a 全绿及 T2 完成
+- W1b 全链验证齐
 
 ## 来源原文
 
