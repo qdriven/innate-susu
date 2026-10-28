@@ -1,0 +1,57 @@
+{
+  "modules": [
+    {
+      "id": "@dogic/plugin-dsh-runtime",
+      "name": "dsh-runtime",
+      "packageName": "@dogic/plugin-dsh-runtime",
+      "path": "innate-dogic/plugins/dsh-runtime",
+      "layer": "plugin",
+      "presence": "target",
+      "source": { "path": "docs/plans/innate-dogic-dsh/03-stage-3-dsh-integration.md" }
+    },
+    {
+      "id": "@dogic/plugin-dsh-workbench",
+      "name": "dsh-workbench",
+      "packageName": "@dogic/plugin-dsh-workbench",
+      "path": "innate-dogic/plugins/dsh-workbench",
+      "layer": "plugin",
+      "presence": "target",
+      "source": { "path": "docs/plans/innate-dogic-dsh/04-stage-4-dsh-host-workspace.md" }
+    },
+    {
+      "id": "@dogic/model-settings",
+      "name": "model-settings",
+      "packageName": "@dogic/model-settings",
+      "path": "innate-dogic/packages/model-settings",
+      "layer": "package",
+      "presence": "target",
+      "source": { "path": "docs/plans/innate-dogic-dsh/05-stage-5-dual-host-settings.md" }
+    }
+  ],
+  "moduleEdges": [
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/plugin-dsh-runtime",
+      "label": "M3 组合",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/plugin-dsh-runtime",
+      "target": "@dogic/harness-runtime",
+      "label": "唯一托管",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/model-settings",
+      "label": "M5 适配",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/plugin-dsh-workbench",
+      "target": "@dogic/model-settings",
+      "label": "M5 设置",
+      "view": "target"
+    }
+  ]
+}

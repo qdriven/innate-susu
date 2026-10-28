@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-3-workspace
 title: W0.3 统一目标仓工程身份与 workspace
 createdAt: 2026-10-28T08:20:07.948165Z
-updatedAt: 2026-10-28T08:20:07.948165Z
-status: draft
+updatedAt: 2026-10-28T09:07:39.193298Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ prUpdatedAt:
 
 ### 非目标
 
-不迁产品代码（T3）、不装依赖跑门禁（T4 验证）、不恢复旧 Web 应用。
 
 ### 依赖
 
-T1（脱敏修复完成后的源基线才允许接线拷贝语义）。
 
 ### 假设
 
-pnpm 12.15.0 对合并后 workspace 可直接 install。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -90,11 +86,9 @@ Sprint w0 子任务；W0.3 卡是需求定义。
 
 ### 决策
 
-合并 labs 脚本与 workspace 登记，保留现有身份与 UI 消费。
 
 ### 风险
 
-glob 冲突或依赖版本不一致 → F1-V1 install 验证。
 
 ### 全局影响
 
@@ -108,15 +102,15 @@ glob 冲突或依赖版本不一致 → F1-V1 install 验证。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] pnpm install 成功且 lockfile 无旧 Web importer
+- F1-V1 [passed] pnpm install 成功且 lockfile 无旧 Web importer
   - 方法：目标根 pnpm install 后检查 lockfile 与 -r list
-  - 证据：-
-- F1-V2 [pending] ui:sync --dry-run 指向正确目标根
+  - 证据：pnpm install 成功；12 workspace 模块解析（10 dogic+canvas+theme）；lockfile grep @susu/susu-web 0 处；electron 二进制经 install.js 兜底就位
+- F1-V2 [passed] ui:sync --dry-run 指向正确目标根
   - 方法：pnpm ui:sync -- --dry-run 输出核对
-  - 证据：-
-- F1-V3 [pending] onlyBuiltDependencies/allowBuilds 合并无丢失
+  - 证据：pnpm ui:sync:dry-run 指向本仓根（@innate:registry=127.0.0.1:4873，package.json 无需改写）
+- F1-V3 [passed] onlyBuiltDependencies/allowBuilds 合并无丢失
   - 方法：yaml 与 package.json 逐项对照 labs+现有项
-  - 证据：-
+  - 证据：allowBuilds 合并 electron+esbuild（electron-winstaller 构建脚本被 pnpm 忽略—打包期依赖，记录为已知项）；packageManager 对齐 12.15.0；vitest 双版本（theme 3.x/root 5.x）记入兼容矩阵
 
 ## 涉及模块
 
@@ -125,14 +119,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W0-baseline.md — W0.3 卡即验收定义，无设计变化
+- S1 [none/-] docs/susu/plan/phases/W0-baseline.md — W0.3 卡即验收定义，无设计变化
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 配置已合并，随 T3 安装验证
+- 验证齐
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.3 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

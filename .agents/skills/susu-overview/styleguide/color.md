@@ -10,12 +10,14 @@
 | 产品层 | 本仓 `packages/theme/src/tokens.css` | orca 观感冻结 + 产品扩展 token（git 装饰、状态色、工作项状态） |
 | 变体层 | `@innate/ui` → `packages/ui/src/themes/*.css` | `shadcn-zinc` / `shadcn-slate` / `shadcn-stone` / `shadcn-gray` / `shadcn-neutral` / `linear` / `notion` / `marshmallow` / `art-deco` / `webshell` |
 
-优先级：`[data-theme]` 变体（特异性更高）> 产品层 `:root`/`.dark` > 基础层 `:root`。所以：
+优先级：变体块里写出来的属性，`[data-theme]` 高于产品层 `:root` / `.dark`；没写的仍是产品层。产品层再高于基础 `:root`。
 
-- **不选变体**（`data-theme` 未设或为 `default`）→ 用产品层 = orca 观感；
-- **选了变体**（如 `linear`）→ 由基础仓接管中性色与图表色，产品层只剩扩展 token。
+- **`data-theme="default"`**（没有对应 CSS 规则）→ 产品层。亮色与基础 `:root` 同值；暗色固定 4 处差异。
+- **`shadcn-*`** → 只换它声明的 surface / accent / border / ring。sidebar、chart、font 仍是产品层。
+- **`linear` / `notion` / `webshell`** → 连 sidebar 一起换（`linear` 还换 chart）。
+- **`marshmallow` / `art-deco`** → 连 `--font-sans` 一起换。
 
-明暗只走 `.dark` class（`@custom-variant dark (&:is(.dark *))`），**不写 `prefers-color-scheme`**。`ThemeProvider` 在 `<html>` 上切 `.dark` 并写 `data-theme`，持久化到 localStorage（`color-mode` / `theme-variant`）；切换入口只有 `ThemeSelector`。
+明暗只走 `.dark` class（`@custom-variant dark (&:is(.dark *))`）。CSS 不写 `prefers-color-scheme`。`color-mode=system` 时 `ThemeProvider` 用 `matchMedia` 决定是否加 `.dark`，并写 `data-theme`（`color-mode` / `theme-variant` 存在 localStorage）。切换入口只有 `ThemeSelector`。
 
 ## 角色表
 
@@ -44,7 +46,7 @@ Token 成对出现：一个 **surface** 和一个在它上面**满足对比度�
 
 ## orca ↔ `@innate/ui` 中性色对照
 
-**结论：`@innate/ui` 基础 `:root` / `.dark`（shadcn Neutral）与 orca 的中性色逐 token 相等**，所以产品层不是「另起一套中性色」，而是把同一套值冻结在仓里（防止基础仓改 Neutral 时桌面端观感漂移）。
+**结论：基础 `:root`（oklch Neutral，不是变体 `shadcn-neutral`）的亮色与 orca 逐 token 相等；基础 `.dark` 有 4 处不相等，产品层按 orca 固定这 4 处。** 产品层把这套值冻结在仓里，避免基础仓改 Neutral 时桌面端观感漂移。
 
 亮色：**全部相等**（`#fff` 与 `oklch(1 0 0)` = `#ffffff` 是写法差异，值相同）。
 

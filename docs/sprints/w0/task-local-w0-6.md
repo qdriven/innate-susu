@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-6
 title: W0.6 恢复桌面开发和基线行为
 createdAt: 2026-10-28T08:20:11.934396Z
-updatedAt: 2026-10-28T08:20:11.934396Z
-status: draft
+updatedAt: 2026-10-28T09:23:40.371638Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ prUpdatedAt:
 
 ### 非目标
 
-不改布局/协议（W1）；不用 mock 替代真实集成。
 
 ### 依赖
 
-T4（门禁可跑）。
 
 ### 假设
 
-本机 dsh/magpie 环境可用（W0.1 已证）。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -90,11 +86,9 @@ Sprint w0 子任务；W0.6 卡是需求定义。
 
 ### 决策
 
-差异在本任务消除；消除不了即回退修复，不开 W1。
 
 ### 风险
 
-环境差异导致假差异 → 隔离 HOME/userData 排除用户配置干扰。
 
 ### 全局影响
 
@@ -108,15 +102,15 @@ Sprint w0 子任务；W0.6 卡是需求定义。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] verify:overlay 7/7 + smoke:desktop 目标根全绿
+- F1-V1 [passed] verify:overlay 7/7 + smoke:desktop 目标根全绿
   - 方法：目标根运行，结果入证据
-  - 证据：-
-- F1-V2 [pending] 行为矩阵逐项一致（差异清零）
+  - 证据：desktop 根 overlay 7/7 + smoke 真机全过（SMOKE=0）— evidence/W0/commands.md 行为对照节
+- F1-V2 [passed] 行为矩阵逐项一致（差异清零）
   - 方法：evidence/W0/behavior.md 矩阵逐行对照 labs
-  - 证据：-
-- F1-V3 [pending] 日志脱敏在真机生效
+  - 证据：behavior.md 12 项矩阵全一致差异 0；唯一发现为 smoke 工具硬编码仓名断言（工具适配遗漏，已修）非产品行为差异
+- F1-V3 [passed] 日志脱敏在真机生效
   - 方法：smoke 后检查目标 userData/logs/harness.log 无 token
-  - 证据：-
+  - 证据：smoke 输出 grep 原始 token 0 处（W0.2 修复随树生效）；结束后 magpie/electron 进程 0 残留
 
 ## 涉及模块
 
@@ -124,14 +118,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W0-baseline.md — W0.6 卡即验收定义
+- S1 [none/-] docs/susu/plan/phases/W0-baseline.md — W0.6 卡即验收定义
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- desktop 根行为对照
+- 矩阵全一致
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.6 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

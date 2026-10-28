@@ -1,10 +1,17 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  # desktop 原生层：UI 基座消费 app 与产品 token/theme 包
+  - 'apps/*'
+  - 'packages/*'
+  # W0 迁入：labs 产品树（apps/packages/plugins/services）与画布引擎
+  - 'innate-dogic/apps/*'
+  - 'innate-dogic/packages/*'
+  - 'innate-dogic/plugins/*'
+  - 'innate-dogic/services/*'
+  - 'innate-project-canvas'
 
 allowBuilds:
   electron: true
   esbuild: true
 
 minimumReleaseAgeExclude:
-  - "@innate/ui@0.1.2"
+  - '@innate/ui@0.1.2'

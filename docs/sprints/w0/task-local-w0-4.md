@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-4
 title: W0.4 按白名单迁入产品与画布模块
 createdAt: 2026-10-28T08:20:09.448168Z
-updatedAt: 2026-10-28T08:20:09.448168Z
-status: draft
+updatedAt: 2026-10-28T09:07:40.688244Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ prUpdatedAt:
 
 ### 非目标
 
-不跑门禁（T4/T5）、不改代码（除 T1 已带修复）、不迁排除项。
 
 ### 依赖
 
-T2（workspace patterns 先就位）；W0.1 白名单。
 
 ### 假设
 
-排除过滤（node_modules/out/dist 等）在复制命令中可靠执行。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -90,11 +86,9 @@ Sprint w0 子任务；W0.4 卡是需求定义。
 
 ### 决策
 
-包名/exports/import 零改写（W0 纪律）。
 
 ### 风险
 
-45MB 二进制与大树复制遗漏 → F1-V1/V4 机器核对。
 
 ### 全局影响
 
@@ -108,18 +102,18 @@ Sprint w0 子任务；W0.4 卡是需求定义。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] pnpm -r list --depth -1 列出全部预期模块
+- F1-V1 [passed] pnpm -r list --depth -1 列出全部预期模块
   - 方法：目标根安装后清单与白名单对照
-  - 证据：-
-- F1-V2 [pending] 源码 diff 仅含 W0.2 修复（无其他改写）
+  - 证据：pnpm -r list 列出全部 12 模块（白名单→目标路径全表核对）
+- F1-V2 [passed] 源码 diff 仅含 W0.2 修复（无其他改写）
   - 方法：逐包与 labs 源 diff
-  - 证据：-
-- F1-V3 [pending] 敏感文件扫描零命中
+  - 证据：diff -rq 双树（排除 node_modules/构建产物）= 0 差异；源含 W0.2 修复；包名/exports/import 零改写
+- F1-V3 [passed] 敏感文件扫描零命中
   - 方法：.env/console-key/DSH profile/用户快照全树扫描
-  - 证据：-
-- F1-V4 [pending] magpie.exe 落位且 SHA256 与 W0.1 指纹一致
+  - 证据：敏感扫描 .env/console-key.json 命中 0
+- F1-V4 [passed] magpie.exe 落位且 SHA256 与 W0.1 指纹一致
   - 方法：sha256sum 对照 ff061131…
-  - 证据：-
+  - 证据：magpie.exe SHA256 ff061131…14d 与 W0.1 指纹一致
 
 ## 涉及模块
 
@@ -129,14 +123,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W0-baseline.md — W0.4 卡即验收定义
+- S1 [none/-] docs/susu/plan/phases/W0-baseline.md — W0.4 卡即验收定义
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 开始白名单整树拷贝
+- 整树落位
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.4 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

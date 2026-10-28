@@ -5,12 +5,12 @@
  *   1. `@innate/ui`（基础仓 innate-fe）是 primitive 与主题机制的唯一来源：
  *      - 明暗机制 = `.dark` class（@custom-variant dark 在 tokens.css 里定义）
  *      - 主题变体 = `:root[data-theme="…"]` / `.dark[data-theme="…"]`
+ *        （只覆盖该块里写了的变量；没有 `[data-theme="default"]`）
  *      - 语义 token 的定义面（background/card/border/ring/…）在基础仓
  *   2. 本文件是**产品 token 层**：在 @innate/ui 之上追加 orca 派生的产品 token
  *      （中性色快照、git 装饰、状态/差异色、壳 chrome 尺寸），并把中性色固定为
  *      orca 同款观感。这是本仓**唯一允许出现字面量**的文件。
- *   3. 优先级：`[data-theme]` 变体选择器（特异性更高）> 本产品层 > @innate/ui 基础 `:root`。
- *      即：app 显式选 `shadcn-zinc` 变体时由基础仓接管中性色；缺省时用本层。
+ *   3. 变体只盖过它写了的变量。shadcn-* 不写 sidebar / chart / font，这三组仍是本层。
  *
  * 事实源：`packages/theme/src/tokens.css`（本文件）。
  * 变更流程：改 token 只改本文件，不要改 @innate/ui 内部路径，也不要在组件里写 hex。
@@ -39,10 +39,11 @@
 }
 
 /* ── :root（亮色） ──────────────────────────────────────────────────────
- * 中性色取 orca 原值。与 @innate/ui 基础 `:root`（shadcn Neutral，即 `default`
- * 变体）逐 token 相等；暗色有 4 处刻意差异（accent / border / sidebar-border /
- * sidebar-ring），对照表见 docs/build-path/1-monorepo-init/style-guide-alignment.md。
- * 注意：`shadcn-zinc` 等 variant 带 240 色相的淡蓝偏移，与本层不等值。 */
+ * 中性色取 orca 原值。`data-theme="default"` 没有对应规则，所以用本层。
+ * 亮色与 @innate/ui 基础 `:root`（oklch Neutral，不是变体 shadcn-neutral）同值；
+ * 暗色有 4 处刻意差异（accent / border / sidebar-border / sidebar-ring），
+ * 对照表见 docs/build-path/1-monorepo-init/style-guide-alignment.md。
+ * shadcn-* 不声明 sidebar / chart / font，选中后这三组仍是本层。 */
 :root {
   --font-sans:
     "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

@@ -27,11 +27,11 @@ UI 规则。本文件描述**角色与规则**，不承载数值——数值在 
 @source "../../../node_modules/@innate/ui/src";
 ```
 
-`@source` 必须写在所有 `@import` 之后。**不要** `@import "@innate/ui/globals.css"`——那是基础仓内部入口，消费方只引 `@innate/ui/tokens.css`。
+`@source` 必须写在所有 `@import` 之后。**不要** `@import "@innate/ui/globals.css"`。消费方引 `@innate-desktop/theme/index.css`，由它再引 `@innate/ui/tokens.css`。
 
-优先级：`[data-theme]` 变体选择器（特异性更高）> 本仓产品层 `:root`/`.dark` > `@innate/ui` 基础 `:root`。
+优先级：变体块里**写出来的**属性，其 `[data-theme]` 选择器高于产品层 `:root` / `.dark`；没写的属性仍是产品层。产品层再高于 `@innate/ui` 基础 `:root`。
 
-**默认变体是 `default`**（基础仓基础 `:root`，即 shadcn Neutral）——它的中性色与 orca **逐 token 相等**，产品层把这套值冻结下来。`shadcn-zinc` / `shadcn-slate` 等是基础仓的**变体**，中性色带 240 色相的淡蓝偏移，与 orca 的纯中性灰**不等值**，因此不是默认值；用户在 `ThemeSelector` 里显式选某个变体时，由基础仓接管中性色。
+**`default` 没有 `[data-theme="default"]` 规则。** `ThemeProvider` 仍把属性写成 `default`，因此用产品层。这是基础仓 oklch Neutral，不是变体 `shadcn-neutral`。亮色共享 token 与基础 `:root` 同值；暗色产品层固定 4 处（`accent` / `border` / `sidebar-border` / `sidebar-ring`）。`shadcn-*` 不声明 sidebar、chart、font，选中后这三组仍走产品层。`linear` / `notion` / `webshell` 声明了 sidebar。`marshmallow` / `art-deco` 声明了 `--font-sans`，会盖过 Geist。
 
 ## 深入阅读
 
@@ -122,8 +122,8 @@ Token 成对出现：一个 **surface** 和一个在它上面**满足对比度�
 | 项 | orca | innate-desktop | 原因 |
 | --- | --- | --- | --- |
 | token 事实源 | `src/renderer/src/assets/main.css` | `@innate/ui` + 本仓 `packages/theme/src/tokens.css` | primitive 与主题机制归基础仓；产品 token 留本仓 |
-| 中性色 | 纯中性灰（hue 0）hex | `@innate/ui` 基础 `:root`（shadcn Neutral）**逐 token 相等**，产品层冻结同值 | 亮色全等；暗色仅 4 处刻意差异（`accent` / `border` / `sidebar-border` / `sidebar-ring`），对照见 [color.md](./styleguide/color.md#orca--innateui-中性色对照) |
-| 主题变体 | 无（只有明暗） | 基础仓 10 个 `data-theme` 变体，`ThemeSelector` 唯一切换入口 | 主题机制归基础仓；产品层优先级低于变体 |
+| 中性色 | 纯中性灰（hue 0）hex | 产品层冻结基础 `:root`（oklch Neutral，不是 `shadcn-neutral`） | 亮色同值；暗色 4 处由产品层固定（`accent` / `border` / `sidebar-border` / `sidebar-ring`），对照见 [color.md](./styleguide/color.md#orca--innateui-中性色对照) |
+| 主题变体 | 无（只有明暗） | 10 个 `[data-theme]` 块加 `default`（无对应规则） | 变体只盖过它声明的变量；`shadcn-*` 不动 sidebar / chart / font |
 | Sans 字体 | Geist（自托管 woff2） | Geist（随 `packages/theme` 分发） | 保持 orca 观感，同时不引入新的下载依赖 |
 | primitive 来源 | orca 自建 `components/ui/*`（38 个，Radix 底座） | `@innate/ui`（58 个，**Base UI** 底座） | 唯一来源；缺件去基础仓补。触发器用 `render` prop，不用 `asChild` |
 | 按钮尺度 | 宽松（default h-9 / 13px） | 紧凑（default h-7 / 13px） | 取 `@innate/ui`；顶栏内的按钮统一用 `icon-sm` / `icon-xs` |

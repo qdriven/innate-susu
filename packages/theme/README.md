@@ -34,16 +34,15 @@ innate-desktop 的**产品 token 层 + 壳 chrome 层**，建立在 `@innate/ui`
 
 ## 主题变体
 
-默认变体是 `default`（`DEFAULT_THEME_VARIANT`）——走 `@innate/ui` 的基础 `:root`
-（shadcn Neutral）。它的中性色与 orca **逐 token 相等**：亮色全等，暗色只有 4 处
-刻意差异（`accent` 更亮一档、`border` / `sidebar-border` 透明度 7% 而非 10%、
-`sidebar-ring` 更收敛）。产品层把这套值冻结在仓里，防止基础仓改 Neutral 时桌面端
-观感漂移。
+`default`（`DEFAULT_THEME_VARIANT`）没有 `[data-theme="default"]` 规则。
+`ThemeProvider` 仍写入这个属性，因此实际用的是产品层 `:root` / `.dark`，也就是
+基础仓 oklch Neutral，不是变体 `shadcn-neutral`。亮色共享 token 与基础 `:root`
+同值；暗色固定 4 处（`accent` `#404040`、`border` / `sidebar-border` 为
+`rgb(255 255 255 / 0.07)`、`sidebar-ring` `#525252`）。
 
-`shadcn-zinc` / `shadcn-slate` / `linear` / `notion` 等是基础仓的**变体**，中性色
-带 240 色相的淡蓝偏移，与 orca 的纯中性灰**不等值**，因此不是默认值。用户在
-`ThemeSelector` 里显式选某个变体时，由基础仓接管中性色（`[data-theme]` 选择器
-特异性更高）。
+变体只覆盖它自己声明的变量。`shadcn-*` 不声明 sidebar / chart / font。
+`linear` / `notion` / `webshell` 声明 sidebar（`linear` 还声明 chart）。
+`marshmallow` / `art-deco` 声明 `--font-sans`，会盖过产品层的 Geist。
 
 逐 token 差异见 [style-guide-alignment.md](../../docs/build-path/1-monorepo-init/style-guide-alignment.md)。
 

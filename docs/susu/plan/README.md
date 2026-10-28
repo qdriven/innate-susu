@@ -66,8 +66,8 @@ flowchart LR
 
 | 阶段 | 状态 | 证据 |
 | --- | --- | --- |
-| W0 | 进行中：W0.1 done（六门禁全绿/83 实测/清单复核），W0.2–W0.8 已拆解为 sprint（docs/sprints/w0/）待执行 | [evidence/W0/](./evidence/W0/) |
-| W1a / W1b / W1c | 待执行 | — |
+| W0 | **done（2026-10-28）**：8 卡全部完成——源头脱敏/工程身份/整树迁入/工具适配+引擎修复/行为对照 12 项一致/便携真机冒烟/执行源切换。Sprint 记录 docs/sprints/w0/ | [evidence/W0/](./evidence/W0/) |
+| W1a / W1b / W1c | 待执行（W1a 拆解已由并发会话启动：docs/sprints/w1a/） | — |
 | W2 / W3 | 待执行 | — |
 | W4 / W5 | 待执行 | — |
 | R1 | 待执行 | — |

@@ -1,0 +1,30 @@
+# Innate simple 模式 overlay —— simple 模式下经 dsh --patch 注入（M2 T2.4）。
+# 底稿：magpie-dsh 已实测的 7 个条目（disabled=true 即关闭对应 UI 入口）。
+# 与 magpie 写入的 cordis.patch.yml 是独立两层，互不覆盖。
+
+# DeepSeek 官方账号/登录（数据层 + 设置页 + 品牌）
+- id: deepseek-account
+  disabled: true
+- id: llm-deepseek-account
+  disabled: true
+- id: ui-settings-account
+  disabled: true
+- id: ui-brand-official
+  disabled: true
+
+# 模型选择 UI（模型由 magpie 统一管，simple 用户不可见）
+- id: ui-settings-models
+  disabled: true
+- id: ui-model-selection
+  disabled: true
+- id: agent-default-model
+  disabled: true
+
+# 可选追加（id 已在 magpie-dsh 实测存在于 dsh web profile）：
+# 高级侧栏入口。默认不启用，避免误伤主工作流；需要更极简时取消注释并跑断言脚本。
+# - id: ui-sidebar-terminal
+#   disabled: true
+# - id: ui-sidebar-files
+#   disabled: true
+# - id: ui-sidebar-browser
+#   disabled: true

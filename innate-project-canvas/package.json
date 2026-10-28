@@ -1,0 +1,28 @@
+{
+  "name": "@innate-labs/project-canvas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Evidence-gated project snapshots, drift audits, Sprint boards, and module maps",
+  "type": "module",
+  "bin": {
+    "innate-project-canvas": "dist/cli.js"
+  },
+  "scripts": {
+    "dev": "tsx src/dev-server.ts",
+    "audit": "tsx src/cli.ts audit --root ../..",
+    "sync": "tsx src/cli.ts sync --root ../..",
+    "sync:preview": "tsx src/cli.ts sync --root ../.. --allow-unverified",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

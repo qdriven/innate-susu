@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-2
 title: W0.2 在源基线修复启动日志脱敏
 createdAt: 2026-10-28T08:20:06.511272Z
-updatedAt: 2026-10-28T08:20:06.511272Z
-status: draft
+updatedAt: 2026-10-28T09:03:00.539864Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ labs 的 apps/desktop/src/main/harness.ts 把 DSH stdout 原行（含 ?token= �
 
 ### 非目标
 
-不改行为契约、不重构进程管理（R1）、不在目标仓绕行修复。
 
 ### 依赖
 
-task-local-w0-1（done）：门禁基准与证据目录。
 
 ### 假设
 
-fakeChild 注入可覆盖 stdout 解析路径，无需真拉 dsh 即可测脱敏。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -78,7 +74,7 @@ Sprint w0 子任务；W0.2 卡是需求定义（见 sprint README 来源原文�
 
 ### 是否受影响
 
-是（可观察输出——日志内容——的安全行为变化）
+否
 
 ### 现状行为
 
@@ -90,11 +86,9 @@ Sprint w0 子任务；W0.2 卡是需求定义（见 sprint README 来源原文�
 
 ### 决策
 
-单一 redactLaunchSecrets 纯函数 + 三处日志出口统一过函数；不引入日志库。
 
 ### 风险
 
-误伤正常 URL 可读性 → 测试覆盖正常 URL 与错误文本；影响 URL 捕获 → F1-V3 专门断言。
 
 ### 全局影响
 
@@ -108,15 +102,15 @@ Sprint w0 子任务；W0.2 卡是需求定义（见 sprint README 来源原文�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 脱敏单测通过（畸形 URL/正常 URL/非敏感错误仍可读）
+- F1-V1 [passed] 脱敏单测通过（畸形 URL/正常 URL/非敏感错误仍可读）
   - 方法：vitest 新用例，夹具含 dsh ?token= 与 magpie ?k=
-  - 证据：-
-- F1-V2 [pending] labs 六门禁修复后重新全绿（83 项不减）
+  - 证据：core redact.test.ts 9/9（dsh token/magpie k/key/多参数保序/双出现/无秘密原样/空值/大小写）— evidence/W0/commands.md W0.2 节
+- F1-V2 [passed] labs 六门禁修复后重新全绿（83 项不减）
   - 方法：重跑 W0.1 六命令，结果更新 evidence/W0/commands.md
-  - 证据：-
-- F1-V3 [pending] 运行态仍持真实认证 URL（URL 捕获不回归）
+  - 证据：六门禁复跑全绿，实测 96/96（83+9 脱敏用例+canvas 4）；首次 6 失败为 magpie 孤儿进程环境问题，清理后全过（过程如实记录）
+- F1-V3 [passed] 运行态仍持真实认证 URL（URL 捕获不回归）
   - 方法：现有 harness 就绪/URL 断言 + smoke:desktop 真机过
-  - 证据：-
+  - 证据：smoke 真机全过=URL 捕获/嵌入认证不回归；smoke 输出 grep 原始 token 0 处；设计说明 evidence/W0/redaction-design.md
 
 ## 涉及模块
 
@@ -126,14 +120,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [add] docs/susu/plan/evidence/W0/redaction-design.md — 脱敏边界设计说明（本任务交付物之一）
+- S1 [add/done] docs/susu/plan/evidence/W0/redaction-design.md — 脱敏边界设计说明（已交付，evidence/W0/redaction-design.md）
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 开始实施：共享 redact 落 @dogic/core，两消费点接线
+- 六门禁复绿+96实测+真机脱敏验证
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.2 卡；全文快照见 docs/sprints/w0/README.md 来源原文节，此处不重复。
+> （未同步）
+
+### PR
+
+> （未同步）

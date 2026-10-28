@@ -3,6 +3,7 @@ import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 import {
+  DARK_TOKEN_DELTAS,
   PRODUCT_TOKENS,
   SHARED_TOKENS,
   SHARED_TOKEN_VALUES,
@@ -76,6 +77,13 @@ describe("产品 token 层", () => {
     const root = tokenValues(tokensCss, ":root")
     for (const name of SHARED_TOKENS) {
       expect(root.get(name), `:root --${name}`).toBe(SHARED_TOKEN_VALUES[name])
+    }
+  })
+
+  it("暗色 4 处差异与 tokens.css 的 .dark 块一致", () => {
+    const dark = tokenValues(tokensCss, ".dark")
+    for (const [name, value] of Object.entries(DARK_TOKEN_DELTAS)) {
+      expect(dark.get(name), `.dark --${name}`).toBe(value)
     }
   })
 

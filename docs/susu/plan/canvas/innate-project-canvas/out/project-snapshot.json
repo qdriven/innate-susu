@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "project": "innate-labs",
-  "generatedAt": "2026-10-28T08:27:33.089Z",
+  "generatedAt": "2026-10-28T09:32:03.492Z",
   "sources": [
     {
       "path": "docs/sprints/S0-w0-baseline.md",
-      "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991"
+      "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7"
     },
     {
       "path": "docs/sprints/S1-w1a-base.md",
@@ -57,10 +57,10 @@
       "id": "S0",
       "title": "W0 基线迁入",
       "estimate": "2–3 人日",
-      "declaredStatus": "待执行",
+      "declaredStatus": "已完成（2026-10-28）",
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991"
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7"
       }
     },
     {
@@ -182,13 +182,24 @@
       "status": "done",
       "summary": "记录 labs 与本仓 commit/工作区/版本；在 labs 实测 build/typecheck/test/check:typescript/verify:overlay/smoke:desktop 并记录实测测试数；列迁移白名单（innate-dogic、tools、innate-project-canvas、根配置）与排除项；magpie.exe 记录版本与哈希。",
       "purpose": "迁移源可复现，范围无歧义。",
-      "verification": "白名单每个包映射到目标路径；排除项不进清单。",
+      "verification": "白名单每个包映射到目标路径；排除项不进清单；证据 `docs/susu/plan/evidence/W0/` 与 `docs/susu/plan/evidence/W0/commands.md`。",
       "estimate": "0.5 天",
       "blockedBy": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/",
+          "kind": "directory",
+          "status": "verified"
+        },
+        {
+          "path": "docs/susu/plan/evidence/W0/commands.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 3
       }
     },
@@ -196,18 +207,24 @@
       "id": "T0.2",
       "sprintId": "S0",
       "title": "W0.2 在源基线修复启动日志脱敏",
-      "status": "todo",
+      "status": "done",
       "summary": "labs 侧 harness.ts 与 services/harness-runtime 增加 redactLaunchSecrets，token/k 查询参数替换为 [redacted]；运行态保留真实 URL，仅日志脱敏；内存/落盘/service 回调走同一边界；不带私改进程参数；修复后重记源 commit。",
       "purpose": "已知 token 泄漏在拷贝前于源头修复。",
-      "verification": "含 dsh ?token= 与 magpie ?k= 的夹具在日志断言中被脱敏；正常 URL 可读；基线门禁重新全绿。",
+      "verification": "含 dsh ?token= 与 magpie ?k= 的夹具在日志断言中被脱敏；正常 URL 可读；基线门禁重新全绿。；证据 `docs/susu/plan/evidence/W0/redaction-design.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.1"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/redaction-design.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 10
       }
     },
@@ -215,18 +232,24 @@
       "id": "T0.3",
       "sprintId": "S0",
       "title": "W0.3 统一目标仓工程身份与 workspace",
-      "status": "todo",
+      "status": "done",
       "summary": "根工程名 innate-desktop；workspace 登记 apps、innate-dogic 四组、innate-project-canvas；合并 onlyBuiltDependencies/allowBuilds；ui:sync 用当前目录与自动发现 innate-fe；对齐包管理器与 Node engine 并记录兼容矩阵。",
       "purpose": "目标身份与私有 UI 消费路径可重复。",
-      "verification": "pnpm install 无旧 Web importer；ui:sync --dry-run 指向正确根。",
+      "verification": "pnpm install 无旧 Web importer；ui:sync --dry-run 指向正确根。；证据 `docs/susu/plan/evidence/W0/commands.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.2"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/commands.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 17
       }
     },
@@ -234,18 +257,24 @@
       "id": "T0.4",
       "sprintId": "S0",
       "title": "W0.4 按白名单迁入产品与画布模块",
-      "status": "todo",
+      "status": "done",
       "summary": "原样复制白名单源码、resources、package/tsconfig 与 magpie.exe；保留 @dogic/* 与 @innate-labs/project-canvas 包名；不复制旧 README 文档链接与用户配置；检查 workspace 依赖可解析、无敏感文件。",
       "purpose": "计划模块全部落位且来源可追踪。",
-      "verification": "pnpm -r list 列出预期模块；源码 diff 仅含 W0.2 与路径适配；敏感文件扫描无结果。",
+      "verification": "pnpm -r list 列出预期模块；源码 diff 仅含 W0.2 与路径适配；敏感文件扫描无结果。；证据 `docs/susu/plan/evidence/W0/migration-inventory.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.3"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/migration-inventory.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 24
       }
     },
@@ -253,18 +282,24 @@
       "id": "T0.5",
       "sprintId": "S0",
       "title": "W0.5 迁入并适配工程工具与根脚本",
-      "status": "todo",
+      "status": "done",
       "summary": "迁入 smoke-desktop/verify-overlay/package-portable/check-typescript；适配 INNATE_WORKSPACE_ROOT 与相对路径；根脚本补齐全部门禁命令；新桌面构建纳入总门禁；不保留指向旧 Web 包的脚本。",
       "purpose": "一套命令验证全部已迁入模块。",
-      "verification": "build/typecheck/test/check:typescript 全绿；测试数不少于 W0.1 实测。",
+      "verification": "build/typecheck/test/check:typescript 全绿；测试数不少于 W0.1 实测。；证据 `docs/susu/plan/evidence/W0/commands.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.4"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/commands.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 31
       }
     },
@@ -272,18 +307,24 @@
       "id": "T0.6",
       "sprintId": "S0",
       "title": "W0.6 恢复桌面开发和基线行为",
-      "status": "todo",
+      "status": "done",
       "summary": "隔离 userData/DSH_HOME 验证 magpie 检测、模型状态、Harness 启动、控制台 Surface、工作区选根与预览、Git status/diff、overlay 7/7、Surface 切换不重载；与 labs 逐项对照，差异本阶段消除。",
       "purpose": "M0–M2 行为在目标仓恢复。",
-      "verification": "verify:overlay 与 smoke:desktop 全绿；行为矩阵全部一致；日志脱敏仍有效。",
+      "verification": "verify:overlay 与 smoke:desktop 全绿；行为矩阵全部一致；日志脱敏仍有效。；证据 `docs/susu/plan/evidence/W0/behavior.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.5"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/behavior.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 38
       }
     },
@@ -291,18 +332,24 @@
       "id": "T0.7",
       "sprintId": "S0",
       "title": "W0.7 验证便携目录与资源完整性",
-      "status": "todo",
+      "status": "done",
       "summary": "构建目录型便携包；从便携目录跑真实 Electron 冒烟；关闭后无孤儿进程；包内无开发仓绝对路径、用户配置与认证信息。",
       "purpose": "便携产物可复制到干净目录运行。",
-      "verification": "便携冒烟通过；资源清单与进程检查入证据。",
+      "verification": "便携冒烟通过；资源清单与进程检查入证据。；证据 `docs/susu/plan/evidence/W0/commands.md`。",
       "estimate": "0.5 天",
       "blockedBy": [
         "T0.6"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/commands.md",
+          "kind": "file",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 45
       }
     },
@@ -310,18 +357,24 @@
       "id": "T0.8",
       "sprintId": "S0",
       "title": "W0.8 切换执行源并冻结基线",
-      "status": "todo",
+      "status": "done",
       "summary": "标记 plan 为唯一执行源、旧 P 系列为 backlog；保存 W0 全部证据；创建可回退基线工作点；labs 此后只收关键 bugfix。",
       "purpose": "新会话从 README 唯一定位 W1a，不再被旧 P 系列分流。",
-      "verification": "从目标 README 唯一找到 W1a 任务；W0.1–W0.8 证据齐全。",
+      "verification": "从目标 README 唯一找到 W1a 任务；W0.1–W0.8 证据齐全。；证据 `docs/susu/plan/evidence/W0/`。",
       "estimate": "0.25 天",
       "blockedBy": [
         "T0.7"
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/susu/plan/evidence/W0/",
+          "kind": "directory",
+          "status": "verified"
+        }
+      ],
       "source": {
         "path": "docs/sprints/S0-w0-baseline.md",
-        "sha256": "edfeb1f93b4cbad43bf2544da9eb65d93825bdb0cd485e8802742ebf1934d991",
+        "sha256": "6b595429cca1e1891ca2ca861010ed1e528a977cc4479fe66fe8b7a747df45f7",
         "line": 52
       }
     },

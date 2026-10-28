@@ -1,0 +1,19 @@
+{
+  "name": "@dogic/service-model-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "description": "ModelGateway 接口的 magpie TypeScript 实现：sidecar 进程托管 + CLI 封装 + DSH 接线"
+}

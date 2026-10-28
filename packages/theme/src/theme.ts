@@ -4,7 +4,7 @@
  * 这个文件不产生运行时代码，只把三件事固定下来，供 `theme.test.ts` 校验、
  * 供消费方（未来的桌面 renderer）引用：
  *
- * 1. 默认主题变体 —— `default`（基础仓基础 `:root`，即 shadcn Neutral）；
+ * 1. 默认主题变体 —— `default`（无对应选择器，落到本层；不是 shadcn-neutral）；
  * 2. 产品扩展 token 清单 —— 必须在 `:root` 与 `.dark` 中成对声明；
  * 3. 共享语义 token 清单 —— 定义面归 `@innate/ui`，产品层只做同值覆写。
  */
@@ -12,14 +12,11 @@
 /**
  * app 的默认主题变体。
  *
- * `default` 走 `@innate/ui` 的基础 `:root`（shadcn Neutral）——它的中性色与
- * orca **逐 token 相等**（亮色全等；暗色只有 4 处刻意差异，见
- * `docs/build-path/1-monorepo-init/style-guide-alignment.md`）。产品层在这之上
- * 覆写同值并固定那 4 处差异，因此「不选变体」= orca 观感。
+ * `default` 没有 `[data-theme="default"]`。ThemeProvider 仍写入该属性，
+ * 因此用产品层 `:root` / `.dark`（基础仓 oklch Neutral，不是 `shadcn-neutral`）。
+ * 亮色与 orca 同值；暗色 4 处差异见 `DARK_TOKEN_DELTAS`。
  *
- * 注意：`shadcn-zinc` / `shadcn-slate` 等是**基础仓的 variant**，它们的中性色
- * 带 240 色相的淡蓝偏移，与 orca 的纯中性灰并不相等，因此**不能**作为默认值。
- * 用户在 `ThemeSelector` 里显式选择某个 variant 时，由基础仓接管中性色。
+ * 变体只覆盖自己声明的变量。`shadcn-*` 不声明 sidebar / chart / font。
  */
 export const DEFAULT_THEME_VARIANT = "default" as const
 
@@ -116,9 +113,8 @@ export const SHARED_TOKENS = [
 /**
  * 产品层对共享语义 token 的期望值（orca 同款中性色）。
  *
- * 与 `@innate/ui` 基础 `:root` 逐项对照：亮色**全部相等**；暗色有 4 处刻意
- * 差异（`accent` 更亮一档、`border` / `sidebar-border` 透明度 7% 而非 10%、
- * `sidebar-ring` 更收敛），见对齐文档。测试钉住这份快照，避免产品层悄悄漂移。
+ * 亮色与 `@innate/ui` 基础 `:root` 同值，由下面的快照钉住。
+ * 暗色 4 处差异在 `DARK_TOKEN_DELTAS`，测试按 `tokens.css` 的 `.dark` 块核对。
  */
 export const SHARED_TOKEN_VALUES: Record<(typeof SHARED_TOKENS)[number], string> =
   {
@@ -141,3 +137,14 @@ export const SHARED_TOKEN_VALUES: Record<(typeof SHARED_TOKENS)[number], string>
     ring: "#a1a1a1",
     radius: "0.625rem",
   }
+
+/**
+ * 产品层 `.dark` 相对基础仓 `.dark` 的 4 处固定值（`tokens.css` 里的原文）。
+ * `sidebar-border` / `sidebar-ring` 不在 `SHARED_TOKENS` 里，但同样写在 `.dark`。
+ */
+export const DARK_TOKEN_DELTAS = {
+  accent: "#404040",
+  border: "rgb(255 255 255 / 0.07)",
+  "sidebar-border": "rgb(255 255 255 / 0.07)",
+  "sidebar-ring": "#525252",
+} as const

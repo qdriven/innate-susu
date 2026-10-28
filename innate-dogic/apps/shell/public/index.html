@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Innate Workspace · 网关</title>
+  <style>
+    :root {
+      --bg: #0f1115; --panel: #171a21; --panel2: #1e222c; --border: #2a2f3a;
+      --text: #e6e8ee; --muted: #8b92a5; --accent: #5b8cff; --green: #34d399;
+      --amber: #fbbf24; --red: #f87171; --mono: ui-monospace, "SF Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; }
+    header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+    header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+    .badge { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); color: var(--muted); }
+    .layout { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 61px); }
+    aside { border-right: 1px solid var(--border); padding: 16px; background: var(--panel); }
+    aside nav a { display: block; padding: 8px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; margin-bottom: 4px; cursor: pointer; }
+    aside nav a.active, aside nav a:hover { background: var(--panel2); color: var(--text); }
+    main { padding: 20px; overflow: auto; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .card h2 { font-size: 14px; margin: 0 0 12px; font-weight: 600; }
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .dot.running { background: var(--green); } .dot.starting { background: var(--amber); } .dot.error, .dot.not-running { background: var(--red); } .dot.not-installed { background: var(--muted); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    th { color: var(--muted); font-weight: 500; }
+    select, input, button { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; }
+    button { cursor: pointer; background: var(--accent); border-color: transparent; color: white; font-weight: 500; }
+    button.ghost { background: transparent; color: var(--text); border-color: var(--border); }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .wizard-step { border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; cursor: pointer; }
+    .wizard-step:hover { border-color: var(--accent); }
+    .wizard-step h3 { margin: 0 0 6px; font-size: 14px; }
+    #status-banner { font-family: var(--mono); }
+    code { font-family: var(--mono); font-size: 12px; background: var(--panel2); padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Innate Workspace</h1>
+    <span class="badge" id="mode-badge">—</span>
+    <span class="badge" id="status-banner">载入中…</span>
+  </header>
+  <div class="layout">
+    <aside>
+      <nav>
+        <a data-view="wizard" class="active">配置向导</a>
+        <a data-view="models">模型管理</a>
+        <a data-view="status">网关状态</a>
+        <a data-view="quota">用量</a>
+      </nav>
+    </aside>
+    <main id="main"></main>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s)
+    const main = $('#main')
+
+    async function api(path, opts) {
+      const res = await fetch(path, opts ? {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(opts),
+      } : undefined)
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || res.statusText)
+      }
+      return res.json()
+    }
+
+    // —— 视图渲染 ——
+    function renderWizard() {
+      main.innerHTML = `
+        <div class="card">
+          <h2>首次启动向导</h2>
+          <p class="muted">选择一种方式接入模型，三选一即可开始会话。</p>
+          <div class="wizard-step" onclick="wizardPick('subscription')">
+            <h3>A · 复用已有订阅</h3>
+            <div class="muted">已登录 Claude Code / Codex 的机器，直接复用其订阅，无需粘贴 key。</div>
+          </div>
+          <div class="wizard-step" onclick="wizardPick('apikey')">
+            <h3>B · 粘贴 API Key</h3>
+            <div class="muted">粘贴一把 provider 的 API key（如 DeepSeek / ZCode），3 分钟内跑通。</div>
+          </div>
+          <div class="wizard-step" onclick="wizardPick('ollama')">
+            <h3>C · 本地模型（Ollama）</h3>
+            <div class="muted">连接本机 Ollama，使用本地模型，无需联网。</div>
+          </div>
+          <div id="wizard-result"></div>
+        </div>`
+    }
+
+    window.wizardPick = async (kind) => {
+      const el = $('#wizard-result')
+      el.innerHTML = `<div class="muted">处理中：${kind} …</div>`
+      try {
+        await api('/api/ensure-running')
+        const providers = await api('/api/providers')
+        el.innerHTML = `
+          <div style="color:var(--green);margin-top:10px">✓ 网关已就绪（${kind} 路径）。</div>
+          <div class="muted" style="margin-top:6px">当前 provider：${providers.length ? providers.map(p => p.id).join(', ') : '（尚无，请在「模型管理」添加）'}</div>`
+        renderStatusBanner()
+      } catch (e) {
+        el.innerHTML = `<div style="color:var(--red);margin-top:10px">✗ ${e.message}</div>`
+      }
+    }
+
+    async function renderModels() {
+      main.innerHTML = `<div class="card"><h2>模型管理</h2><p class="muted">加载中…（查询 magpie 约需 10–25 秒，请稍候）</p></div>`
+      let providers = null, agents = null
+      try { providers = await api('/api/providers') } catch {}
+      try { agents = await api('/api/agents') } catch {}
+      if (!providers || !agents) {
+        main.innerHTML = `<div class="card"><h2>模型管理</h2><p style="color:var(--amber)">查询 magpie 失败或超时（网关可能正在启动，或 magpie 未运行）。</p><div class="row"><button onclick="retryModels()">重试</button></div></div>`
+        return
+      }
+      try {
+        const provOptions = providers.map(p =>
+          (p.models || []).map(m => `<option value="${p.id}|${m}">${p.id}/${m}</option>`).join('')
+        ).join('')
+        main.innerHTML = `
+          <div class="card">
+            <h2>Provider 列表</h2>
+            <table>
+              <tr><th>ID</th><th>名称</th><th>类型</th><th>模型</th><th>状态</th></tr>
+              ${providers.map(p => `<tr>
+                <td><code>${p.id}</code></td><td>${p.name}</td><td>${p.type}</td>
+                <td>${(p.models || []).join(', ') || '—'}</td><td>${p.enabled ? '●' : '○'}</td>
+              </tr>`).join('') || '<tr><td colspan="5" class="muted">（无 provider）</td></tr>'}
+            </table>
+          </div>
+          <div class="card">
+            <h2>Agent 接线</h2>
+            <table>
+              <tr><th>Agent</th><th>当前模型</th><th>模式</th><th>操作</th></tr>
+              ${agents.map(a => `<tr>
+                <td>${a.agentId}</td>
+                <td>${a.wired && a.model ? a.model.provider + '/' + a.model.model : (a.wired ? '已接入（' + (a.mode || 'gateway') + '）' : '—')}</td>
+                <td>${a.mode || '—'}</td>
+                <td><button class="ghost" onclick="unwire('${a.agentId}', this)">还原</button></td>
+              </tr>`).join('') || '<tr><td colspan="4" class="muted">（无 agent）</td></tr>'}
+            </table>
+            <div class="row" style="margin-top:14px">
+              <select id="wire-agent"></select>
+              <select id="wire-model">${provOptions || '<option>无模型</option>'}</select>
+              <button onclick="wire(this)">接线</button>
+            </div>
+          </div>`
+        const agentSel = $('#wire-agent')
+        ;['claude', 'codex', 'dsh'].forEach(a => {
+          agentSel.innerHTML += `<option>${a}</option>`
+        })
+      } catch (e) {
+        main.innerHTML = `<div class="card"><h2>模型管理</h2><p style="color:var(--red)">渲染失败：${e && e.message ? e.message : e}</p><p class="muted">数据已返回但渲染出错，请反馈此错误信息。</p></div>`
+      }
+    }
+
+    window.wire = async (btn) => {
+      const agent = $('#wire-agent').value
+      const [provider, model] = $('#wire-model').value.split('|')
+      if (!provider || !model) return alert('请选择模型')
+      btn.disabled = true; btn.textContent = '接线中…（可能需要数十秒）'
+      try { await api('/api/wire', { agent, provider, model }); renderModels(); renderStatusBanner() }
+      catch (e) { alert(e.message); btn.disabled = false; btn.textContent = '接线' }
+    }
+    window.unwire = async (agent, btn) => {
+      btn.disabled = true; btn.textContent = '还原中…'
+      try { await api('/api/unwire', { agent }); renderModels(); renderStatusBanner() }
+      catch (e) { alert(e.message); btn.disabled = false; btn.textContent = '还原' }
+    }
+
+    async function renderStatus() {
+      let s = {}
+      try { s = await api('/api/status') } catch {}
+      const state = s.state || 'unknown'
+      main.innerHTML = `
+        <div class="card">
+          <h2>网关状态</h2>
+          <p><span class="dot ${state}"></span><span id="status-banner2">${state}</span></p>
+          <div class="muted" id="status-detail"></div>
+          <div class="row" style="margin-top:12px">
+            <button onclick="restart()">重新启动</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>诊断信息</h2>
+          <pre class="muted">${JSON.stringify(s, null, 2)}</pre>
+        </div>`
+    }
+
+    window.restart = async () => {
+      try { await api('/api/ensure-running'); renderStatus(); renderStatusBanner() }
+      catch (e) { alert(e.message) }
+    }
+
+    async function renderQuota() {
+      main.innerHTML = `<div class="card"><h2>用量</h2><p class="muted">加载中…（查询 magpie 约需 10–25 秒，请稍候）</p></div>`
+      let q = null
+      try { q = await api('/api/quota') } catch {}
+      if (!q) {
+        main.innerHTML = `<div class="card"><h2>用量</h2><p style="color:var(--amber)">查询 magpie 失败或超时（网关可能正在启动，或 magpie 未运行）。</p><div class="row"><button onclick="retryQuota()">重试</button></div></div>`
+        return
+      }
+      try {
+        main.innerHTML = `
+          <div class="card">
+            <h2>用量</h2>
+            <table>
+              <tr><th>Provider</th><th>已用</th><th>限额</th><th>单位</th><th>状态</th></tr>
+              ${q.map(x => `<tr>
+                <td>${x.provider || '—'}</td><td>${x.used ?? '—'}</td><td>${x.limit ?? '—'}</td>
+                <td>${x.unit || '—'}</td><td>${x.stale ? '<span style="color:var(--amber)">陈旧</span>' : '<span style="color:var(--green)">新鲜</span>'}</td>
+              </tr>`).join('') || '<tr><td colspan="5" class="muted">（直连模式无用量数据，或暂无 provider）</td></tr>'}
+            </table>
+          </div>`
+      } catch (e) {
+        main.innerHTML = `<div class="card"><h2>用量</h2><p style="color:var(--red)">渲染失败：${e && e.message ? e.message : e}</p></div>`
+      }
+    }
+
+    // —— 状态徽章 ——
+    async function renderStatusBanner() {
+      const el = $('#status-banner')
+      try {
+        const s = await api('/api/status')
+        el.textContent = '网关：' + s.state
+        el.style.color = { running: 'var(--green)', starting: 'var(--amber)', error: 'var(--red)' }[s.state] || 'var(--muted)'
+      } catch { el.textContent = '网关：不可达' }
+    }
+
+    async function renderMode() {
+      try {
+        const s = await api('/api/status')
+        $('#mode-badge').textContent = (s.url === 'direct' || s.state === 'not-installed') ? '直连模式' : 'magpie 模式'
+      } catch {}
+    }
+
+    // —— 路由 ——
+    const views = { wizard: renderWizard, models: renderModels, status: renderStatus, quota: renderQuota }
+    window.retryModels = renderModels
+    window.retryQuota = renderQuota
+    document.querySelectorAll('nav a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelectorAll('nav a').forEach(x => x.classList.remove('active'))
+        a.classList.add('active')
+        views[a.dataset.view]()
+      })
+    })
+
+    // 启动
+    renderWizard()
+    renderStatusBanner()
+    renderMode()
+    setInterval(renderStatusBanner, 5000)
+  </script>
+</body>
+</html>

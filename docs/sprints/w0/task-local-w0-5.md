@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-5
 title: W0.5 迁入并适配工程工具与根脚本
 createdAt: 2026-10-28T08:20:10.816625Z
-updatedAt: 2026-10-28T08:20:10.816625Z
-status: draft
+updatedAt: 2026-10-28T09:20:49.023193Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ tools 与根脚本按 labs 根写死路径（innate-dogic/sites/tools 扫描根�
 
 ### 非目标
 
-不改产品代码；不跑行为对照（T5）。
 
 ### 依赖
 
-T3（工具落位后才能适配）。
 
 ### 假设
 
-Electron 二进制 install.js 兜底可用。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -90,11 +86,9 @@ Sprint w0 子任务；W0.5 卡是需求定义。
 
 ### 决策
 
-check-typescript 扫描根改为 innate-dogic/tools/apps/packages 并容忍缺失；verify-overlay 内置 shim 反解 dsh bin.js。
 
 ### 风险
 
-Electron postinstall 失败 → install.js 兜底验证。
 
 ### 全局影响
 
@@ -108,15 +102,15 @@ Electron postinstall 失败 → install.js 兜底验证。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] build+typecheck+test+check:typescript 四门禁目标根全绿
+- F1-V1 [passed] build+typecheck+test+check:typescript 四门禁目标根全绿
   - 方法：逐项运行记录退出码
-  - 证据：-
-- F1-V2 [pending] 测试数不少于源基线 83
+  - 证据：desktop 根 build/typecheck/test/check:typescript 四门禁 exit 0 — evidence/W0/commands.md desktop 节
+- F1-V2 [passed] 测试数不少于源基线 83
   - 方法：汇总行对照 W0.1 commands.md
-  - 证据：-
-- F1-V3 [pending] 工具不引用 labs 绝对路径
+  - 证据：实测 106/106（dogic 92=源基线 92 含脱敏 9 + canvas 4 + theme 10）
+- F1-V3 [passed] 工具不引用 labs 绝对路径
   - 方法：grep 绝对路径检查 tools 与脚本
-  - 证据：-
+  - 证据：grep tools/*.ts labs 绝对路径 0 处；dsh 入口改 shim 自动反解（无参 overlay 7/7 实证）
 
 ### F2 · 画布引擎 evidence 根适配
 
@@ -124,9 +118,9 @@ Spec：S1
 模块：M3
 Spec：S1
 
-- F2-V1 [pending] extractEvidence 接受 docs/susu/plan/evidence/ 前缀且旧前缀兼容
+- F2-V1 [passed] extractEvidence 接受 docs/susu/plan/evidence/ 前缀且旧前缀兼容
   - 方法：引擎单测两种前缀；投影重跑 audit 0 错
-  - 证据：-
+  - 证据：引擎 extractEvidence 支持 docs/susu/plan/evidence/ 前缀+多基解析；repo 引擎 audit plan 投影 0 错（快照 3ab53b37）
 
 ## 涉及模块
 
@@ -136,14 +130,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W0-baseline.md — W0.5 卡即验收定义
+- S1 [none/-] docs/susu/plan/phases/W0-baseline.md — W0.5 卡即验收定义
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 工具适配+引擎 evidence 根修复
+- 四门禁+引擎修复全绿
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.5 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

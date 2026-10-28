@@ -1,0 +1,24 @@
+{
+  "name": "@dogic/harness-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "typecheck": "tsc -b tsconfig.json --pretty false",
+    "start": "node dist/backend-cli.js"
+  },
+  "description": "DeepSeek Harness TypeScript 运行时：Node 启动 web profile、端口与健康检查",
+  "dependencies": {
+    "@dogic/core": "workspace:*",
+    "@dogic/service-model-gateway": "workspace:*"
+  }
+}

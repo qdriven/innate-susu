@@ -1,0 +1,23 @@
+{
+  "name": "@dogic/shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dogic/kernel": "workspace:*",
+    "@dogic/sdk": "workspace:*",
+    "@dogic/plugin-model-gateway": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "@types/node": "^22.7.5"
+  }
+}

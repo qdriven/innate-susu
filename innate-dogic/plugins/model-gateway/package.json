@@ -1,0 +1,30 @@
+{
+  "name": "@dogic/plugin-model-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "innate": {
+    "plugin": {
+      "id": "model-gateway",
+      "host": "dist/index.js",
+      "provides": ["model-gateway"],
+      "consumes": []
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dogic/kernel": "workspace:*",
+    "@dogic/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "@types/node": "^22.7.5"
+  }
+}

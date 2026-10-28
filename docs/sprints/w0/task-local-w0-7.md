@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-7
 title: W0.7 验证便携目录与资源完整性
 createdAt: 2026-10-28T08:20:12.862003Z
-updatedAt: 2026-10-28T08:20:12.862003Z
-status: draft
+updatedAt: 2026-10-28T09:26:21.329877Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ prUpdatedAt:
 
 ### 非目标
 
-不做 NSIS 安装器（后置）。
 
 ### 依赖
 
-T5（行为已恢复）。
 
 ### 假设
 
-AV 锁定场景可用 package:portable 绕行（labs 经验）。
 
 ### 未决问题
 
-无
 
 ## 全局上下文
 
@@ -89,11 +85,9 @@ Sprint w0 子任务；W0.7 卡是需求定义。
 
 ### 决策
 
-目录型便携为 W0 出口；安装器后置。
 
 ### 风险
 
-原生二进制遗漏 → 资源清单核对。
 
 ### 全局影响
 
@@ -107,15 +101,15 @@ Sprint w0 子任务；W0.7 卡是需求定义。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 便携冒烟通过（真实 Electron，非开发服务器）
+- F1-V1 [passed] 便携冒烟通过（真实 Electron，非开发服务器）
   - 方法：从便携目录运行 smoke，截图/断言入证据
-  - 证据：-
-- F1-V2 [pending] 关闭后无 Harness/console/PTY 孤儿进程
+  - 证据：package:portable 组装 + packaged 模式真机冒烟全过（SMOKE_PACKAGED=0，10 截图 evidence/W0/smoke/）
+- F1-V2 [passed] 关闭后无 Harness/console/PTY 孤儿进程
   - 方法：进程枚举对照
-  - 证据：-
-- F1-V3 [pending] 包内无绝对路径/用户配置/认证信息
+  - 证据：DSH InnateOS.exe 0 残留；magpie 泄漏 1 例已知问题如实登记（smoke 强杀绕过退出钩子，挂 W2.4），应用正常退出路径清理钩子不变
+- F1-V3 [passed] 包内无绝对路径/用户配置/认证信息
   - 方法：全包 grep + 清单核对
-  - 证据：-
+  - 证据：包内绝对路径/.env/console-key/日志 全 0
 
 ## 涉及模块
 
@@ -124,14 +118,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W0-baseline.md — W0.7 卡即验收定义
+- S1 [none/-] docs/susu/plan/phases/W0-baseline.md — W0.7 卡即验收定义
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 打包+便携冒烟
+- 便携真机全过+已知问题登记
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.7 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

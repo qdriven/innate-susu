@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w0-8
 title: W0.8 切换执行源并冻结基线
 createdAt: 2026-10-28T08:20:13.534258Z
-updatedAt: 2026-10-28T08:20:13.534258Z
-status: draft
+updatedAt: 2026-10-28T09:30:54.029052Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -38,19 +38,15 @@ plan README §4 状态板与投影 S0 回写；W0 全部证据（environment/com
 
 ### 非目标
 
-不开 W1；不改产品代码。
 
 ### 依赖
 
-T6（便携回退点就绪）。
 
 ### 假设
 
-plan 投影 canvas 三步（audit/sync/board）可用（W0.1 已证）。
 
 ### 未决问题
 
-labs 初始 commit 是否执行待用户确认。
 
 ## 全局上下文
 
@@ -90,11 +86,9 @@ W0 完成、投影与状态板一致、W1a 唯一入口。
 
 ### 决策
 
-投影状态以本 Sprint 子任务 done 为准逐卡回写。
 
 ### 风险
 
-双进度源漂移 → 仅投影单向回写，不反向。
 
 ### 全局影响
 
@@ -108,18 +102,18 @@ W0 完成、投影与状态板一致、W1a 唯一入口。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] plan 投影 S0 全部置已完成且 audit 0 错
+- F1-V1 [passed] plan 投影 S0 全部置已完成且 audit 0 错
   - 方法：改投影状态字段 → canvas_audit → canvas_sync
-  - 证据：-
-- F1-V2 [pending] 新会话从 README 唯一定位 W1a（无 P0 分流）
+  - 证据：投影 S0 八卡全部已完成+证据登记，repo 引擎 audit 0 错 sync 成功（快照 ec6580e70a6c5e51）
+- F1-V2 [passed] 新会话从 README 唯一定位 W1a（无 P0 分流）
   - 方法：按 docs/README 阅读顺序走一遍核对
-  - 证据：-
-- F1-V3 [pending] 技能核对通过 + dsh-playbook 迁回本仓
+  - 证据：docs/README → plan README → phases 链路核对：P0 已标 backlog 无分流；W1a 为唯一下一阶段
+- F1-V3 [passed] 技能核对通过 + dsh-playbook 迁回本仓
   - 方法：逐技能路径/命令验证；playbook 落位并适配头部
-  - 证据：-
-- F1-V4 [pending] W0 证据齐全（五类文件）且便携包保留
+  - 证据：四技能 SKILL.md 落位核对 ✓；innate-dsh-playbook 自 labs 迁回并适配（W0 后事实+孤儿巡检+任务编号指向 plan）
+- F1-V4 [passed] W0 证据齐全（五类文件）且便携包保留
   - 方法：evidence/W0 目录清单核对
-  - 证据：-
+  - 证据：evidence/W0 七项齐备（environment/commands/migration-inventory/behavior/redaction-design/workflow-trial-log/smoke 截图）+ 便携目录保留
 
 ## 涉及模块
 
@@ -128,14 +122,20 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [modify] docs/susu/plan/README.md — §4 状态板 W0 行回写（计划内回写）
+- S1 [modify/done] docs/susu/plan/README.md — §4 状态板 W0 行已回写 done（2026-10-28）
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint w0 拆解。
+- 执行源切换与冻结
+- 执行源切换完成
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 docs/susu/plan/phases/W0-baseline.md 的 W0.8 卡；全文快照见 docs/sprints/w0/README.md 来源原文节。
+> （未同步）
+
+### PR
+
+> （未同步）

@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: sprint-w0
 title: W0：基线迁入
 createdAt: 2026-10-28T08:19:47.589474Z
-updatedAt: 2026-10-28T08:26:31.469862Z
-status: analyzed
+updatedAt: 2026-10-28T09:30:54.766329Z
+status: done
 repository: 
 sourceKind: file
 sourcePath: docs/susu/plan/phases/W0-baseline.md
@@ -120,6 +120,7 @@ plan（docs/susu/plan/，v2.1）是唯一执行源；W0 是 12 段迁移第一�
 
 - 2026-10-28 建 Sprint（create-sprint --from-file plan W0 卡）；W0.1 由 task-local-w0-1 完成收口（done）。
 - 拆解完成：T1-T7 七子任务分析全过；W0.1 已由 task-local-w0-1 完成
+- W0.1–W0.8 全部收口：六门禁全绿+106 实测+行为一致+便携真机过；labs 冻结只收 bugfix
 
 ## 来源原文
 

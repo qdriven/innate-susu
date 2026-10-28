@@ -1,0 +1,29 @@
+{
+  "name": "@dogic/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH InnateOS 核心逻辑：网关、dsh、验证与可供浏览器使用的 Surface 生命周期",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./surface": {
+      "types": "./dist/surface.d.ts",
+      "import": "./dist/surface.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,1278 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "innate-labs",
+  "generatedAt": "2026-10-27T07:23:41.104Z",
+  "sources": [
+    {
+      "path": "docs/sprints/S0-engineering-baseline.md",
+      "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c"
+    },
+    {
+      "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+      "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20"
+    },
+    {
+      "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+      "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa"
+    },
+    {
+      "path": "docs/sprints/S3-m5-dual-host-settings.md",
+      "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6"
+    },
+    {
+      "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+      "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9"
+    },
+    {
+      "path": "docs/sprints/S5-mini-gateway-decision.md",
+      "sha256": "ead7493d804a15ab6f073dce5672e7db76911d486abfbf62f500ae1f689abcc5"
+    },
+    {
+      "path": "docs/sprints/S6-code-health.md",
+      "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528"
+    },
+    {
+      "path": "innate-dogic/apps/desktop/package.json",
+      "sha256": "803b57c4aec8baa7516278c4d171621afeb02bcc890216aef99b75be976d2db1"
+    },
+    {
+      "path": "innate-dogic/apps/shell/package.json",
+      "sha256": "6879e670569f317a03aa5eda97defa7f32891e1c79fafea60d84a0178b7dc4d9"
+    },
+    {
+      "path": "innate-dogic/plugins/model-gateway/package.json",
+      "sha256": "0267b0bde6412b0e22be0f8488d9ac053e00cdbcb2519290b55f33e0f21f4390"
+    },
+    {
+      "path": "innate-dogic/plugins/workspace/package.json",
+      "sha256": "8ae022b1b0c085300ee544e6b7957f3f0c07a77d39ae23de8e01d26198021b95"
+    },
+    {
+      "path": "innate-dogic/packages/core/package.json",
+      "sha256": "3650f9d1a071bb36ae5a79132c7d07d794ca8d4172e5afac271550e3eda4ddfb"
+    },
+    {
+      "path": "innate-dogic/packages/kernel/package.json",
+      "sha256": "6676c8fbe05da3e58ba809f98374b1fdc64e962cbab351677d6dc322a57810b2"
+    },
+    {
+      "path": "innate-dogic/packages/sdk/package.json",
+      "sha256": "99a558f57e31fe16f1b982d051ffe3fe5594667089019fa5f3628f52783dfced"
+    },
+    {
+      "path": "innate-dogic/packages/syntax-highlighting/package.json",
+      "sha256": "18a9877caf71e0c50a7414ee4a638d057b2ef92d1fc1263ece76146ee8886924"
+    },
+    {
+      "path": "innate-dogic/services/harness-runtime/package.json",
+      "sha256": "9d83e1b894d923da77fc915b63ee2c17c8098b3c1e0d559089ddd26fc6424f86"
+    },
+    {
+      "path": "innate-dogic/services/model-gateway/package.json",
+      "sha256": "3932806cb363abd17e4ffbe44144bb168c1029a41d571e8267319447e6bd4e19"
+    },
+    {
+      "path": "sites/dsh-desktop-plan/package.json",
+      "sha256": "ae5f9c3242f33309e555ad2279a7c59794ae850888d08b23e6756c2297841dd0"
+    },
+    {
+      "path": "innate-project-canvas/package.json",
+      "sha256": "9cda0c91229872c892ba3e437d242682c74f4d909dc69e6f8381e517c525b948"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/03-stage-3-dsh-integration.md"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/04-stage-4-dsh-host-workspace.md"
+    },
+    {
+      "path": "docs/plans/innate-dogic-dsh/05-stage-5-dual-host-settings.md"
+    }
+  ],
+  "sprints": [
+    {
+      "id": "S0",
+      "title": "工程与版本库基线",
+      "estimate": "1–1.5 天",
+      "declaredStatus": "下一执行项（先于 M3）",
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c"
+      }
+    },
+    {
+      "id": "S1",
+      "title": "M3：DSH Runtime 插件化与托管收敛",
+      "estimate": "2–3 天",
+      "declaredStatus": "排队（S0 后）",
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20"
+      }
+    },
+    {
+      "id": "S2",
+      "title": "M4：DSH 侧 Innate 工作区插件",
+      "estimate": "4–6 天",
+      "declaredStatus": "待 S1",
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa"
+      }
+    },
+    {
+      "id": "S3",
+      "title": "M5：双向宿主模型设置",
+      "estimate": "3–4 天",
+      "declaredStatus": "待 S2",
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6"
+      }
+    },
+    {
+      "id": "S4",
+      "title": "M6–M7：Surface 双向化与双宿主发布",
+      "estimate": "按 Surface 排期",
+      "declaredStatus": "待 S3",
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9"
+      }
+    },
+    {
+      "id": "S5",
+      "title": "mini-gateway 决策门（独立可选）",
+      "estimate": "决策 0.5 天",
+      "declaredStatus": "决策门未触发，不排期",
+      "source": {
+        "path": "docs/sprints/S5-mini-gateway-decision.md",
+        "sha256": "ead7493d804a15ab6f073dce5672e7db76911d486abfbf62f500ae1f689abcc5"
+      }
+    },
+    {
+      "id": "S6",
+      "title": "插件装配与代码健康收尾",
+      "estimate": "1–2 天",
+      "declaredStatus": "可与 S2–S3 穿插，不阻塞主线",
+      "source": {
+        "path": "docs/sprints/S6-code-health.md",
+        "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T0.1",
+      "sprintId": "S0",
+      "title": "落首笔基线提交",
+      "status": "todo",
+      "summary": "在 .gitignore 已补全（`references/`、`*.exe`、`*.exe.new`、`.tmp/`，2026-10-26 已完成）的基础上，`git add` 产品代码/文档/工具/网站并完成首笔 baseline commit；此后按 T 编号提交。",
+      "purpose": "当前仓库 0 commit，所有\"已验证\"不可追溯，T 编号变更控制无法落地；基线提交是回滚与评审的前提。",
+      "verification": "`git log` 有基线提交；`git status` 无 references/、无 *.exe 待提交；`git count-objects -vH` 仓库体积在合理范围（< ~100MB）；`.agents/`、`docs/`、`innate-dogic/` 全部入库。",
+      "estimate": "0.5 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 9
+      }
+    },
+    {
+      "id": "T0.2",
+      "sprintId": "S0",
+      "title": "magpie 二进制清单化",
+      "status": "partial",
+      "summary": "新建 `innate-dogic/bin/README.md` 记录保留版本的版本号、sha256、来源与更新流程；`detect`/`launcher` 启动时校验版本不低于记录版本。孤儿 `.new` 文件已清理，无需重复处置。",
+      "purpose": "二进制是外部依赖却无版本溯源；清单化后“哪个版本测过”有据可查。",
+      "verification": "`bin/` 只有一份 exe + README；`magpie --version` 输出与 README 记录一致；sha256 与记录一致；全仓无 `magpie.exe.new` 引用。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "T0.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 16
+      }
+    },
+    {
+      "id": "T0.3",
+      "sprintId": "S0",
+      "title": "工程配置清理",
+      "status": "todo",
+      "summary": "移除 `pnpm-workspace.yaml` 的 `allowBuilds` 占位垃圾（2026-10-26 已完成）；复核 `.npmrc` 与 `verifyDepsBeforeRun` 的重复声明，收敛为一处。",
+      "purpose": "无效配置项掩盖真实意图，干扰后续排查。",
+      "verification": "`pnpm install` 无占位文案残留；配置文件 grep 无 \"set this to\"。",
+      "estimate": "0.1 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 24
+      }
+    },
+    {
+      "id": "T0.4",
+      "sprintId": "S0",
+      "title": "lint 与 format 基建",
+      "status": "todo",
+      "summary": "引入单一工具链（建议 Biome：单配置覆盖 lint+format），根配置 + `pnpm lint` / `pnpm format` 脚本；首次全量 format 独立成一个纯格式提交。",
+      "purpose": "全仓无 lint/format 配置（唯一 eslint 在方案网站）；多人/多 agent 协作需要统一的机器可执行风格门禁。",
+      "verification": "`pnpm lint` 全绿；format 提交后 `pnpm build && pnpm typecheck && pnpm test` 全绿（纯格式零行为变化）；CI 接入 lint。",
+      "estimate": "0.25 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 31
+      }
+    },
+    {
+      "id": "T0.5",
+      "sprintId": "S0",
+      "title": "最小 CI",
+      "status": "todo",
+      "summary": "新增 GitHub Actions workflow（Windows runner）：install → lint → build → typecheck → test → `check:typescript`；测试中依赖真实 magpie/dsh 环境的用例在 CI 自动跳过（配合 T0.6 的开关）。",
+      "purpose": "当前无任何 CI；门禁只存在于本机，T 编号验收缺独立执行环境。",
+      "verification": "提 PR 触发 workflow 全绿；故意引入类型错误时 CI 变红；CI 时长 < 15 分钟。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "T0.4",
+        "T0.6"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 38
+      }
+    },
+    {
+      "id": "T0.6",
+      "sprintId": "S0",
+      "title": "测试密封化与 vitest 配置分包",
+      "status": "todo",
+      "summary": "① 各包独立 vitest 配置（或统一 workspace 配置），修复\"根配置超时对包内运行不生效\"问题；② `plugins/model-gateway` 测试去环境依赖：去掉对真实账号状态的断言（如 `ls()` 含 'Claude'、\"网关应该在运行中\"），改 mock `run` 或显式跳过开关；真实二进制用例统一加 `MAGPIE_INTEGRATION=1` 类开关。",
+      "purpose": "当前测试绑定本机二进制与账号状态，换机/CI 必挂；根 vitest 配置实际不生效造成超时错位。",
+      "verification": "断网 + 干净环境（无 magpie、无 dsh）跑 `pnpm test` 全绿；CI 上 test 步骤通过；默认开关下不触网、不依赖本机二进制。",
+      "estimate": "0.5 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 45
+      }
+    },
+    {
+      "id": "T0.7",
+      "sprintId": "S0",
+      "title": "安全快修（只修 M3 之后仍存活的代码）",
+      "status": "todo",
+      "summary": "① `services/harness-runtime` 启动 dsh 时补 `--host 127.0.0.1`（desktop 版已显式绑定，service 版缺失会把带 token 的 Web UI 暴露面交给 dsh 默认值）；② desktop 主窗口 `sandbox: true`（preload 仅用 contextBridge/ipcRenderer，当前 `sandbox:false` 是不必要放宽）；③ `main/launcher.ts` spawn 补 `child.on('error')` 处理（非 Windows 下二进制缺失会以未捕获异常击穿主进程）。",
+      "purpose": "三处已知安全/健壮性缺陷，且都位于 M3 收敛后仍保留的代码路径，先修不返工。",
+      "verification": "① harness-runtime 启动参数含 `--host 127.0.0.1`（单测断言 argv）；② 主窗口 webPreferences 检查 + `pnpm smoke:desktop` 通过（preload 功能不回归）；③ 临时移走 magpie 二进制后启动应用，主进程不崩溃且 UI 有可操作错误。",
+      "estimate": "0.25 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 52
+      }
+    },
+    {
+      "id": "T0.8",
+      "sprintId": "S0",
+      "title": "文档数字与方案网站同步",
+      "status": "done",
+      "summary": "同步 plans、sprints、build-path、CONTEXT、module-map 与方案网站；保留历史里程碑中的旧数字时必须明确标为历史。后续状态变化继续同步 `sites/dsh-desktop-plan/src/data/project.ts`。",
+      "purpose": "消除执行顺序、当前/目标接线和验证状态的冲突；网站现在能展示 41 张任务卡及其依赖、验证方式。",
+      "verification": "过期无上下文数字 grep 无结果；网站构建与 lint 通过；文档本地链接有效；build-path 命令与根 scripts 对应。",
+      "estimate": "0.25 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S0-engineering-baseline.md",
+        "sha256": "7294fd0fc7ca5290ee23adb336b3ed5a7aad67cf5dd80df3e4ee7347236cc20c",
+        "line": 59
+      }
+    },
+    {
+      "id": "T3.1",
+      "sprintId": "S1",
+      "title": "托管行为对齐清单",
+      "status": "todo",
+      "summary": "逐项比较 desktop `main/harness.ts` 与 `services/harness-runtime` 的实现差异，形成行为矩阵，每项标注\"保留 / 修正 / 删除\"：dsh 入口与系统 Node 解析（Windows npm shim、ELECTRON_RUN_AS_NODE 清理）；`DSH_HOME` 语义（desktop 继承真实目录 vs service 显式注入）；`web/--profile web`、simple overlay、host/port/no-open 参数；stdout 认证 URL 捕获、就绪探测、超时与日志；Windows 进程树停止、异常退出、重复启动、应用退出回收；首次 profile 初始化与 magpie 接线顺序。",
+      "purpose": "两套实现行为已漂移（树杀、重启、--host、token 日志四处不一致）；不先对齐就合并会把 bug 一起合并。",
+      "verification": "矩阵落在本文档附录或 `evidence/m3/behavior-matrix.md`，每行有理由与对应测试名；评审通过后才进入 T3.2。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S0"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m3/behavior-matrix.md",
+          "kind": "file",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 21
+      }
+    },
+    {
+      "id": "T3.2",
+      "sprintId": "S1",
+      "title": "收敛 services/harness-runtime 为唯一实现",
+      "status": "todo",
+      "summary": "把 T3.1 确认保留的 desktop 行为迁入 service；配置显式化（`dshEntry`/`nodePath`/`dshHome`/port/patch/log，默认解析放 DSH 适配层）；迁移时**顺带修复四个已知缺陷**：① stop-during-start 时 launch Promise 永不 resolve 且监听器泄漏；② 60s 超时置 failed 后就绪循环可能把状态翻回 running（无 phase 前置检查）；③ stdout 按行解析未做跨 chunk 行缓冲，token URL 可能漏检；④ **认证 URL/token 不得写入持久化日志**（当前 desktop 版 `harness.log` 明文记录，service 版已做对，以 service 版为准）。",
+      "purpose": "消灭平行实现是 M3 的核心交付；四个缺陷都位于收敛后唯一存活的实现里，修复一次永久生效。",
+      "verification": "单测覆盖参数拼装、URL 提取（含跨 chunk 行缓冲用例）、状态机（stop-during-start、超时竞态、异常退出）与停止（mock child_process）；隔离临时 `DSH_HOME` 做首次初始化测试；service 独立启动真实 dsh 成功；`grep -rn \"token\" userData/logs/` 无泄漏。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "T3.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 28
+      }
+    },
+    {
+      "id": "T3.3",
+      "sprintId": "S1",
+      "title": "新增 DSH Runtime 集成插件",
+      "status": "todo",
+      "summary": "新建 `innate-dogic/plugins/dsh-runtime`（`@dogic/plugin-dsh-runtime`），从现有真实能力抽最小 Runtime 契约：发现、启动、状态、显示、隐藏、停止；插件负责 DSH 特异的入口解析、patch 选择与 Harness Surface 描述；复用现有 `SurfaceHost`/`SurfaceRegistry`，不复制 WebContents 管理；magpie 接线仍属 model-gateway 能力，经受限服务协作，CLI 不散进 renderer。",
+      "purpose": "方向 A（dogic 托管 DSH）的插件化落点——DSH 从\"desktop 私有模块\"变为\"可禁用、可测试、可独立演进\"的组合插件。",
+      "verification": "插件独立 build/typecheck/test 全绿；`packages/sdk`、`packages/core` 不反向依赖该插件（依赖方向检查）；契约有 mock 实现与契约测试。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T3.2"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 35
+      }
+    },
+    {
+      "id": "T3.4",
+      "sprintId": "S1",
+      "title": "desktop 改为组合插件",
+      "status": "todo",
+      "summary": "`apps/desktop` 声明并装配 dsh-runtime 插件；删除 desktop 私有 `HarnessRuntime`，IPC 只转发插件契约；`innate:harness*` 通道可暂留兼容别名但不再有第二实现；simple/dev 页面门控改为根据插件贡献与 capability 计算，插件禁用时无无效对话入口。装配机制沿用现有静态组合（动态装配归 S6）。",
+      "purpose": "应用内只剩一条 DSH 启动链、一个状态源；\"DSH 插件可移除\"成为验收指标（禁用后工作台和其他插件不受影响）。",
+      "verification": "`grep -rn \"spawn\\|dsh web\" apps/desktop/src/main/` 无进程启动代码残留；禁用插件后 `pnpm smoke:desktop`（无 Harness 变体）通过；启用后全量冒烟通过；应用内无平行状态源（状态只从插件契约读取）。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T3.3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 42
+      }
+    },
+    {
+      "id": "T3.5",
+      "sprintId": "S1",
+      "title": "生命周期与故障隔离",
+      "status": "todo",
+      "summary": "deactivate 不杀会话（只隐藏/卸载 Surface），close/stop 才终止 Runtime；禁用/卸载插件时关闭其 Surface、停止子进程并注销贡献，不影响 workspace 等插件；DSH 未安装、启动超时、token 缺失、异常退出都有可操作错误（UI 可见 + 可重试）；禁止递归加载 desktop、禁止认证 URL 进布局快照。",
+      "purpose": "双向宿主计划的统一验收指标\"DSH 插件可移除\"依赖本项；故障隔离决定插件化是否真的成立。",
+      "verification": "手工 + 自动用例：deactivate 后 dsh 进程仍活着；disable 后进程树被回收且 workspace 功能正常；四类故障各自出现可理解错误文案；`evidence/m3/` 有对应截图。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T3.4"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m3/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 49
+      }
+    },
+    {
+      "id": "T3.6",
+      "sprintId": "S1",
+      "title": "双模式真实回归与文档",
+      "status": "todo",
+      "summary": "全量门禁 + 真实打包冒烟：\n```bash\npnpm package:portable\npnpm smoke:desktop -- docs/plans/innate-dogic-dsh/evidence/m3 --packaged --with-harness\n```\n覆盖 simple/dev Harness、控制台、工作区恢复、Git diff、插件禁用与进程清理；更新 `module-map.md`、`workbench-surfaces.md`、`docs/build-path/`、方案网站与本文状态。",
+      "purpose": "M3 出口标准要求\"现有用户流程零回退\"——只有打包产物上的真实冒熟能证明。",
+      "verification": "冒烟断言全绿且证据入 `evidence/m3/`；83 基线 + 新增测试全过；任务卡第 3 条规则（提交关联 T 编号）在 git log 可查。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T3.5",
+        "T3.2"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m3/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S1-m3-dsh-runtime-plugin.md",
+        "sha256": "305ed2cde09b328ffa9042d3c8a6b35b50bce143d96de2e9e75d46730aac0b20",
+        "line": 56
+      }
+    },
+    {
+      "id": "T4.1",
+      "sprintId": "S2",
+      "title": "DSH plugin 能力侦察（短 spike）",
+      "status": "todo",
+      "summary": "以当前安装的 DSH 版本实测并记录：插件 manifest、link/install/uninstall、版本兼容与加载失败行为；`InnateUI` 的 toolbar/panels/settings 真实贡献点与生命周期；官方 Node/后端入口、文件读取、子进程、Git、目录选择与事件能力；主题 token、明暗模式、通知、路由、状态持久化；多窗口/多 profile、认证与 web 资源加载约束。产出最小可加载示例（只用于侦察）。",
+      "purpose": "方向 B 的全部实现方式取决于 DSH 官方插件能力的真实边界；先花 0.5–1 天实测避免数周的错误设计。",
+      "verification": "`evidence/m4/plugin-capabilities.md` 落档（每项能力标注：可用/受限/缺失 + 实测命令或代码路径）；最小示例在真实 DSH 加载成功并有截图；**不允许用静态页面冒充能力验证**。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "S1"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m4/plugin-capabilities.md",
+          "kind": "file",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 18
+      }
+    },
+    {
+      "id": "T4.2",
+      "sprintId": "S2",
+      "title": "工作区能力与宿主解耦",
+      "status": "todo",
+      "summary": "明确 `WorkspaceApi`、根目录选择、文档描述、安全快照的宿主无关部分；纯 UI/Markdown/高亮与 Electron IPC 适配分层（复用收益低的页面允许两份）；dogic 现有行为不变，快照 schema 版本兼容；为双宿主定义同一场景清单：列目录、读文本、Markdown 相对资源、Git status、staged/unstaged diff。",
+      "purpose": "这是\"允许两套薄实现，但契约与验收必须一致\"原则的落地；不做这步，DSH 侧实现会与桌面实现各自漂移。",
+      "verification": "现有 workspace 测试与桌面冒烟全绿（不为等 DSH 侧而破坏现状）；场景清单落档并被两侧共享；快照 schema 有版本字段与兼容读取测试。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "T4.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 25
+      }
+    },
+    {
+      "id": "T4.3",
+      "sprintId": "S2",
+      "title": "DSH 插件骨架与安装链",
+      "status": "todo",
+      "summary": "新建 `innate-dogic/plugins/dsh-workbench`（strict TS），含构建、manifest、安装/卸载清理；用 DSH 官方贡献点注册\"工作区\"叶子页面或 Panel（不加载完整 desktop）；插件加载失败只禁用自身，不破坏 DSH 对话与原生设置；记录支持的 DSH 版本。",
+      "purpose": "M7 的独立分发对象从这里开始生长；fail-closed 语义在此建立。",
+      "verification": "真实 DSH 中 link/install 成功、uninstall 后贡献点消失且 DSH 原生功能完好；manifest 缺陷或版本不匹配时插件被禁用并留日志，DSH 不受影响。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T4.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 32
+      }
+    },
+    {
+      "id": "T4.4",
+      "sprintId": "S2",
+      "title": "文件与 Markdown 垂直切片",
+      "status": "todo",
+      "summary": "用户明确选择/授权工作区根目录；实现目录懒加载、文本/图片/Markdown 预览、代码高亮、文档切换；保持 canonical root 包含检查、相对链接与图片防逃逸、大小上限、失败回退；token/凭据/文件内容不进插件布局持久化。",
+      "purpose": "双宿主第一个真实可用的垂直切片；安全边界（只读 + 防逃逸）从桌面原样带到 DSH 侧。",
+      "verification": "真实 DSH 内打开本仓，文件与 Markdown 可读，相对链接与图片行为与 dogic 一致；双宿主跑同一场景清单结果一致；路径逃逸用例（`../`、symlink）两侧都被拒绝；`evidence/m4/` 截图。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "T4.2",
+        "T4.3"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m4/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 39
+      }
+    },
+    {
+      "id": "T4.5",
+      "sprintId": "S2",
+      "title": "只读 Git",
+      "status": "todo",
+      "summary": "当前分支、porcelain status、staged/unstaged diff；系统 Git 用参数数组 + 明确根目录（禁 shell 拼接）；不提供 stage/commit/checkout/reset/discard 等写操作；Git 不存在、非仓库、超大 diff、路径异常都有可理解反馈。",
+      "purpose": "工作区场景的最后一块；只读边界是硬约束（工程规范第 3 节）。",
+      "verification": "双宿主同一临时仓库 diff 内容一致；注入用例（`relative` 传 `../..`、伪造 `--upload-pack` 类参数位）被拒绝；无 Git 环境的降级文案可操作。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "T4.4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 46
+      }
+    },
+    {
+      "id": "T4.6",
+      "sprintId": "S2",
+      "title": "生命周期、卸载与故障隔离",
+      "status": "todo",
+      "summary": "deactivate 与 dispose 语义明确；后台监听、计时器、子进程可回收；卸载后贡献点消失、授权状态按 DSH 文档处理、不修改用户项目文件；dogic 已嵌入 Harness 时，DSH 插件仍只显示叶子能力（无递归桌面）。",
+      "purpose": "工程规范回滚表承诺\"卸载后移除贡献点和监听，不影响 DSH 对话\"；递归嵌入是计划第 1.1 节的红线。",
+      "verification": "安装→重载→卸载循环后 DSH 内存中无残留监听（DSH 调试通道或行为验证）；卸载后用户项目文件 mtime 不变；desktop 内嵌 Harness 中插件只见叶子能力，`evidence/m4/` 截图。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T4.4"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m4/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 53
+      }
+    },
+    {
+      "id": "T4.7",
+      "sprintId": "S2",
+      "title": "双宿主验收",
+      "status": "todo",
+      "summary": "保留 `tools/smoke-desktop.ts` dogic 回归；新增 DSH 宿主真实驱动与截图（`evidence/m4/`）；同一临时仓库跑双宿主场景断言核心结果一致；敏感配置用隔离环境；验证安装、重载、卸载、版本不兼容与 Git 异常路径。",
+      "purpose": "M4 出口标准的直接执行项；\"双宿主同一用例可对照\"从此成为常规资产。",
+      "verification": "工程规范双宿主矩阵的\"工作区\"行全部通过；DSH 宿主 E2E 脚本可重复执行（非手工一次性）；全量门禁绿。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "T4.5",
+        "T4.6"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m4/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S2-m4-dsh-workbench-plugin.md",
+        "sha256": "d24ba17ce9867a46a6533de3b6e3e4289e73effdd2e97e0074bc6c0c924d80fa",
+        "line": 60
+      }
+    },
+    {
+      "id": "T5.1",
+      "sprintId": "S3",
+      "title": "设置 schema 与应用服务",
+      "status": "todo",
+      "summary": "定义版本化 `ModelSettingsConfig`（provider 引用、默认模型、目标 Agent；**不含 key**）；`apply` 幂等，按步骤返回 `{step, ok, detail}`，失败停止后续动作并给恢复方式；MagpieCli 依赖注入，mock 覆盖空配置、重复应用、失败与免 key 订阅。",
+      "purpose": "M3 旧计划中的\"facade 极简配置\"在 v2.0 的归宿——设置逻辑先做成宿主无关的应用服务，两侧 UI 只是薄适配；apply 的步骤化返回是\"配置失败不得谎称部分成功\"的基础。",
+      "verification": "schema 有版本字段与兼容读取测试；apply 幂等（重复调用结果一致）；失败停在当前步且 detail 可操作；真实二进制测试只读或隔离临时 `DSH_HOME`（硬约束 6）。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "S2"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6",
+        "line": 18
+      }
+    },
+    {
+      "id": "T5.2",
+      "sprintId": "S3",
+      "title": "dogic simple 原生设置页",
+      "status": "todo",
+      "summary": "simple 模式\"设置\"页实现模型来源与默认模型两区块（替换当前\"内嵌控制台简化入口\"）；所有操作有进行中态与下一步错误提示；成功后状态灯实时更新、新 DSH 会话读新接线；dev 控制台、浏览器逃生口、断开恢复继续可用；设置操作日志只含时间/动作/结果（无 key、token、完整认证 URL）。",
+      "purpose": "小白\"≤3 步\"指标的直接载体；同时消灭 simple 模式对 magpie 控制台嵌页的依赖。",
+      "verification": "干净环境走查：安装→选 simple→设来源→选模型→接入→对话真实回复，全程 ≤3 步、不离开 App、无第二应用、无手工配置；`evidence/m5/` 截图 + 走查录像；日志文件 grep 无 key/token。",
+      "estimate": "1 天",
+      "blockedBy": [
+        "T5.1"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m5/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6",
+        "line": 25
+      }
+    },
+    {
+      "id": "T5.3",
+      "sprintId": "S3",
+      "title": "DSH 内设置贡献",
+      "status": "todo",
+      "summary": "扩展 `plugins/dsh-workbench`，经 M4 已验证的真实 settings/panel 贡献点提供同一功能；不引入任意进程执行接口；simple/dev 可见性与 dogic 语义一致，无法确定模式时默认展示最少配置面；卸载后 DSH 原生设置恢复、无失效贡献点。",
+      "purpose": "模型设置成为第二个双宿主能力；验证 M4 建立的贡献点机制可承载表单类交互。",
+      "verification": "真实 DSH 内完成来源→模型→接入→对话（同 T5.2 场景）；卸载插件后 DSH 原生设置页完好；双宿主术语与错误文案一致（对照场景清单）。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "T5.2"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6",
+        "line": 32
+      }
+    },
+    {
+      "id": "T5.4",
+      "sprintId": "S3",
+      "title": "降级与恢复",
+      "status": "todo",
+      "summary": "magpie 缺失或网关失败给明确提示与安装/重试入口；直连模式只在能安全写 DSH 配置时开放并注明无故障转移/用量能力；`magpie dsh default` 恢复路径保留；配置失败不谎称部分成功；无 DSH、无 magpie、无模型、无效 key 四类场景双宿主测试。",
+      "purpose": "工程规范回滚表要求\"恢复与降级路径明确\"；降级体验决定小白在异常路径上是否卡死。",
+      "verification": "四类缺失场景各有专项用例（双宿主）；恢复路径实测从失败状态回到可对话；UI 在每个失败分支有下一步动作。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T5.2",
+        "T5.3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6",
+        "line": 39
+      }
+    },
+    {
+      "id": "T5.5",
+      "sprintId": "S3",
+      "title": "双宿主 UAT 与文档",
+      "status": "todo",
+      "summary": "按工程规范第 6 节在干净环境分别执行 dogic simple 与 DSH 宿主设置流程（UAT 6.1 / 6.2 脚本）；更新 module-map、build-path、方案网站与 `evidence/m5/`。",
+      "purpose": "M5 出口标准的验收形式；UAT 脚本从此成为可重复资产。",
+      "verification": "UAT 通过标准逐条满足（≤3 步、无第二个应用、无手工配置、无高级术语弹错 + 无 magpie/无 DSH/无效 key 变体）；文档四处同步完成。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "T5.4"
+      ],
+      "evidence": [
+        {
+          "path": "docs/plans/innate-dogic-dsh/evidence/m5/",
+          "kind": "directory",
+          "status": "missing"
+        }
+      ],
+      "source": {
+        "path": "docs/sprints/S3-m5-dual-host-settings.md",
+        "sha256": "cacab1af79f54f16b3b49cf8bf15a310c154157f619a7591fed0086432579bf6",
+        "line": 46
+      }
+    },
+    {
+      "id": "T6.1",
+      "sprintId": "S4",
+      "title": "M6.1 terminal Surface",
+      "status": "todo",
+      "summary": "dogic 主进程持有 pty；renderer 只做视图与输入/显示事件；会话绑定明确工作区与可执行配置，禁止 renderer 传任意 shell 字符串的通用 IPC；输入/输出/resize/exit 分通道，有背压、缓冲上限与退出清理；deactivate 保留会话、close 才终止；默认 dev 模式开放（simple 不可见）；DSH 侧仅在官方插件进程能力与交互场景成立时适配。",
+      "purpose": "第一个非 webcontents 的 Surface 类型，验证 SurfaceKind 抽象的真实扩展性；也是第一个高权限能力，验证\"不复用只读 WorkspaceApi\"的权限分层。",
+      "verification": "真实命令交互、resize、退出清理（无孤儿 shell 进程）；simple 模式不可见；伪造任意 shell 字符串的 IPC 调用被拒绝；全量冒烟绿。",
+      "estimate": "按排期",
+      "blockedBy": [
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 9
+      }
+    },
+    {
+      "id": "T6.2",
+      "sprintId": "S4",
+      "title": "M6.2 browser Surface",
+      "status": "todo",
+      "summary": "独立 WebContents provider 与持久分区策略，保留 sandbox/contextIsolation；导航、弹窗、下载、权限分别审核（默认拒绝摄像头/麦克风/通知）；认证 URL 不作为普通可分享地址；下载不自动执行；DSH 内优先复用其官方浏览器能力，不造嵌套浏览器。",
+      "purpose": "为后续需要嵌网页的场景（文档、控制台类）提供安全基座。",
+      "verification": "导航策略（外跳规则）、权限默认拒绝、会话分区隔离、下载落盘位置可控、provider 崩溃不拖垮工作台；安全审查记录入 evidence。",
+      "estimate": "按排期",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 16
+      }
+    },
+    {
+      "id": "T6.3",
+      "sprintId": "S4",
+      "title": "M6.3 canvas Surface",
+      "status": "todo",
+      "summary": "优先文档型 Surface（不额外加 WebContents）；数据模型、视口、渲染分离；文档持久化独立于 Surface 布局；插件节点经 SDK 注册、不获得任意主进程函数；双宿主共享文档 schema，UI 可按宿主分别实现。",
+      "purpose": "Document 类型 Surface 的深化；验证\"插件贡献节点\"这一扩展点。",
+      "verification": "重启恢复、大数据性能基线、自动保存、插件节点无越权（越权调用被拒）；文档 schema 版本化。",
+      "estimate": "按排期",
+      "blockedBy": [
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 23
+      }
+    },
+    {
+      "id": "T6.4",
+      "sprintId": "S4",
+      "title": "M6.4 Structured I/O + Annotation v1 契约",
+      "status": "todo",
+      "summary": "按 [structured-io 架构契约](../architecture/structured-io.md) 在 `packages/sdk` 增加浏览器/Node 安全的 `agent-io` 与 `annotation` 子入口：TaskInput、CapabilityDescriptor、六类 OutputBlock、RunResult、RunEvent、AnnotationTarget/Thread/Message/Proposal、AnnotationStore 接口及运行时 JSON Schema；建立有效/非法夹具、版本兼容、事件顺序、权限与降级测试。只交付契约，不实现 Agentic UI、批注 Panel 或生产存储。",
+      "purpose": "先固定跨进程、跨插件、跨宿主和 AI 内容边界，避免 T6.5/T6.6 各自发明事件、结果和批注格式；TypeScript interface 之外必须有运行时校验。",
+      "verification": "严格类型、Schema 与示例一致；六类块和全部事件有夹具；非法版本/discriminator、重复块 id、乱序/重复/终态后事件、伪造引用、未知块降级、actions 审批不可被模型关闭均有测试；浏览器入口无 Node/Electron/React 依赖；全量门禁绿；不创建空 UI 包。",
+      "estimate": "1–2 天",
+      "blockedBy": [
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 30
+      }
+    },
+    {
+      "id": "T6.5",
+      "sprintId": "S4",
+      "title": "M6.5 Agentic UI Surface",
+      "status": "todo",
+      "summary": "以任务/运行实例为 Surface，消费 T6.4 的 TaskInput/RunEvent/RunResult/OutputBlock；DSH 是首个执行后端，通过版本化 adapter 投影真实事件，不复制其私有状态；实现 markdown/table/artifact 首批 renderer、可恢复事件流、人工审批、暂停/恢复/取消与审计；写入/命令执行/网络访问独立审批，renderer 不持有模型密钥。",
+      "purpose": "工作台的差异化能力，也是\"投影契约而非复制状态\"原则的最大考验；UI 不再自定义第二套 Agent 输出协议。",
+      "verification": "T6.4 mock 夹具可投影；真实 DSH 事件适配通过；伪造审批、乱序/重复/终态后事件被拒；重启恢复；非法输出安全降级；执行端失败不拖垮工作台；密钥只存在于 main/service。",
+      "estimate": "按排期",
+      "blockedBy": [
+        "T6.4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 37
+      }
+    },
+    {
+      "id": "T6.6",
+      "sprintId": "S4",
+      "title": "M6.6 批注与反馈垂直切片",
+      "status": "todo",
+      "summary": "实现独立 AnnotationStore 宿主适配、窄 IPC 与反馈 Panel；首片支持 Agent markdown 输出块批注、回复、解决/重开、本地原子持久化、筛选与反馈汇总；AI 只能返回 AnnotationProposal，用户接受后入库；文档文本、diff 行、图片区域和画布锚点在首片后按真实场景扩展，不预先做多人协作。",
+      "purpose": "把问题记录和反馈收集变成可追溯的一等能力，同时保持 RunResult 不可变、批注独立存储、原文权限可复核。",
+      "verification": "重载恢复；回复和状态流转正确；orphaned 不丢数据；越权 annotation/原文引用被拒；AI 不能直接 resolve/reanchor/delete；汇总包含 annotation references；存储失败不拖垮 Agentic Surface；全量门禁与真实桌面冒烟通过。",
+      "estimate": "1–2 天",
+      "blockedBy": [
+        "T6.5"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 44
+      }
+    },
+    {
+      "id": "T7.1",
+      "sprintId": "S4",
+      "title": "M7.1 桌面分发",
+      "status": "todo",
+      "summary": "全量门禁 + 目录型便携版回归；实测 `package:dir`、NSIS、单文件 portable（不用旧失败结论代替新验证）；明确 DSH、magpie、系统 Node、Git 是安装前置还是随包分发（随包则设计 `extraResources`、生产依赖、原生模块 unpack、运行时路径）；simple overlay、DSH Runtime 插件、所需服务进组合清单。",
+      "purpose": "发布物验收指标（Windows 安装包可启动、可对话）的落地。",
+      "verification": "三种打包形态分别出真实结果记录；组合清单与实际产物一致；干净机器安装→对话走查通过。",
+      "estimate": "2–3 天 + 外部工具链",
+      "blockedBy": [
+        "S3"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 51
+      }
+    },
+    {
+      "id": "T7.2",
+      "sprintId": "S4",
+      "title": "M7.2 DSH 插件分发",
+      "status": "todo",
+      "summary": "为 `dsh-workbench` 生成独立可安装产物与 manifest（不用 monorepo 源码路径当发布包）；记录 DSH 兼容版本、安装/升级/卸载命令与权限说明；版本不兼容时 fail closed（禁用 Innate 贡献、不破坏 DSH）；desktop 内嵌 DSH 与独立 DSH 两场景都验证。",
+      "purpose": "方向 B 的交付形态——用户拿到的是插件包，不是一个仓库。",
+      "verification": "产物在支持的 DSH 版本安装/升级/卸载/回滚全通过；不兼容版本实测 fail closed；产物可重复构建（CI 出包）。",
+      "estimate": "随 T7.1",
+      "blockedBy": [
+        "T4.3",
+        "T7.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 58
+      }
+    },
+    {
+      "id": "T7.3",
+      "sprintId": "S4",
+      "title": "M7.3 双宿主发布矩阵",
+      "status": "todo",
+      "summary": "跑齐并记录六组场景：dogic simple（首启→来源→模型→首对话）；dogic dev（Harness/控制台/工作区/Git/Surface）；独立 DSH + 插件（安装/工作区/设置/重载/卸载）；desktop 内嵌 DSH + 插件（叶子贡献、无递归、无重复状态源）；无 DSH / 无 magpie / 无 Git 降级；升级与回滚（配置兼容、插件禁用、接线恢复、旧快照可读）。",
+      "purpose": "统一验收指标的最终执行表；发布前最后一道门。",
+      "verification": "矩阵逐格有证据链接（evidence 目录 + 截图/日志）；任何一格不通过则不可宣称可发布。",
+      "estimate": "随 T7.1、T7.2。\n---\n- 每个进入发行版的 Surface 有独立真实验收；未实现能力不出现占位入口。\n- T6.4 契约通过运行时 Schema、事件顺序、权限和降级测试；T6.5",
+      "blockedBy": [
+        "T6.6"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S4-m6-m7-surfaces-release.md",
+        "sha256": "36164c177d856860b6cb905c2c8a1eafb39a4d649e1b34e1ad518e4be06649f9",
+        "line": 65
+      }
+    },
+    {
+      "id": "TG.1",
+      "sprintId": "S5",
+      "title": "决策门",
+      "status": "optional",
+      "summary": "产出 `docs/plans/innate-dogic-dsh/decision-mini-gateway.md`，用实测数据回答四问：\n1. 实际接入的 Provider 原生协议有几种？（magpie 配置与模型清单 → **不超过 2 种才可考虑**）\n2. 是否依赖订阅池、用量归账或路由组？（产品需求与设置操作记录 → **任一强依赖则保留 magpie**）\n3. 去掉 Go 二进制的收益是否大于维护成本？（打包体积、内存、维护成本实测 → **无明确收益则不做**）\n4. sealed reasoning 能否完整保留？（真实模型会话 → **不能保证则不做跨协议翻译**）",
+      "purpose": "把\"要不要自研网关\"从氛围争论变成数据决策；避免为维护方便 fork/重写 magpie 损失协议能力（风险登记 R2）。",
+      "verification": "决策文档四问各有数据来源与结论；做或不做都有结论落档；结论同步到总纲风险表与方案网站。",
+      "estimate": "0.5 天",
+      "blockedBy": [],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S5-mini-gateway-decision.md",
+        "sha256": "ead7493d804a15ab6f073dce5672e7db76911d486abfbf62f500ae1f689abcc5",
+        "line": 9
+      }
+    },
+    {
+      "id": "TG.2",
+      "sprintId": "S5",
+      "title": "条件实施（仅当 TG.1 通过）",
+      "status": "optional",
+      "summary": "新模块 `innate-dogic/services/mini-gateway`（strict TS、纯 ESM、Node HTTP）；与 magpie 路径并存可切换（不一刀切）；HTTP 只监听 `127.0.0.1` 随机端口；只实现确认的原生协议端点（`/v1/models`、`/v1/messages`，确需翻译时单独评审并记录 reasoning 损失）；DSH 接线格式按当前 DSH 版本实测，写前备份、断开原子恢复；`MiniGateway` 与 `MagpieGateway` 对齐 ModelGateway 同形契约（设置页不感知切换）。",
+      "purpose": "若四问全过，提供更轻的分发形态（去掉 47MB Go 二进制）。",
+      "verification": "同一台机器 magpie 与 mini-gateway 分别完成\"接入 → 对话 → 断开恢复\"；协议转发、真实 DSH 会话、接线/断开恢复、凭据隔离测试全过；决策文档记录默认实现与回滚方式。",
+      "estimate": "按决策",
+      "blockedBy": [
+        "TG.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S5-mini-gateway-decision.md",
+        "sha256": "ead7493d804a15ab6f073dce5672e7db76911d486abfbf62f500ae1f689abcc5",
+        "line": 20
+      }
+    },
+    {
+      "id": "TC.1",
+      "sprintId": "S6",
+      "title": "内核死代码处置与插件契约统一",
+      "status": "debt",
+      "summary": "对 `packages/kernel` 三处未接线设施做明确决断——`Registry`（宣称的 pending/retry 机制实际没有 retry 实现）、`ModuleLoader`（全局安装设施零引用）、`LifecycleManager.globalListeners`（无公开写入方法，事件广播死路）：**有真实需求的接线（补 retry/事件广播 + 测试），没需求的删除**，二选一，不留假抽象。同时统一插件形态：`plugins/model-gateway` 的裸函数 `apply(ctx, options)` 改为标准 `Plugin = { id, apply(ctx) }`（SDK options 走容器注入）；desktop/shell 手工拼的 no-op 事件总线（`on/emit: () => {}`）替换为真实事件通道或显式移除事件能力。",
+      "purpose": "kernel 自称\"插件内核\"但生产路径零使用；两个插件两种形态。收敛后\"三层插件化\"才是真的，否则 README/CONTEXT 的承诺是假的。",
+      "verification": "kernel 无未被任何包引用的死代码（依赖图检查 + grep）；两个插件同形态且都过 LifecycleManager 生命周期测试；plugin-registry 事件真实可达（renderer 发事件 → 插件收到）；全量门禁绿。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "S1",
+        "T3.3",
+        "T3.4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-code-health.md",
+        "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528",
+        "line": 9
+      }
+    },
+    {
+      "id": "TC.2",
+      "sprintId": "S6",
+      "title": "magpie 探测与发现收敛为单一实现",
+      "status": "debt",
+      "summary": "合并两套互不知晓的 magpie 二进制探测（`apps/desktop` launcher 的 `resolveMagpieBin`：env→resources→repo 相对路径→PATH；`plugins/model-gateway/detect.ts` 的 `detectMagpie`：PATH→常见安装目录）为一个共享入口；明确并文档化 magpie 能力的分工边界（desktop 走 core HTTP 发现 `/api/hello`、`/v1/models`；shell 走插件 CLI 封装），或在成本可接受时收敛为一层适配；`MIN_MAGPIE_VERSION` 形同虚设的版本下限与 T0.2 的 bin/README 清单打通。\n- **2026-10-27 实测补充**（shell web UI 排障结论）：① `MagpieCli` 默认超时 10s 小于 magpie CLI 实际延迟（10–13s），已修为 30s；② `parseProviders/parseAgents` 为占位实现，解析不了真实表格输出而返回空数组（shell「模型管理」页因此恒为空）；③ shell 页已加加载/错误/重试反馈（`apps/shell/public/index.html`）。本任务须以真实解析或统一实现替换占位 parser。",
+      "purpose": "同一外部依赖三处平行认知（探测 ×2 + 发现 ×2），行为已经不一致；收敛后版本兼容、降级行为可统一测试。",
+      "verification": "全仓只有一处二进制探测实现与一处网关状态发现入口（grep 验证）；两消费方（desktop/shell）在\"无 magpie / 旧版本 magpie\"场景行为一致（契约测试）；`pnpm smoke:desktop` 与 shell 集成测试绿。",
+      "estimate": "0.5 天",
+      "blockedBy": [
+        "S1",
+        "T0.2"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-code-health.md",
+        "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528",
+        "line": 16
+      }
+    },
+    {
+      "id": "TC.3",
+      "sprintId": "S6",
+      "title": "renderer 拆分与页面注册表统一",
+      "status": "debt",
+      "summary": "拆分 `App.tsx`（全仓最大文件，~367 行，内联 Card/SmallBtn/Wizard/ModelsTab/ToolsTab 五个组件）为独立组件文件；统一 `pages.ts` 静态注册表与 `WorkbenchHost.registerPanel()`（两套互不相识的注册表，后者在 desktop 生产路径未被消费）——按 TC.1 的决断结果接线或删除其一；5s 轮询 `readStatus()`（每轮 spawn where/which + 多个 2–4s HTTP 探测）加退避或事件化。",
+      "purpose": "M3 门控改为\"按插件贡献计算页面\"（T3.4）后，页面注册表必须只有一份；renderer 拆分让后续 M5 设置页、M6 Surface 页有干净的落点。",
+      "verification": "`App.tsx` < 200 行；页面只有一种注册机制（grep 验证）；`pnpm smoke:desktop` 全绿（门控数量断言不变）；状态轮询在空闲时频率可观测下降。",
+      "estimate": "0.5–1 天",
+      "blockedBy": [
+        "TC.1",
+        "S1",
+        "T3.4"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-code-health.md",
+        "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528",
+        "line": 24
+      }
+    },
+    {
+      "id": "TC.4",
+      "sprintId": "S6",
+      "title": "M3 遗留清理",
+      "status": "debt",
+      "summary": "删除 M3 (T3.4) 暂留的 `innate:harness*` IPC 兼容别名；清理 desktop 内被 services 取代后残留的私有实现碎片；复核 `packages/kernel` 对 `@dogic/sdk` 的死依赖（声明但未使用）等 package.json 卫生问题。",
+      "purpose": "兼容期结束后的正常清账；防止\"暂时保留\"变成永久第二实现。",
+      "verification": "grep 无 `innate:harness` 通道（preload/renderer/main 同步移除）；renderer 使用新通道的冒烟绿；各包 package.json 依赖与实际 import 一致（可用 depcheck 类工具或人工清单）。",
+      "estimate": "0.25 天",
+      "blockedBy": [
+        "S1",
+        "TC.1"
+      ],
+      "evidence": [],
+      "source": {
+        "path": "docs/sprints/S6-code-health.md",
+        "sha256": "5c668a6d729b584e0851de391a1e7f4bf492f71f33dfecb80ec841fec2089528",
+        "line": 31
+      }
+    }
+  ],
+  "modules": [
+    {
+      "id": "@dogic/desktop",
+      "name": "desktop",
+      "packageName": "@dogic/desktop",
+      "path": "innate-dogic/apps/desktop",
+      "layer": "app",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/apps/desktop/package.json",
+        "sha256": "803b57c4aec8baa7516278c4d171621afeb02bcc890216aef99b75be976d2db1"
+      }
+    },
+    {
+      "id": "@dogic/shell",
+      "name": "shell",
+      "packageName": "@dogic/shell",
+      "path": "innate-dogic/apps/shell",
+      "layer": "app",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/apps/shell/package.json",
+        "sha256": "6879e670569f317a03aa5eda97defa7f32891e1c79fafea60d84a0178b7dc4d9"
+      }
+    },
+    {
+      "id": "@dogic/plugin-model-gateway",
+      "name": "model-gateway",
+      "packageName": "@dogic/plugin-model-gateway",
+      "path": "innate-dogic/plugins/model-gateway",
+      "layer": "plugin",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/plugins/model-gateway/package.json",
+        "sha256": "0267b0bde6412b0e22be0f8488d9ac053e00cdbcb2519290b55f33e0f21f4390"
+      }
+    },
+    {
+      "id": "@dogic/plugin-workspace",
+      "name": "workspace",
+      "packageName": "@dogic/plugin-workspace",
+      "path": "innate-dogic/plugins/workspace",
+      "layer": "plugin",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/plugins/workspace/package.json",
+        "sha256": "8ae022b1b0c085300ee544e6b7957f3f0c07a77d39ae23de8e01d26198021b95"
+      }
+    },
+    {
+      "id": "@dogic/core",
+      "name": "core",
+      "packageName": "@dogic/core",
+      "path": "innate-dogic/packages/core",
+      "layer": "package",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/packages/core/package.json",
+        "sha256": "3650f9d1a071bb36ae5a79132c7d07d794ca8d4172e5afac271550e3eda4ddfb"
+      }
+    },
+    {
+      "id": "@dogic/kernel",
+      "name": "kernel",
+      "packageName": "@dogic/kernel",
+      "path": "innate-dogic/packages/kernel",
+      "layer": "package",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/packages/kernel/package.json",
+        "sha256": "6676c8fbe05da3e58ba809f98374b1fdc64e962cbab351677d6dc322a57810b2"
+      }
+    },
+    {
+      "id": "@dogic/sdk",
+      "name": "sdk",
+      "packageName": "@dogic/sdk",
+      "path": "innate-dogic/packages/sdk",
+      "layer": "package",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/packages/sdk/package.json",
+        "sha256": "99a558f57e31fe16f1b982d051ffe3fe5594667089019fa5f3628f52783dfced"
+      }
+    },
+    {
+      "id": "@dogic/syntax-highlighting",
+      "name": "syntax-highlighting",
+      "packageName": "@dogic/syntax-highlighting",
+      "path": "innate-dogic/packages/syntax-highlighting",
+      "layer": "package",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/packages/syntax-highlighting/package.json",
+        "sha256": "18a9877caf71e0c50a7414ee4a638d057b2ef92d1fc1263ece76146ee8886924"
+      }
+    },
+    {
+      "id": "@dogic/harness-runtime",
+      "name": "harness-runtime",
+      "packageName": "@dogic/harness-runtime",
+      "path": "innate-dogic/services/harness-runtime",
+      "layer": "service",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/services/harness-runtime/package.json",
+        "sha256": "9d83e1b894d923da77fc915b63ee2c17c8098b3c1e0d559089ddd26fc6424f86"
+      }
+    },
+    {
+      "id": "@dogic/service-model-gateway",
+      "name": "model-gateway",
+      "packageName": "@dogic/service-model-gateway",
+      "path": "innate-dogic/services/model-gateway",
+      "layer": "service",
+      "presence": "current",
+      "source": {
+        "path": "innate-dogic/services/model-gateway/package.json",
+        "sha256": "3932806cb363abd17e4ffbe44144bb168c1029a41d571e8267319447e6bd4e19"
+      }
+    },
+    {
+      "id": "@innate-labs/dsh-desktop-plan",
+      "name": "dsh-desktop-plan",
+      "packageName": "@innate-labs/dsh-desktop-plan",
+      "path": "sites/dsh-desktop-plan",
+      "layer": "site",
+      "presence": "current",
+      "source": {
+        "path": "sites/dsh-desktop-plan/package.json",
+        "sha256": "ae5f9c3242f33309e555ad2279a7c59794ae850888d08b23e6756c2297841dd0"
+      }
+    },
+    {
+      "id": "@innate-labs/project-canvas",
+      "name": "innate-project-canvas",
+      "packageName": "@innate-labs/project-canvas",
+      "path": "innate-project-canvas",
+      "layer": "tool",
+      "presence": "current",
+      "source": {
+        "path": "innate-project-canvas/package.json",
+        "sha256": "9cda0c91229872c892ba3e437d242682c74f4d909dc69e6f8381e517c525b948"
+      }
+    },
+    {
+      "id": "@dogic/plugin-dsh-runtime",
+      "name": "dsh-runtime",
+      "packageName": "@dogic/plugin-dsh-runtime",
+      "path": "innate-dogic/plugins/dsh-runtime",
+      "layer": "plugin",
+      "presence": "target",
+      "source": {
+        "path": "docs/plans/innate-dogic-dsh/03-stage-3-dsh-integration.md"
+      }
+    },
+    {
+      "id": "@dogic/plugin-dsh-workbench",
+      "name": "dsh-workbench",
+      "packageName": "@dogic/plugin-dsh-workbench",
+      "path": "innate-dogic/plugins/dsh-workbench",
+      "layer": "plugin",
+      "presence": "target",
+      "source": {
+        "path": "docs/plans/innate-dogic-dsh/04-stage-4-dsh-host-workspace.md"
+      }
+    },
+    {
+      "id": "@dogic/model-settings",
+      "name": "model-settings",
+      "packageName": "@dogic/model-settings",
+      "path": "innate-dogic/packages/model-settings",
+      "layer": "package",
+      "presence": "target",
+      "source": {
+        "path": "docs/plans/innate-dogic-dsh/05-stage-5-dual-host-settings.md"
+      }
+    }
+  ],
+  "moduleEdges": [
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/core",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/kernel",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/plugin-workspace",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/shell",
+      "target": "@dogic/kernel",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/shell",
+      "target": "@dogic/sdk",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/shell",
+      "target": "@dogic/plugin-model-gateway",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/plugin-model-gateway",
+      "target": "@dogic/kernel",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/plugin-model-gateway",
+      "target": "@dogic/sdk",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/plugin-workspace",
+      "target": "@dogic/core",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/plugin-workspace",
+      "target": "@dogic/kernel",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/plugin-workspace",
+      "target": "@dogic/syntax-highlighting",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/kernel",
+      "target": "@dogic/sdk",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/harness-runtime",
+      "target": "@dogic/service-model-gateway",
+      "label": "runtime dependency",
+      "view": "current"
+    },
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/plugin-dsh-runtime",
+      "label": "M3 组合",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/plugin-dsh-runtime",
+      "target": "@dogic/harness-runtime",
+      "label": "唯一托管",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/desktop",
+      "target": "@dogic/model-settings",
+      "label": "M5 适配",
+      "view": "target"
+    },
+    {
+      "source": "@dogic/plugin-dsh-workbench",
+      "target": "@dogic/model-settings",
+      "label": "M5 设置",
+      "view": "target"
+    }
+  ]
+}
