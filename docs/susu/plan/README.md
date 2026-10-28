@@ -67,7 +67,7 @@ flowchart LR
 | 阶段 | 状态 | 证据 |
 | --- | --- | --- |
 | W0 | **done（2026-10-28）**：8 卡全部完成——源头脱敏/工程身份/整树迁入/工具适配+引擎修复/行为对照 12 项一致/便携真机冒烟/执行源切换。Sprint 记录 docs/sprints/w0/ | [evidence/W0/](./evidence/W0/) |
-| W1a / W1b / W1c | W1b **done（2026-10-28）**：注册表元数据+@innate/ui 壳组合+右栏挂载点+回归全绿（desktop 19 测试/根 128/128/smoke with-harness 0 错）；W1a T2 done（主题基座+Geist 明暗证据）、T1 并发会话进行中、T3 待执行；W1c 已拆解待 W1a | [evidence/W1b/smoke/](./evidence/W1b/smoke/) |
+| W1a / W1b / W1c | W1a **done（2026-10-28）**：行为基线、产品主题与三区 titlebar 全绿；W1b **done（2026-10-28）**：注册表元数据+@innate/ui 壳组合+右栏挂载点+回归全绿。最终全仓 build/typecheck 通过，21 个测试文件 132/132，desktop 22/22，完整真机冒烟通过；W1c 已拆解，可进入开工门禁 | [evidence/W1a/](./evidence/W1a/)、[evidence/W1b/smoke/](./evidence/W1b/smoke/) |
 | W2 / W3 | 待执行 | — |
 | W4 / W5 | 待执行 | — |
 | R1 | 待执行 | — |
