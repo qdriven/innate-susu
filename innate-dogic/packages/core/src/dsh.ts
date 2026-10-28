@@ -127,7 +127,7 @@ export async function pnpmGlobalRootFromShim(shimPath: string): Promise<string |
     const index = Math.max(forward, backward)
     if (index < 0) return undefined
     const sepLength = forward > backward ? '/node_modules/'.length : '\\node_modules\\'.length
-    return target.slice(0, index + sepLength)
+    return target.slice(0, index + sepLength - 1)
   } catch {
     return undefined
   }

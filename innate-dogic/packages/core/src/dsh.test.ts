@@ -74,8 +74,7 @@ describe('pnpmGlobalRootFromShim', () => {
     const { join } = await import('node:path')
     const dir = mkdtempSync(join(tmpdir(), 'dsh-shim-'))
     const shim = join(dir, 'dsh')
-    writeFileSync(shim, '# cmd-shim-target=D:/pnpm/global/v11/abc/node_modules/@deepseek-ai/dsh/lib/bin.js
-')
+    writeFileSync(shim, '# cmd-shim-target=D:/pnpm/global/v11/abc/node_modules/@deepseek-ai/dsh/lib/bin.js\n')
     expect(await pnpmGlobalRootFromShim(shim)).toBe('D:/pnpm/global/v11/abc/node_modules')
   })
 
