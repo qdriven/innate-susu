@@ -43,6 +43,7 @@ gateway ensureRunning ──► 模型目录 ──► 接线操作 ──► �
 ```
 
 - DSH 段（boot → wire → chat 完整链路）不在网关侧目标链内，归 R1；W2.6 只验证 gateway 起动 → 模型 → 直连调用这条 Q1 网关前提链。
+- **W2.6 冒烟证据（2026-10-29）**：`pnpm smoke:magpie` 10/10 全过——网关就绪（复用 3425 运行中实例）→ 模型目录 → 直连最小 LLM 调用 → dsh wire/unwire 隔离与恢复 → 真实 `~/.dsh` 零修改 → 无网关降级显式失败 → 临时目录清理。证据：[smoke-magpie/smoke-magpie.json](./smoke-magpie/smoke-magpie.json)（秘密扫描 0 命中）。脚本在 `tools/smoke-magpie.ts`（不入默认门禁），R1.3 可复用其隔离方法（临时 DSH_HOME + 空闲端口 + 只回收自启进程树）。
 
 ## 4. console 与 gateway 是两个进程/认证域
 

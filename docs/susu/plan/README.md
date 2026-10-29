@@ -69,7 +69,8 @@ flowchart LR
 | --- | --- | --- |
 | W0 | **done（2026-10-28）**：8 卡全部完成——源头脱敏/工程身份/整树迁入/工具适配+引擎修复/行为对照 12 项一致/便携真机冒烟/执行源切换。Sprint 记录 docs/sprints/w0/ | [evidence/W0/](./evidence/W0/) |
 | W1a / W1b / W1c | W1a **done（2026-10-28）**：行为基线、产品主题与三区 titlebar 全绿；W1b **done（2026-10-28）**：注册表元数据+@innate/ui 壳组合+右栏挂载点+回归全绿。最终全仓 build/typecheck 通过，21 个测试文件 132/132，desktop 22/22，完整真机冒烟通过；W1c 已拆解，可进入开工门禁 | [evidence/W1a/](./evidence/W1a/)、[evidence/W1b/smoke/](./evidence/W1b/smoke/) |
-| W2 / W3 | 待执行 | — |
+| W2 / W3 | W2 **done（2026-10-29）**：7 卡全完成（T1 行为矩阵 → T2 sidecar 生命周期 → T3 CLI/接线收口 → T4 控制台生命周期 → T5 状态接入壳 → T6 隔离链路冒烟 → T7 全量回归与交接）；网关侧 A1–A8 收敛，Harness 差异移交 R1。总门禁 build/typecheck/test 全绿（desktop 79 + plugin 39 + service 8 + core 34 + sdk 9 + kernel 28 + theme 10 + workspace 5 + syntax 3 + canvas 4，基线只增不减），overlay 7/7，桌面冒烟 dev+便携各 12 截图全过，smoke:magpie 10/10（证据秘密扫描 0 命中）。Sprint 记录 docs/sprints/w2/ | [evidence/W2/](./evidence/W2/) |
+| W3 | 待执行 | — |
 | W4 / W5 | 待执行 | — |
 | R1 | 待执行 | — |
 | Q1 / Q2 / Q3 | 待执行 | — |
