@@ -8,7 +8,7 @@
 
 | # | 能力 | desktop `main/launcher.ts` | desktop `main/ipc.ts` + `packages/core` | `plugins/model-gateway` | `services/model-gateway` | 决定 |
 | --- | --- | --- | --- | --- | --- | --- |
-| A1 | magpie 进程拉起（serve 形态） | `startMagpie()`：spawn detached、fire-and-forget、无健康检查无退避 | — | `MagpieProcess.start()`：spawn `serve` + healthcheck 轮询 + 指数退避重启 | `MagpieGateway.ensureRunning()`：healthy 复用 / spawn `serve` + 健康轮询 + `RESTART_DELAYS_MS` 退避重启 | **收敛**：desktop 改走 `MagpieGateway`，删除私有 fire-and-forget spawn（测试：T2 契约测试 reuse/timeout/backoff/stop） |
+| A1 | magpie 进程拉起（serve 形态） | `startMagpie()`：spawn detached、fire-and-forget、无健康检查无退避 | — | `MagpieProcess.start()`：spawn `serve` + healthcheck 轮询 + 指数退避重启 | `MagpieGateway.ensureRunning()`：healthy 复用 / spawn `serve` + 健康轮询 + `RESTART_DELAYS_MS` 退避重启 | **收敛（T2 完成）**：desktop 私有 fire-and-forget spawn 已删除，`startMagpie()` 改经 `getGateway()` 单例调 `ensureRunning()`；服务层补齐 `GatewayStatus` 状态机（not-running/not-installed/starting/running/error recoverable）、`onStatusChange` 事件、`form` 注入、可注入时序（测试：T2 契约测试 8 例 reuse/not-installed/timeout/backoff/stop/form/wire/quota） |
 | A2 | magpie 桌面形态（desktop 版） | `startMagpie()`：`INNATE_MAGPIE_FORM=desktop` 时不带参 spawn | — | — | — | **保留并参数化**：`MagpieGateway` 增加 `form` 注入（`desktop`/`serve`），复用同一 ensureRunning/健康检查；桌面形态的 healthcheck 语义与 serve 相同（测试：T2 form 参数契约） |
 | A3 | 健康检查 | — | `core discoverGatewayPort/probeHello`（HTTP `/api/hello`，运行期发现） | `MagpieCli.healthcheck()`（CLI，启动探测） | `MagpieGateway.healthy()`（CLI `healthcheck`，启动探测） | **保留双实现并明确分工**：CLI `healthcheck` 只用于启动/复用判定（T2）；HTTP `/api/hello` 只用于运行期状态与 UI 目录（T5 事件 + 低频 reconcile）。两者不互相替代（测试：T2/T5 各自断言） |
 | A4 | 网关模型目录 | — | `core fetchModels(port)`（HTTP `/v1/models`）→ `innate:models` | `MagpieModelGateway.listProviders()`（CLI `providers`） | — | **保留双路径、UI 走类型化 facade**：桌面 UI 的模型目录经 `innate:models`（HTTP）不变，但通道语义收口到 facade；CLI providers 供插件侧（测试：T3 契约测试 + 解析测试） |
@@ -58,7 +58,7 @@ gateway ensureRunning ──► 模型目录 ──► 接线操作 ──► �
 
 | 差异项 | 决定 | 测试挂钩 |
 | --- | --- | --- |
-| serve 生命周期双实现 | 收敛至 services `MagpieGateway`，desktop 私有 spawn 删除 | T2 契约测试 |
+| serve 生命周期双实现 | 收敛至 services `MagpieGateway`，desktop 私有 spawn 删除（T2 完成：`class MagpieGateway` 已打包进 desktop main bundle，launcher 经 `getGateway()` 收口） | T2 契约测试（8 例全过，基线只增不减） |
 | 健康检查双实现 | 保留：CLI 启动探测（T2）/ HTTP 运行期发现（T5） | T2 + T5 断言 |
 | 接线直调双实现 | 收敛至类型化 facade | T3 负路径 + 隔离 HOME |
 | 配额双实现 | 收敛至 `MagpieCli.quota()` | T3 解析/超时测试 |

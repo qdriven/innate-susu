@@ -6,22 +6,42 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
 import path from 'node:path'
 import { app } from 'electron'
+import { MagpieGateway } from '@dogic/service-model-gateway'
+import { dshHome, redactLaunchSecrets } from '@dogic/core'
 
 const execFileAsync = promisify(execFile)
 
-/** 启动 magpie（desktop 优先；INNATE_MAGPIE_FORM=serve 走纯网关） */
-export function startMagpie(): { ok: boolean; detail: string } {
-  const form = process.env.INNATE_MAGPIE_FORM ?? 'desktop'
-  const args = form === 'serve' ? ['serve'] : []
-  try {
-    const child = spawn(resolveMagpieBin(), args, {
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: form === 'serve',
-      shell: process.platform === 'win32',
+let gateway: MagpieGateway | undefined
+
+/**
+ * 网关唯一实现：桌面经 MagpieGateway 复用/拉起 magpie（healthcheck 复用、
+ * 崩溃退避、显式停止），不再私有维护第二套等价 serve 生命周期。
+ */
+export function getGateway(): MagpieGateway {
+  if (!gateway) {
+    const form = process.env.INNATE_MAGPIE_FORM === 'serve' ? 'serve' : 'desktop'
+    gateway = new MagpieGateway({
+      binPath: resolveMagpieBin(),
+      form,
+      env: { ...process.env, DSH_HOME: dshHome() },
+      // 网关日志过脱敏边界：认证 URL/token 不进日志
+      log: (line) => console.log(`[innate:gateway] ${redactLaunchSecrets(line)}`),
     })
-    child.unref()
-    return { ok: true, detail: `已请求以 ${form} 形态启动 magpie（若 CLI 不在 PATH 请手动启动）` }
+  }
+  return gateway
+}
+
+/** 启动 magpie（经统一网关生命周期；已健康实例复用不重复启动） */
+export async function startMagpie(): Promise<{ ok: boolean; detail: string }> {
+  const gw = getGateway()
+  try {
+    await gw.ensureRunning()
+    const { state } = gw.status()
+    const form = process.env.INNATE_MAGPIE_FORM ?? 'desktop'
+    return {
+      ok: state === 'running',
+      detail: state === 'running' ? `magpie（${form} 形态）已就绪` : `启动未就绪（状态 ${state}）`,
+    }
   } catch (e) {
     return { ok: false, detail: `启动失败: ${String(e)}（可手动打开 magpie 桌面版）` }
   }

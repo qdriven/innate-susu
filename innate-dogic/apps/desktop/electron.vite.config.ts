@@ -7,17 +7,19 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 const coreSrc = resolve(__dirname, '../../packages/core/src/index.ts')
 const kernelSrc = resolve(__dirname, '../../packages/kernel/src')
 const workspaceSrc = resolve(__dirname, '../../plugins/workspace/src')
+const serviceGatewaySrc = resolve(__dirname, '../../services/model-gateway/src/index.ts')
 const aliases = {
   '@dogic/core/surface': resolve(__dirname, '../../packages/core/src/surface.ts'),
   '@dogic/core': coreSrc,
   '@dogic/kernel/browser': resolve(kernelSrc, 'browser.ts'),
   '@dogic/kernel': resolve(kernelSrc, 'index.ts'),
   '@dogic/syntax-highlighting': resolve(__dirname, '../../packages/syntax-highlighting/src/index.ts'),
+  '@dogic/service-model-gateway': serviceGatewaySrc,
   '@dogic/plugin-workspace/main': resolve(workspaceSrc, 'main/index.ts'),
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
 }
-const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/syntax-highlighting']
+const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/service-model-gateway', '@dogic/syntax-highlighting']
 
 export default defineConfig({
   main: {
