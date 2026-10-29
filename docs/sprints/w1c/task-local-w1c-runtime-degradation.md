@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1c-runtime-degradation
 title: W1c.3 可摘除的运行时降级
 createdAt: 2026-10-28T08:43:02.613464Z
-updatedAt: 2026-10-28T09:36:50.227666Z
-status: blocked
+updatedAt: 2026-10-28T14:15:36.374630Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ prUpdatedAt:
 
 ### 依赖
 
-- W1b 全绿；当前四个 W1b 子 task 均为 blocked。
+- W1b 全绿（2026-10-28 完成）。
 - T2 全绿
 
 ### 假设
@@ -113,12 +113,12 @@ DSH 缺失显示启动/重试/提示；控制台禁用只移除自身贡献，Ha
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 模拟 DSH 缺失/未启动/注册失败时壳、导航和其他页面仍可用
+- F1-V1 [passed] 模拟 DSH 缺失/未启动/注册失败时壳、导航和其他页面仍可用
   - 方法：运行三类故障注入测试并断言错误与重试动作
-  - 证据：-
-- F1-V2 [pending] 禁用控制台只移除其标签和贡献，不停止 Harness；dispose 不影响其他 provider
+  - 证据：App.surface.test.tsx：DSH 未安装显示安装提示、启动失败给出查看日志、控制台 provider 打开失败显示错误页与重试动作；三种情况下导航与工作区页仍可用（桌面 52/52 绿）
+- F1-V2 [passed] 禁用控制台只移除其标签和贡献，不停止 Harness；dispose 不影响其他 provider
   - 方法：运行 provider 隔离与 dispose 测试
-  - 证据：-
+  - 证据：provider-registry.test.ts + SurfaceSlot.test.tsx：摘除 magpie console 只移除其标签与贡献，Harness 标签与激活项保留；单个 provider dispose 抛错不影响其它 provider
 
 ## 涉及模块
 
@@ -131,7 +131,9 @@ Spec：S1
 
 ## 交付记录
 
-- 计划已完成；等待 W1b 全绿及前置子任务完成
+- 前置依赖（W1a/W1b）已全绿，W1c 实施完成。
+- W1c.3 实施：错误页、重试与可摘除 provider
+- W1c.3 完成：错误页/恢复动作/provider 错误边界/可摘除 provider
 
 ## 来源原文
 

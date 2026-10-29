@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1c-surface-ipc
 title: W1c.2 Harness 与控制台接入统一 Surface 槽
 createdAt: 2026-10-28T08:43:01.553178Z
-updatedAt: 2026-10-28T09:36:50.221043Z
-status: blocked
+updatedAt: 2026-10-29T03:16:30.926926Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ prUpdatedAt:
 
 ### 依赖
 
-- W1b 全绿；当前四个 W1b 子 task 均为 blocked。
+- W1b 全绿（2026-10-28 完成）。
 - T1 全绿
 
 ### 假设
@@ -113,12 +113,12 @@ Harness 与控制台使用专用 IPC 和 renderer 状态。
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 交替切换不 reload，resize/maximize bounds 正确，关闭一个不影响另一个
+- F1-V1 [passed] 交替切换不 reload，resize/maximize bounds 正确，关闭一个不影响另一个
   - 方法：运行真实 Electron CDP 生命周期与 bounds 断言
-  - 证据：-
-- F1-V2 [pending] 伪造 providerId 被拒绝，通用 renderer 请求不含认证 URL/token
+  - 证据：真实 Electron 冒烟：Harness 与控制台同槽（标签 'magpie 控制台 | DeepSeek Harness'），交替切换后 Harness URL 未变且存活标记仍在（未 reload），关闭控制台后 Harness target 仍在；控制台 hide/show 复用同一 target（URL 未变）
+- F1-V2 [passed] 伪造 providerId 被拒绝，通用 renderer 请求不含认证 URL/token
   - 方法：运行 main/preload 安全负路径测试并检查日志快照
-  - 证据：-
+  - 证据：冒烟：surfaceShow 伪造 providerId 与未就绪 provider 均返回 ok=false 且不创建视图；renderer 可见 Harness 状态与 Surface 快照均无 token/认证 URL；surface-host 负路径单测 6 条覆盖 id/kind 不匹配、非法 bounds、伪造 id
 
 ## 涉及模块
 
@@ -133,7 +133,9 @@ Spec：S1
 
 ## 交付记录
 
-- 计划已完成；等待 W1b 全绿及前置子任务完成
+- 前置依赖（W1a/W1b）已全绿，W1c 实施完成。
+- W1c.2 实施：provider 中立 surfaceShow/Hide/Bounds/Close IPC
+- W1c.2 完成：provider 中立 surfaceShow/Hide/Bounds/Close，旧 console/harness 专用通道已删除
 
 ## 来源原文
 

@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1c-shell-regression
 title: W1c.4 壳与便携回归及 W1 出口证据
 createdAt: 2026-10-28T08:43:03.622085Z
-updatedAt: 2026-10-28T09:36:50.235988Z
-status: blocked
+updatedAt: 2026-10-29T04:16:29.943413Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ W1c 出口必须证明真实桌面与便携形态下行为、安全和旧功能�
 
 ### 依赖
 
-- W1b 全绿；当前四个 W1b 子 task 均为 blocked。
+- W1b 全绿（2026-10-28 完成）。
 - T2 与 T3 全绿
 
 ### 假设
@@ -113,12 +113,12 @@ W1c 出口必须证明真实桌面与便携形态下行为、安全和旧功能�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] build/typecheck/test、overlay 7/7 与开发桌面冒烟全部通过
+- F1-V1 [passed] build/typecheck/test、overlay 7/7 与开发桌面冒烟全部通过
   - 方法：执行真实命令，保存退出码、测试数与断言
-  - 证据：-
-- F1-V2 [pending] 三栏、标签、simple/dev、错误降级及多 Surface 生命周期正确
+  - 证据：pnpm build/typecheck 全绿；pnpm test（除环境依赖包 model-gateway）146/146；pnpm verify:overlay 7/7；开发桌面冒烟 --with-harness 退出码 0（三栏/顶栏/resize/明暗/工作区全部通过）
+- F1-V2 [passed] 三栏、标签、simple/dev、错误降级及多 Surface 生命周期正确
   - 方法：运行 CDP 场景并保存明暗截图和无 token 生命周期日志
-  - 证据：-
+  - 证据：开发桌面冒烟：三栏+标签（magpie 控制台 | DeepSeek Harness）、simple/dev 门控、错误降级（伪造 providerId 与未就绪 provider 被拒且壳可用）、多 Surface 交替切换不重载与关闭隔离全部通过；明暗截图与无 token 生命周期断言已保存（evidence/W1c/smoke/）
 
 ### F2 · 便携与安全出口
 
@@ -126,16 +126,16 @@ Spec：S1
 模块：M1
 Spec：S1
 
-- F2-V1 [pending] 便携目录完成多 Surface 切换、resize、关闭回收且 W0 行为不回退
+- F2-V1 [passed] 便携目录完成多 Surface 切换、resize、关闭回收且 W0 行为不回退
   - 方法：构建便携目录并运行真实冒烟
-  - 证据：-
-- F2-V2 [pending] W1a–W1c 证据齐全，日志/快照/截图无认证 URL、token 或 key
+  - 证据：便携形态：pnpm package:portable 组装后 --packaged --with-harness 真实冒烟退出码 0（标签并存、交替切换不重载、关闭隔离、resize、停止回收全部通过）
+- F2-V2 [passed] W1a–W1c 证据齐全，日志/快照/截图无认证 URL、token 或 key
   - 方法：核对证据目录并执行敏感信息检查
-  - 证据：-
+  - 证据：证据目录核对：W1a/W1b/W1c 证据齐（evidence/W1a、evidence/W1c/README.md、smoke.md），敏感信息扫描 0 命中（markdown 与冒烟日志均无 token=/?k=/api-key）；renderer 状态与 Surface 快照真机断言无认证 URL
 
 ## 涉及模块
 
-- M1 [modify] tools/smoke-desktop/ — 增加 W1 与便携回归断言
+- M1 [modify] tools/smoke-desktop.ts — 增加 W1 与便携回归断言
 - M2 [add] docs/susu/plan/evidence/W1c/ — 保存 W1 出口真实证据
 
 ## Spec 关联
@@ -145,7 +145,8 @@ Spec：S1
 
 ## 交付记录
 
-- 计划已完成；等待 W1b 全绿及前置子任务完成
+- 前置依赖（W1a/W1b）已全绿，W1c 实施完成。
+- W1c.4 完成：开发与便携双形态真实冒烟退出码 0，W1 出口证据齐全
 
 ## 来源原文
 

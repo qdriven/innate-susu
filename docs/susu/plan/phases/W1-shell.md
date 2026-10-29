@@ -126,6 +126,15 @@
 - **验证**：W0 所有行为不回退，新生命周期断言全绿。
 - **完成标准**：W1a–W1c 证据齐全，才允许 W2/W3 并行开始。
 
+### W1c 实施记录（2026-10-28）
+
+- **W1c.1 标签模型**：`packages/core/src/surface.ts` 增 `parseSurfaceDescriptor` 白名单解析（只复制 id/providerId/kind/title/workspaceId/capabilities），`SurfaceRegistry.open` 拒绝跨 provider 复用同一 id；renderer 新增 `src/renderer/src/surfaces/`：`SurfaceTabs`（标签状态 + 安全快照持久化 `innate.surface-tabs:center`）、`SurfaceProviderRegistry`（注册/摘除/隔离 dispose）、`SurfaceSlot`（标签条 + 统一中栏槽 + provider 级错误边界）、`createWebContentsProvider` / `createDocumentProvider`。
+- **W1c.2 统一 IPC**：新增 provider 中立窄接口 `innate:surfaceShow/surfaceHide/surfaceBounds/surfaceClose`，参数只有安全 descriptor 与 bounds；`main/surface-host.ts` 引入 runtime provider 注册表，认证 URL 只在 provider 内解析；删除旧 `console{Show,Hide,Bounds}` 与 `harness{Show,Hide,Bounds}` 通道（保留 `launchHarness`/`stopHarness`/`startMagpie` 等运行时 API）；renderer 可见的 Harness 状态与启动结果不再带认证 URL。
+- **W1c.3 运行时降级**：provider 打开失败显示常驻错误页（重试 / 启动 magpie 并重试 / 浏览器打开 / 查看日志 / 关闭标签）；provider 未注册显示明确错误；provider 渲染异常由错误边界隔离；摘除 provider 只移除自身标签与贡献；DSH 未安装/启动失败在对话页给出提示与查看日志入口，壳与导航始终可用。
+- **W1c.4 回归**：`tools/smoke-desktop.ts` 增加统一中栏标签、多 Surface 交替切换不重载、关闭隔离、伪造 providerId 拒绝、状态/快照无 token 等断言；证据见 `docs/susu/plan/evidence/W1c/`。
+- **环境备注**：本机 magpie 控制台冷启动实测 40–160s，控制台启动上限改为可用 `INNATE_MAGPIE_CONSOLE_TIMEOUT_MS` 覆盖（默认仍 15s），冒烟脚本按需放宽；dsh 就绪上限同样可用 `INNATE_HARNESS_READY_TIMEOUT_MS` 覆盖（默认仍 60s）。
+- **顺带修复（阻断真机验收）**：`packages/core/src/dsh.ts` 的 `resolveDshEntry` 之前直接返回 pnpm 全局符号链接路径，Windows 下 Node 无法据此加载模块（`Cannot find module`），Harness 永远起不来；现统一取 `realpath` 后再 spawn，命令行协议不变。
+
 ## 阶段回退
 
 回退 W1 的 renderer 组合和通用 Surface IPC，恢复 W0 页面与专用适配；保留已经独立通过的日志脱敏。不得为保留新布局而降低“切换不重载”或安全断言。任一门失败只回退该门。

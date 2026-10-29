@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: sprint-w1c
 title: W1c 中栏多 Surface 标签与降级
 createdAt: 2026-10-28T08:42:59.178754Z
-updatedAt: 2026-10-28T09:36:50.204450Z
-status: analyzed
+updatedAt: 2026-10-29T03:28:14.096050Z
+status: done
 repository: 
 sourceKind: file
 sourcePath: docs/susu/plan/phases/W1-shell.md
@@ -43,7 +43,7 @@ W1c 要在统一中栏槽承载 Harness、控制台与本地页面，但 W0/W1a/
 
 - W0 已全绿：W0.1–W0.8 全部 done，产品树已迁入 innate-dogic/。
 - W1a 全绿
-- W1b 全绿；当前四个 W1b 子 task 均为 blocked。
+- W1b 全绿（2026-10-28 完成）。
 - T1 → T2 → T3 → T4 顺序执行
 
 ### 假设
@@ -119,6 +119,7 @@ W1c 复用 packages/core Surface 契约，在 innate-dogic/apps/desktop 增加 p
 ## 交付记录
 
 - W1c 已拆解为 4 个子 task；W1b 未全绿，实施阻塞
+- W1c 四个子 task 全绿：标签模型、统一 Surface IPC、运行时降级、壳与便携回归
 
 ## 来源原文
 

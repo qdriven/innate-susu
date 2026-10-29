@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w1c-surface-model
 title: W1c.1 provider 中立的 Surface 标签模型
 createdAt: 2026-10-28T08:43:00.286065Z
-updatedAt: 2026-10-28T09:36:50.212636Z
-status: blocked
+updatedAt: 2026-10-28T12:05:32.748299Z
+status: done
 branch: 
 repository: 
 sourceKind: file
@@ -45,7 +45,7 @@ prUpdatedAt:
 
 ### 依赖
 
-- W1b 全绿；当前四个 W1b 子 task 均为 blocked。
+- W1b 全绿（2026-10-28 完成）。
 
 ### 假设
 
@@ -112,17 +112,17 @@ Harness/控制台各自维护页面状态，标签模型与私有 runtime 类型
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] open/activate/deactivate/close、activeId 恢复和重复 ID 行为正确
+- F1-V1 [passed] open/activate/deactivate/close、activeId 恢复和重复 ID 行为正确
   - 方法：运行 surface 状态单测覆盖全部转换
-  - 证据：-
-- F1-V2 [pending] 旧快照可读，非法 descriptor/版本安全回退，token 与私有对象不进入状态
+  - 证据：desktop surface-tabs/SurfaceSlot 单测：open/activate/deactivate/close、activeId 恢复、重复 id、removeProvider 隔离全绿（surface-tabs.test.ts + SurfaceSlot.test.tsx）
+- F1-V2 [passed] 旧快照可读，非法 descriptor/版本安全回退，token 与私有对象不进入状态
   - 方法：运行兼容、安全负路径单测并检查快照字段
-  - 证据：-
+  - 证据：core surface.test.ts 9 条 + 白名单解析单测：非法 descriptor/版本/重复 id 安全回退，快照与 localStorage 均无 url/token/webContents
 
 ## 涉及模块
 
-- M1 [modify] packages/core/src/surface.ts — 复用并扩展安全 Surface 契约
-- M2 [add] innate-dogic/apps/desktop/src/renderer/surfaces/ — 实现 provider 中立标签状态和注册接口
+- M1 [modify] innate-dogic/packages/core/src/surface.ts — 复用并扩展安全 Surface 契约
+- M2 [add] innate-dogic/apps/desktop/src/renderer/src/surfaces/ — 实现 provider 中立标签状态和注册接口
 
 ## Spec 关联
 
@@ -131,7 +131,9 @@ Spec：S1
 
 ## 交付记录
 
-- 计划已完成；等待 W1b 全绿及前置子任务完成
+- 前置依赖（W1a/W1b）已全绿，W1c 实施完成。
+- W1a/W1b 已全绿，开始实施 W1c.1
+- W1c.1 完成：core 白名单解析 + renderer SurfaceTabs/provider 注册表/SurfaceSlot
 
 ## 来源原文
 

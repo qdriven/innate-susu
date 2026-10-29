@@ -59,7 +59,7 @@ innate-desktop/
   → DSH Agent 会话；模型请求走 profile 里的 magpie 路由 → magpie 网关 → Provider
 ```
 
-**Surface 模型**：桌面内容分三类 —— Surface（Harness 级上下文，WebContentsView 承载）、Document（文件/diff 标签）、Panel（文件树等侧栏）。`packages/core/src/surface.ts` 的 `SurfaceRegistry` 管描述与安全快照；`main/surface-host.ts` 管 WebContentsView 生命周期。magpie 控制台与 Harness 共用同一 Surface 宿主。terminal/browser/canvas/agentic UI 是 M6 按需项，无占位入口。
+**Surface 模型**：桌面内容分三类 —— Surface（Harness 级上下文，WebContentsView 承载）、Document（文件/diff 标签）、Panel（文件树等侧栏）。`packages/core/src/surface.ts` 的 `SurfaceRegistry` 管描述与安全快照；`main/surface-host.ts` 管 WebContentsView 生命周期。magpie 控制台与 Harness 共用同一 Surface 宿主与同一中栏标签槽（`renderer/src/surfaces/`：SurfaceTabs + provider 注册表 + SurfaceSlot），切换只 detach、显式关闭才销毁。terminal/browser/canvas/agentic UI 是 M6 按需项，无占位入口。
 
 **进程拓扑**：Electron main 托管全部外部进程（dsh web、magpie CLI/控制台、Git 只读命令），renderer 无任何 Node/shell；services 包可脱离 Electron 单独跑（`backend-cli.js`）。
 
@@ -140,13 +140,24 @@ wireAgent(agentId, model); unwireAgent(agentId); gatewayUrl(); quota()
 
 ### 5.4 壳层 IPC 契约（Electron）
 
-- 通道统一 `innate:*`：status、win*（窗口控制）、get/setMode、models、checks、smoke、startMagpie、openMagpieWeb、console{Show,Hide,Bounds}、harness{State,Launch,Show,Hide,Bounds,Stop}、disconnectDsh、workspace{GetRoot,PickRoot,List,Read,GitStatus,GitDiff}。
+- 通道统一 `innate:*`：status、win*（窗口控制）、get/setMode、models、checks、smoke、startMagpie、openMagpieWeb、surface{Show,Hide,Bounds,Close}、harness{State,Launch,Stop}、disconnectDsh、workspace{GetRoot,PickRoot,List,Read,GitStatus,GitDiff}。
+- Surface 走 provider 中立窄接口（W1c）：`surfaceShow(descriptor, bounds)` 只收安全 descriptor 与 bounds，**不接受 URL**；`surfaceHide/surfaceBounds/surfaceClose` 只收 surface id。旧的 `console{Show,Hide,Bounds}` 与 `harness{Show,Hide,Bounds}` 专用通道已删除。
+- 认证 URL 只在主进程对应 runtime provider 内解析（`SurfaceHost.registerProvider`）：renderer 既拿不到也提交不了带 token 的链接；伪造 providerId、id/kind 不匹配、非法 bounds 一律拒绝。
 - preload 用 `contextBridge` 暴露 `window.innate`，类型双向锁定（renderer `api.ts` 的 `declare global` + preload `satisfies WorkspaceApi`）。
 - renderer 不获得任意文件系统/进程/shell；workspace 服务按窄契约暴露，文件只读、canonical root 包含检查、大小上限。
+- renderer 可见的 Harness 状态与启动结果不含认证 URL（`publicHarnessState` / `publicLaunchResult` 只回传 phase、port 与脱敏文案）。
 
 ### 5.5 Surface 契约（`packages/core/surface`）
 
 `SurfaceKind = webcontents | document | terminal | canvas | agentic`；`SurfaceDescriptor/Record/Snapshot` 描述 id、kind、capabilities、安全快照。规则：detach 不销毁会话；URL 不变不 reload；认证 URL/token 不进布局快照；快照 schema 版本化、不兼容时安全回退。
+
+W1c 落地形态：
+
+- `packages/core/src/surface.ts`：`SurfaceRegistry` 是唯一生命周期语义来源；`parseSurfaceDescriptor` 白名单解析不可信输入（只复制 id/providerId/kind/title/workspaceId/capabilities）。
+- renderer `surfaces/`：`SurfaceTabs`（标签状态 + 安全快照持久化，键 `innate.surface-tabs:center`）、`SurfaceProviderRegistry`（provider 注册/摘除/隔离 dispose）、`SurfaceSlot`（标签条 + 统一中栏槽 + 错误边界）。
+- provider 契约同一接口容纳两类实现：`webcontents`（视图在主进程 `WebContentsView`）与 renderer `document`/`panel`（视图在 renderer 内）；terminal/browser 只保留 kind，不建空实现。
+- 标签状态只含安全字段：URL token、webContents、ChildProcess 一律不进 renderer 状态、快照与证据。
+
 
 ### 5.6 Structured I/O 与 Annotation 契约（M6.4 计划）
 
