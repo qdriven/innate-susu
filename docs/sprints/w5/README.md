@@ -111,7 +111,12 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
 ## 交付记录
 
 - 2026-10-28 拆解为计划态（analyzed 前置），未实施任何子任务。
-- 拆解完成（计划态）；实施按门禁：待 W4)
+- 2026-10-29 W5.1 完成：新包 `plugins/browser`——browser 契约（协议白名单
+  http/https、独立持久分区 `persist:innate-browser`、`network:navigate`
+  capability 声明、非法 descriptor/capability 拒绝、凭据内嵌 URL 拒绝）
+  与 `BrowserProvider` 策略层实现（会话/历史状态机、activate/deactivate
+  不销毁、close 隔离、并发上限 8、dispose 统一回收）；单元测试 26/26，
+  全量门禁 `pnpm verify` 退出码 0。证据见 docs/susu/plan/evidence/W5/contract.md。
 
 ## 来源原文
 
