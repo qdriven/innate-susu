@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
-import type { AppMode, CheckResult, HarnessState, ModelInfo, SmokeResult, StatusSnapshot } from '@dogic/core'
+import type {
+  AppMode,
+  CheckResult,
+  ConsoleStatusEvent,
+  GatewayStatusEvent,
+  HarnessState,
+  ModelInfo,
+  SmokeResult,
+  StatusSnapshot,
+} from '@dogic/core'
 import type { SurfaceDescriptor } from '@dogic/core/surface'
 import { api } from './api'
 import ConsolePage from './ConsolePage'
@@ -33,6 +42,8 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
   const [mode, setMode] = useState<AppMode | null>(null)
   const [modeLoaded, setModeLoaded] = useState(false)
   const [status, setStatus] = useState<StatusSnapshot | null>(null)
+  const [gatewayStatus, setGatewayStatus] = useState<GatewayStatusEvent | null>(null)
+  const [consoleStatus, setConsoleStatus] = useState<ConsoleStatusEvent | null>(null)
   const [harness, setHarness] = useState<HarnessState>({ phase: 'idle', message: 'Harness 未运行' })
   const [harnessLoaded, setHarnessLoaded] = useState(false)
   const [launching, setLaunching] = useState(false)
@@ -59,14 +70,25 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
     setTab(defaultPageId(m))
   }, [])
 
+  // W2.5：事件驱动 + 低频 reconcile（替代 5s 全量轮询）。
+  // 网关/控制台状态事件即发即更；30s 兜底只覆盖 dsh 接线等慢变化。
   const refresh = useCallback(async () => {
     setStatus(await api.getStatus())
   }, [])
 
   useEffect(() => {
     void refresh()
-    const t = setInterval(() => void refresh(), 5000)
-    return () => clearInterval(t)
+    const unGateway = api.onGatewayStatus((s) => {
+      setGatewayStatus(s)
+      void refresh()
+    })
+    const unConsole = api.onConsoleStatus(setConsoleStatus)
+    const t = setInterval(() => void refresh(), 30_000)
+    return () => {
+      unGateway()
+      unConsole()
+      clearInterval(t)
+    }
   }, [refresh])
 
   useEffect(() => {
@@ -169,6 +191,11 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
         mode={mode}
         pageLabel={pages.find((page) => page.id === activeTab)?.label ?? ''}
         status={status}
+        gatewayStatus={gatewayStatus}
+        consoleStatus={consoleStatus}
+        onStartGateway={() => {
+          void api.startMagpie().then((r) => setLaunchMsg(r.detail))
+        }}
         onSwitchMode={() => void chooseMode(mode === 'simple' ? 'dev' : 'simple')}
       />
 

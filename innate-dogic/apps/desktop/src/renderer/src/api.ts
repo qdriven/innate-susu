@@ -1,5 +1,7 @@
 import type {
   CheckResult,
+  ConsoleStatusEvent,
+  GatewayStatusEvent,
   HarnessLaunchResult,
   HarnessState,
   ModelInfo,
@@ -45,6 +47,10 @@ declare global {
       getHarnessState: () => Promise<HarnessState>
       stopHarness: () => Promise<boolean>
       onHarnessState: (cb: (state: HarnessState) => void) => () => void
+      /** 网关状态事件（W2.5；脱敏：无认证查询串） */
+      onGatewayStatus: (cb: (status: GatewayStatusEvent) => void) => () => void
+      /** 控制台生命周期事件（W2.5；不含认证 URL） */
+      onConsoleStatus: (cb: (status: ConsoleStatusEvent) => void) => () => void
     }
   }
 }

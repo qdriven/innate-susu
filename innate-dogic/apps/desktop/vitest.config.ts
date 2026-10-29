@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@dogic/core/surface': path.resolve(here, '../../packages/core/src/surface.ts'),
+      '@dogic/core/redact': path.resolve(here, '../../packages/core/src/redact.ts'),
     },
   },
   test: {

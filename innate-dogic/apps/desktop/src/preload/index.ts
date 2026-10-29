@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
   CheckResult,
+  ConsoleStatusEvent,
+  GatewayStatusEvent,
   HarnessLaunchResult,
   HarnessState,
   ModelInfo,
@@ -56,6 +58,18 @@ const api = {
     const listener = (_e: unknown, state: HarnessState): void => cb(state)
     ipcRenderer.on('innate:harness-state', listener)
     return () => ipcRenderer.removeListener('innate:harness-state', listener)
+  },
+  /** 网关状态事件（W2.5；脱敏：无认证查询串） */
+  onGatewayStatus: (cb: (status: GatewayStatusEvent) => void): (() => void) => {
+    const listener = (_e: unknown, status: GatewayStatusEvent): void => cb(status)
+    ipcRenderer.on('innate:gateway-status', listener)
+    return () => ipcRenderer.removeListener('innate:gateway-status', listener)
+  },
+  /** 控制台生命周期事件（W2.5；不含认证 URL） */
+  onConsoleStatus: (cb: (status: ConsoleStatusEvent) => void): (() => void) => {
+    const listener = (_e: unknown, status: ConsoleStatusEvent): void => cb(status)
+    ipcRenderer.on('innate:console-status', listener)
+    return () => ipcRenderer.removeListener('innate:console-status', listener)
   },
   workspaceGetRoot: (): Promise<WorkspaceRoot | null> => ipcRenderer.invoke('innate:workspaceGetRoot'),
   workspacePickRoot: (): Promise<WorkspaceRoot | null> => ipcRenderer.invoke('innate:workspacePickRoot'),

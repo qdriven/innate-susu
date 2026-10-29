@@ -53,6 +53,24 @@ export interface StatusSnapshot {
   timestamp: string
 }
 
+/** W2.5 网关状态事件（innate:gateway-status 通道；已脱敏：无认证查询串，url 仅 running 时为回环地址） */
+export type GatewayStatusState = 'not-installed' | 'not-running' | 'starting' | 'running' | 'error'
+
+export interface GatewayStatusEvent {
+  state: GatewayStatusState
+  url?: string
+  message?: string
+  recoverable?: boolean
+}
+
+/** W2.5 控制台生命周期事件（innate:console-status 通道；不含认证 URL） */
+export type ConsoleStatusPhase = 'idle' | 'starting' | 'running' | 'failed' | 'stopped'
+
+export interface ConsoleStatusEvent {
+  phase: ConsoleStatusPhase
+  message: string
+}
+
 /** 向导/验证单步结果 */
 export interface CheckResult {
   id: string

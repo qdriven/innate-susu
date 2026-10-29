@@ -15,7 +15,7 @@
 | A5 | 接线操作 | `disconnectDsh()`：`magpie dsh default` 直调 | — | `MagpieModelGateway.wireAgent/unwireAgent`（CLI 参数数组） | `MagpieGateway.wireDsh/unwireDsh`（CLI `dsh <model>`/`dsh default`） | **收敛（T2/T3 完成）**：desktop `innate:disconnectDsh` 改经 `getGateway().unwireDsh()`，launcher 私有直调删除；新增 `innate:wireDsh`/`innate:quota` 类型化通道；`MagpieCli` 对 agent/model 参数做白名单校验（win32 shell 拼接防注入）；断开显式返回恢复结果/失败原因/下一步 hint（测试：T2 契约 + T3 负路径 + 隔离 DSH_HOME） |
 | A6 | 配额/用量 | — | — | `MagpieModelGateway.quota()`（CLI `quota`） | `MagpieGateway.quota()`（CLI `usage today`） | **收敛到 facade（T3 完成）**：解析集中 `MagpieCli`（导出 `parseProviders/parseAgents/parseQuota`），`MagpieModelGateway` 惰性 cli 构造 + 可注入；退出码映射修正（status/数值 code 即真实退出码）；桌面新增 `innate:quota` 通道走 `MagpieGateway.quota()`（测试：T3 CLI 解析/超时/非零退出） |
 | A7 | 控制台（magpie web） | `MagpieConsole` 类：独立回环端口 + 受管 key（仅 userData `console-key.json`，损坏/过短重生成）+ stdout `magpie web on <url?k=>` 只在 main 解析 + 超时 | `innate:openMagpieWeb`（Surface provider `magpie-console`） | — | — | **收敛（T4 完成）**：接 W1c 通用生命周期（phase 状态机 idle/starting/running/failed/stopped + state/log 事件 + 日志缓冲过脱敏边界）；重复 show 复用同一 URL 不重复 spawn、SurfaceHost 不 reload；缺 key/进程退出/超时显式报错且可重试；stop 只回收自己启动的进程树（win32 `taskkill /T /F`，不终止他人实例）；启动失败只影响控制台（测试：T4 契约 10 例 + key 存储 + 脱敏断言 + gateway 隔离） |
-| A8 | 运行状态 | — | `readStatus()`（gateway/webUi/dsh/magpieCli 汇总）+ App.tsx 5s 轮询 | `GatewayStatus`（ModelGateway 契约，`onStatusChange`） | — | **收敛**：网关状态改事件驱动（`innate:gateway-status`），5s 轮询降为低频 reconcile；直连降级状态显式区分（测试：T5 四态 UI 转换 + 断连提示） |
+| A8 | 运行状态 | — | `readStatus()`（gateway/webUi/dsh/magpieCli 汇总）+ App.tsx 5s 轮询 | `GatewayStatus`（ModelGateway 契约，`onStatusChange`） | — | **收敛（T5 完成）**：网关/控制台状态改事件驱动（`innate:gateway-status` + `innate:console-status` 类型化通道），5s 轮询降为 30s 低频 reconcile 兜底；顶栏网关/控制台双 pill 区分显示（不混用单"在线"掩盖部分失败），未运行/启动中/异常四态文案 + 下一步 hint，可恢复错误 pill 可直接点击启动网关；事件与文案二次过脱敏边界，pill 不含 URL/token（测试：T5 映射 5 例 + 组件 8 例 + TitlebarStrip 2 例 + App 事件驱动 1 例，基线 63→79） |
 
 ## 2. Harness 差异对照（desktop `main/harness.ts` vs `services/harness-runtime`）
 
@@ -63,7 +63,7 @@ gateway ensureRunning ──► 模型目录 ──► 接线操作 ──► �
 | 接线直调双实现 | 收敛至类型化 facade（T3 完成：`MagpieCli` 白名单守卫 + `MagpieGateway` 单一通道 + 解析集中） | T3 负路径 + 隔离 HOME |
 | 配额双实现 | 收敛至 `MagpieCli` 解析集中（T3 完成：`parseProviders/Agents/Quota` 导出 + 退出码修正） | T3 解析/超时测试 |
 | Harness 九项差异 | 记录 + R1 收敛方案（本矩阵 §2） | R1 开工时逐项对照 |
-| 状态轮询 | 收敛为事件驱动 + 低频 reconcile | T5 UI 状态转换测试 |
+| 状态轮询 | 收敛为事件驱动 + 低频 reconcile（T5 完成：`innate:gateway-status`/`innate:console-status` 双通道 + 30s reconcile + 双 pill） | T5 映射/组件/事件测试（基线 63→79） |
 | console 生命周期 | 保留 + W1c 通用生命周期适配（T4 完成：`MagpieConsole` 状态机 + 仅停自己进程树 + key 仅 userData + 脱敏日志） | T4 契约测试（10 例全过，基线 53→63） |
 
 ## 6. 已知限制

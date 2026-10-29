@@ -10,6 +10,7 @@ const workspaceSrc = resolve(__dirname, '../../plugins/workspace/src')
 const serviceGatewaySrc = resolve(__dirname, '../../services/model-gateway/src/index.ts')
 const aliases = {
   '@dogic/core/surface': resolve(__dirname, '../../packages/core/src/surface.ts'),
+  '@dogic/core/redact': resolve(__dirname, '../../packages/core/src/redact.ts'),
   '@dogic/core': coreSrc,
   '@dogic/kernel/browser': resolve(kernelSrc, 'browser.ts'),
   '@dogic/kernel': resolve(kernelSrc, 'index.ts'),

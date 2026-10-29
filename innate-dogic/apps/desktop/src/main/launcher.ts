@@ -283,7 +283,7 @@ export class MagpieConsole extends EventEmitter {
 
 let consoleInstance: MagpieConsole | undefined
 
-function getConsole(): MagpieConsole {
+export function getConsole(): MagpieConsole {
   if (!consoleInstance) {
     consoleInstance = new MagpieConsole({
       log: (line) => console.log(`[innate:console] ${line}`),

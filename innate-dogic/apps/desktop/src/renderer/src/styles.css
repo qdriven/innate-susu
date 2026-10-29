@@ -65,7 +65,15 @@ body {
 }
 .pill.ok { color: var(--ok); border-color: var(--ok); }
 .pill.bad { color: var(--bad); border-color: var(--bad); }
+.pill.warn { color: var(--warn); border-color: var(--warn); }
 .pill.dim { color: var(--dim); }
+
+/* W2.5 顶栏状态 pill：网关/控制台区分显示 */
+.status-pills { display: flex; gap: 6px; align-items: center; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.status-pill.clickable { cursor: pointer; }
+.status-pill.clickable:hover { filter: brightness(1.15); }
+.status-pill-hint { opacity: .75; }
 
 /* 壳：orca 式窄图标栏 + 内容区 */
 .shell { display: flex; flex: 1; min-height: 0; }

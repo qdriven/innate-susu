@@ -11,11 +11,17 @@ import {
   writeMode,
   redactLaunchSecrets,
 } from '@dogic/core'
-import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
+import type {
+  AppMode,
+  GatewayStatusEvent,
+  GatewayStatusState,
+  HarnessLaunchResult,
+  HarnessState,
+} from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
-import { ensureMagpieConsole, getGateway, startMagpie } from './launcher'
+import { ensureMagpieConsole, getConsole, getGateway, startMagpie } from './launcher'
 
 export const harness = new HarnessRuntime()
 
@@ -184,5 +190,39 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   harness.on('state', (state) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', publicHarnessState(state))
   })
+
+  // 网关/控制台状态事件 → renderer 状态 pill（W2.5：事件驱动 + 低频 reconcile，替代无意义重复轮询）。
+  // 事件脱敏：认证查询串不进事件；url 仅 running 时为回环地址；message 过 redactLaunchSecrets。
+  const sendGatewayStatus = (): void => {
+    if (!mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('innate:gateway-status', publicGatewayStatus(getGateway().status()))
+    }
+  }
+  getGateway().onStatusChange(sendGatewayStatus)
+  sendGatewayStatus()
+
+  const sendConsoleStatus = (): void => {
+    if (!mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('innate:console-status', getConsole().getState())
+    }
+  }
+  getConsole().on('state', sendConsoleStatus)
+  sendConsoleStatus()
+}
+
+/** renderer 可见的网关状态事件：脱敏（认证查询串不进事件；url 仅 running 时为回环地址）。 */
+function publicGatewayStatus(status: {
+  state: string
+  url?: string
+  message?: string
+  recoverable?: boolean
+}): GatewayStatusEvent {
+  const event: GatewayStatusEvent = {
+    state: status.state as GatewayStatusState,
+    recoverable: status.recoverable ?? true,
+  }
+  if (status.state === 'running') event.url = status.url
+  if (status.message) event.message = redactLaunchSecrets(status.message)
+  return event
 }
 
