@@ -25,15 +25,18 @@ describe('parseTerminalDescriptor（W4.2 契约）', () => {
       title: '终端',
       cols: 80,
       rows: 24,
-      profile: baseProfile,
+      profile: { id: 'default' },
     })
     expect('workspaceId' in parsed).toBe(false)
   })
 
-  it('接受合法 workspaceId 与 profile 环境变量', () => {
-    const parsed = parseTerminalDescriptor(descriptorInput({ workspaceId: 'ws-1', profile: { ...baseProfile, env: { TERM: 'xterm-256color' } } }))
+  it('接受合法 workspaceId；profile 引用只保留 id（shell/args/env 由服务端解析）', () => {
+    const parsed = parseTerminalDescriptor(descriptorInput({
+      workspaceId: 'ws-1',
+      profile: { id: 'default', shell: 'evil.exe', args: ['-c', 'rm -rf'], env: { SECRET: 'x' } },
+    }))
     expect(parsed.workspaceId).toBe('ws-1')
-    expect(parsed.profile.env).toEqual({ TERM: 'xterm-256color' })
+    expect(parsed.profile).toEqual({ id: 'default' })
   })
 
   it('非法 id 拒绝', () => {
@@ -54,8 +57,12 @@ describe('parseTerminalDescriptor（W4.2 契约）', () => {
     expect(() => parseTerminalDescriptor(descriptorInput({ rows: '24' }))).toThrow(/rows/)
   })
 
-  it('未知 shell profile 拒绝', () => {
-    expect(() => parseTerminalDescriptor(descriptorInput({ profile: { id: 'evil', shell: 'cmd.exe /c rm -rf', args: [] } }))).toThrow(/未知 shell profile/)
+  it('未知 shell profile：descriptor 层结构校验，成员裁决在服务端（见 service 测试）', () => {
+    // 结构非法（id 含空格）在契约层拒绝
+    expect(() => parseTerminalDescriptor(descriptorInput({ profile: { id: 'bad id' } }))).toThrow(/非法字符|profile id/)
+    // 结构合法但未注册的 id 由服务端 profile 注册表裁决（create 时拒绝）
+    const parsed = parseTerminalDescriptor(descriptorInput({ profile: { id: 'evil', shell: 'x.exe', args: [] } }))
+    expect(parsed.profile).toEqual({ id: 'evil' })
     expect(() => parseTerminalDescriptor(descriptorInput({ profile: undefined }))).toThrow(/profile/)
   })
 
@@ -85,8 +92,8 @@ describe('parseTerminalProfile（shell 白名单）', () => {
     expect(parseTerminalProfile(baseProfile)).toEqual(baseProfile)
   })
 
-  it('未知 profile id 拒绝；非字符串参数过滤', () => {
-    expect(() => parseTerminalProfile({ id: 'custom', shell: 'bash', args: [] })).toThrow(/未知 shell profile/)
+  it('非法 id 字符拒绝；非字符串参数过滤', () => {
+    expect(() => parseTerminalProfile({ id: 'bad id', shell: 'bash', args: [] })).toThrow(/非法字符/)
     const parsed = parseTerminalProfile({ id: 'default', shell: 'cmd.exe', args: [1, '-v', null, 'flag'] })
     expect(parsed.args).toEqual(['-v', 'flag'])
   })

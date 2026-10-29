@@ -6,12 +6,15 @@
 
 - W4.1 PTY 技术 spike：node-pty 预编译二进制在 Electron 43.7.11 主进程全链路验证（见 `spike.md`）。
 - W4.2 terminal 与 process capability 契约：通用 handler registry 首版 + terminal 契约类型与 preload 窄通道（见 `contract.md`）。
+- W4.3 主进程 TerminalService：会话生命周期、root 安全注入、shell 受控、env 白名单、环形截断、进程树回收、desktop main 组合（见 `service.md`）。
 
 ## 门禁结果
 
 - `pnpm --filter @dogic/core test`：handler-registry 10/10 通过（注册/并列/默认/审批挂钩/热插/键空间隔离）。
-- `pnpm --filter @dogic/plugin-terminal test`：契约单测 15/15 通过（非法 id/尺寸/未知 shell/伪造 capability/绝对路径逃逸/重复输入上限等负路径）。
-- `pnpm --filter @dogic/plugin-terminal typecheck`：通过。
+- `pnpm --filter @dogic/plugin-terminal test`：**27/27** 通过（契约 15 + 服务 12：真命令输出/中文输出/环形截断/resize/重复 id/root 失效/关闭语义/dispose/profile 注册表/env 白名单/孤儿进程回收）。
+- `pnpm --filter @dogic/plugin-terminal typecheck`、`pnpm --filter @dogic/desktop typecheck`、`pnpm --filter @dogic/desktop test`（53/53）：通过。
+- `pnpm --filter @dogic/desktop build`：通过，node-pty 在 main bundle 中 externalize（`require("node-pty")`）。
+- 真实桌面冒烟（`tools/smoke-desktop.ts`）：退出码 0，`[smoke] OK`。
 
 ## 安全结论
 

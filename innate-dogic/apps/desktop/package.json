@@ -18,7 +18,9 @@
     "@innate-desktop/theme": "workspace:*",
     "@dogic/core": "workspace:*",
     "@dogic/kernel": "workspace:*",
+    "@dogic/plugin-terminal": "workspace:*",
     "@dogic/plugin-workspace": "workspace:*",
+    "node-pty": "^1.1.0-beta.42",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

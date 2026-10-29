@@ -7,6 +7,7 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 const coreSrc = resolve(__dirname, '../../packages/core/src/index.ts')
 const kernelSrc = resolve(__dirname, '../../packages/kernel/src')
 const workspaceSrc = resolve(__dirname, '../../plugins/workspace/src')
+const terminalSrc = resolve(__dirname, '../../plugins/terminal/src')
 const aliases = {
   '@dogic/core/surface': resolve(__dirname, '../../packages/core/src/surface.ts'),
   '@dogic/core': coreSrc,
@@ -16,8 +17,10 @@ const aliases = {
   '@dogic/plugin-workspace/main': resolve(workspaceSrc, 'main/index.ts'),
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
+  '@dogic/plugin-terminal/main': resolve(terminalSrc, 'main/index.ts'),
+  '@dogic/plugin-terminal': resolve(terminalSrc, 'shared/index.ts'),
 }
-const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/syntax-highlighting']
+const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/plugin-terminal', '@dogic/syntax-highlighting']
 
 export default defineConfig({
   main: {

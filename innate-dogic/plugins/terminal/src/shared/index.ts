@@ -8,12 +8,21 @@
 
 export const TERMINAL_PROVIDER_ID = 'terminal'
 
-/** 受控 shell profile：显式 shell 与参数数组，禁止字符串拼接。 */
+/** 受控 shell profile：服务端注册的可信配置（显式 shell 与参数数组，禁止字符串拼接）。 */
 export interface TerminalProfile {
   id: string
   shell: string
   args: string[]
   env?: Record<string, string>
+}
+
+/**
+ * renderer 提交的 profile 引用——只允许 id。
+ * shell 可执行文件与参数数组由服务端 profile 表解析，
+ * renderer 不得指定可执行文件（防 descriptor 劫持 shell 路径）。
+ */
+export interface TerminalProfileRef {
+  id: string
 }
 
 export interface TerminalDescriptor {
@@ -24,7 +33,7 @@ export interface TerminalDescriptor {
   workspaceId?: string
   cols: number
   rows: number
-  profile: TerminalProfile
+  profile: TerminalProfileRef
 }
 
 export interface TerminalShowResult {
@@ -87,7 +96,7 @@ export function parseTerminalDescriptor(input: unknown): TerminalDescriptor {
       value.rows < MIN_ROWS || value.rows > MAX_ROWS) {
     invalid(`terminal rows 必须是 ${MIN_ROWS}-${MAX_ROWS} 的整数`)
   }
-  const profile = parseTerminalProfile(value.profile)
+  const profile = parseTerminalProfileRef(value.profile)
   return {
     id: value.id,
     providerId: TERMINAL_PROVIDER_ID,
@@ -100,23 +109,32 @@ export function parseTerminalDescriptor(input: unknown): TerminalDescriptor {
   }
 }
 
-/** shell profile 白名单校验：只接受注册过的 profile id 或内置安全默认。 */
-const BUILTIN_PROFILE_IDS = new Set(['default'])
-
-export function isKnownProfileId(id: string): boolean {
-  return BUILTIN_PROFILE_IDS.has(id)
+/** renderer 提交的 profile 引用：只保留 id，shell/args/env 一律忽略（服务端解析）。
+ *  id 的合法性由服务端 profile 注册表裁决（成员校验在 create 时执行）。 */
+export function parseTerminalProfileRef(input: unknown): TerminalProfileRef {
+  if (!input || typeof input !== 'object') invalid('terminal profile 必须是对象')
+  const value = input as Partial<TerminalProfileRef>
+  if (typeof value.id !== 'string' || value.id.length === 0 || value.id.length > 64) {
+    invalid('terminal profile id 必须是非空字符串（≤64）')
+  }
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(value.id)) invalid('terminal profile id 含非法字符')
+  return { id: value.id }
 }
 
+/** 服务端 profile 注册表条目的解析（可信配置：shell 可执行与参数数组）。 */
 export function parseTerminalProfile(input: unknown): TerminalProfile {
   if (!input || typeof input !== 'object') invalid('terminal profile 必须是对象')
   const value = input as Partial<TerminalProfile>
   if (typeof value.id !== 'string' || value.id.length === 0 || value.id.length > 64) {
     invalid('terminal profile id 必须是非空字符串（≤64）')
   }
-  if (!isKnownProfileId(value.id)) invalid(`未知 shell profile: ${value.id}`)
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(value.id)) invalid('terminal profile id 含非法字符')
+  if (typeof value.shell !== 'string' || value.shell.length === 0) {
+    invalid('terminal profile shell 必须是非空字符串')
+  }
   return {
     id: value.id,
-    shell: typeof value.shell === 'string' && value.shell.length > 0 ? value.shell : '',
+    shell: value.shell,
     args: Array.isArray(value.args) ? value.args.filter((item): item is string => typeof item === 'string') : [],
     ...(value.env && typeof value.env === 'object' && !Array.isArray(value.env)
       ? { env: Object.fromEntries(Object.entries(value.env).filter(([, v]) => typeof v === 'string')) }

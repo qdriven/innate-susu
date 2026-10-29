@@ -11,6 +11,7 @@ import type {
 import type { AppMode } from '@dogic/core'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi, WorkspaceRoot } from '@dogic/plugin-workspace'
+import type { TerminalApi, TerminalDescriptor, TerminalEvent, TerminalShowResult } from '@dogic/plugin-terminal'
 
 const api = {
   getStatus: (): Promise<StatusSnapshot> => ipcRenderer.invoke('innate:status'),
@@ -57,7 +58,20 @@ const api = {
   workspaceRead: (root: string, relative: string) => ipcRenderer.invoke('innate:workspaceRead', root, relative),
   workspaceGitStatus: (root: string) => ipcRenderer.invoke('innate:workspaceGitStatus', root),
   workspaceGitDiff: (root: string, relative: string) => ipcRenderer.invoke('innate:workspaceGitDiff', root, relative),
-} satisfies WorkspaceApi & Record<string, unknown>
+  // 主进程 PTY Terminal 窄通道（W4.3）：只提交安全字段，事件由主进程推送。
+  terminalCreate: (descriptor: TerminalDescriptor): Promise<TerminalShowResult> =>
+    ipcRenderer.invoke('innate:terminalCreate', descriptor),
+  terminalInput: (terminalId: string, data: string): Promise<boolean> =>
+    ipcRenderer.invoke('innate:terminalInput', terminalId, data),
+  terminalResize: (terminalId: string, size: { cols: number; rows: number }): Promise<boolean> =>
+    ipcRenderer.invoke('innate:terminalResize', terminalId, size),
+  terminalClose: (terminalId: string): Promise<boolean> => ipcRenderer.invoke('innate:terminalClose', terminalId),
+  terminalOnEvent: (cb: (event: TerminalEvent) => void): (() => void) => {
+    const listener = (_e: unknown, event: TerminalEvent): void => cb(event)
+    ipcRenderer.on('innate:terminal-event', listener)
+    return () => ipcRenderer.removeListener('innate:terminal-event', listener)
+  },
+} satisfies WorkspaceApi & TerminalApi & Record<string, unknown>
 
 contextBridge.exposeInMainWorld('innate', api)
 export type InnateApi = typeof api

@@ -13,6 +13,7 @@ import {
 } from '@dogic/core'
 import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
+import { TerminalService } from '@dogic/plugin-terminal/main'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
 import { disconnectDsh, ensureMagpieConsole, startMagpie } from './launcher'
@@ -37,7 +38,21 @@ function publicLaunchResult(result: HarnessLaunchResult): HarnessLaunchResult {
 export function registerIpc(mainWindow: BrowserWindow): void {
   const surfaces = new SurfaceHost(mainWindow)
   const workspace = new WorkspaceService(path.join(app.getPath('userData'), 'workspace.json'))
-  mainWindow.on('closed', () => surfaces.dispose())
+  // 主进程 PTY Terminal（W4.3）：事件出口窄包装到 renderer；root 由工作区服务驱动。
+  const terminal = new TerminalService({
+    onEvent: (event) => {
+      if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:terminal-event', event)
+    },
+  })
+  mainWindow.on('closed', () => {
+    surfaces.dispose()
+    void terminal.dispose()
+  })
+  // 启动时同步已保存的工作区 root（W4.5 订阅语义的先行接线）。
+  void (async () => {
+    const saved = await workspace.getRoot()
+    if (saved) await terminal.setRoot(saved.path)
+  })()
 
   // 认证 URL 只在对应 runtime provider 内解析；renderer 只提交安全 descriptor。
   surfaces.registerProvider({
@@ -130,7 +145,9 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:workspaceGetRoot', async () => {
     const saved = await workspace.getRoot()
     if (saved || !process.env.INNATE_WORKSPACE_ROOT) return saved
-    return await workspace.setRoot(process.env.INNATE_WORKSPACE_ROOT)
+    const root = await workspace.setRoot(process.env.INNATE_WORKSPACE_ROOT)
+    await terminal.setRoot(root.path)
+    return root
   })
   ipcMain.handle('innate:workspacePickRoot', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
@@ -138,12 +155,21 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       properties: ['openDirectory'],
     })
     const selected = result.filePaths[0]
-    return result.canceled || !selected ? null : await workspace.setRoot(selected)
+    if (result.canceled || !selected) return null
+    const root = await workspace.setRoot(selected)
+    await terminal.setRoot(root.path)
+    return root
   })
   ipcMain.handle('innate:workspaceList', (_e, root: string, relative?: string) => workspace.list(root, relative))
   ipcMain.handle('innate:workspaceRead', (_e, root: string, relative: string) => workspace.read(root, relative))
   ipcMain.handle('innate:workspaceGitStatus', (_e, root: string) => workspace.gitStatus(root))
   ipcMain.handle('innate:workspaceGitDiff', (_e, root: string, relative: string) => workspace.gitDiff(root, relative))
+
+  // 主进程 PTY Terminal 窄通道（W4.3）：renderer 只提交安全字段，事件由主进程推送。
+  ipcMain.handle('innate:terminalCreate', (_e, descriptor: unknown) => terminal.create(descriptor))
+  ipcMain.handle('innate:terminalInput', (_e, terminalId: unknown, data: unknown) => terminal.input(terminalId, data))
+  ipcMain.handle('innate:terminalResize', (_e, terminalId: unknown, size: unknown) => terminal.resize(terminalId, size))
+  ipcMain.handle('innate:terminalClose', (_e, terminalId: unknown) => terminal.close(terminalId))
 
   harness.on('state', (state) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', publicHarnessState(state))
