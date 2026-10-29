@@ -638,6 +638,13 @@ try {
   process.exitCode = 1
 } finally {
   clearTimeout(watchdog)
+  // 优雅关闭：让应用自己跑 window-all-closed 清理（受管 magpie 控制台、Harness 子进程）
+  try {
+    await cdp('Browser.close')
+    await sleep(2_000)
+  } catch {
+    /* 已断开则直接强杀 */
+  }
   try { ws?.close() } catch { /* ignore */ }
   spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
   await killSmokeDsh()
