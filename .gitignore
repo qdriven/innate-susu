@@ -1,6 +1,8 @@
 node_modules/
 out/
 dist-package/
+# magpie 二进制不入库（W2.8：版本钉死 tools/magpie-version.json + 按需获取 tools/fetch-magpie.ts）
+innate-dogic/bin/magpie.exe
 *.exe.new
 dist/
 *.tsbuildinfo

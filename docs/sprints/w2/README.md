@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w2
 title: W2：magpie 运行链路收口（网关侧）
 createdAt: 2026-10-28T10:53:30.522033Z
-updatedAt: 2026-10-28T11:01:30.653909Z
+updatedAt: 2026-10-29T17:13:43.641076Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -103,6 +103,7 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
 - T5 task-local-w2-5.md — W2.5 运行状态接入壳状态区
 - T6 task-local-w2-6.md — W2.6 隔离环境网关真实链路
 - T7 task-local-w2-7.md — W2.7 全量回归与交接
+- T8 task-local-w2-8-magpie-tools.md — W2.8 magpie 版本钉死与按需获取（tools 层）
 
 ## Spec 关联
 

@@ -82,7 +82,7 @@ if (win) {
   } catch { /* 保持默认提示 */ }
   info(`dsh 入口：${dsh}`)
 }
-info(`magpie.exe：${existsSync(path.join(root, 'innate-dogic', 'bin', 'magpie.exe')) ? '就位' : '缺失（bin/magpie.exe）'}`)
+run('pnpm', ['magpie:check']) === 0 || info('magpie 未就位或版本漂移——见上方指引（不阻塞启动：网关功能运行时接入）')
 
 // ── 6. 构建 ─────────────────────────────────────────────────────────────
 if (PACKAGED || FRESH || !existsSync(outMain)) {

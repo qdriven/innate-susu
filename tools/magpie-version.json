@@ -1,0 +1,6 @@
+{
+  "comment": "magpie 钉死版本（W2.8）。sha256 为准，version 仅展示。更新渠道信任 magpie 官方 `magpie update`（自带 usemagpie.ai SHA-256 校验）；漂移时显式重钉本文件并跑一次全量门禁。获取：设 INNATE_MAGPIE_SOURCE 指向本地副本后跑 pnpm magpie:check，或按 launch 预检指引。",
+  "version": "0.1.1230",
+  "sha256": "ff061131531c721f2292c200f49530874900f66f94f7bab28f346f90eb31914d",
+  "path": "innate-dogic/bin/magpie.exe"
+}
