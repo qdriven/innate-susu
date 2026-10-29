@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdir, mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -592,6 +592,84 @@ describe('TerminalService process:execute（W4.6）', () => {
       const after = await service.execute({ profileId: 'sleeper', args: ['echo', 'x'] })
       expect(after.ok).toBe(false)
       expect(after.detail).toContain('已关闭')
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('TerminalService process:execute 资源上限与故障回收（W4.7）', () => {
+  it('并发上限 8：第 9 个在跑执行被拒；取消后全部以 cancelled 收尾', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'sleeper', command: 'node', args: ['-e', 'setTimeout(() => {}, 30000)'] })).toEqual({ ok: true })
+      const acks: string[] = []
+      for (let i = 0; i < 8; i++) {
+        const ack = await service.execute({ profileId: 'sleeper', args: [] })
+        expect(ack.ok).toBe(true)
+        acks.push(ack.executionId)
+      }
+      const ninth = await service.execute({ profileId: 'sleeper', args: [] })
+      expect(ninth.ok).toBe(false)
+      expect(ninth.detail).toContain('上限')
+      for (const id of acks) expect(await service.cancel(id)).toBe(true)
+      for (const id of acks) {
+        const result = await service.processResult(id)
+        expect(result.cancelled).toBe(true)
+        expect(result.ok).toBe(false)
+      }
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('崩溃路径：外部 taskkill 杀死进程后执行正常收尾不挂起', async () => {
+    const root = await tempRoot()
+    const pidFile = path.join(root, 'child.pid')
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({
+        id: 'pidprinter',
+        command: 'node',
+        args: ['-e', 'require("fs").writeFileSync(process.env.PTY_PID_FILE, String(process.pid)); setTimeout(() => {}, 60000)'],
+      })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'pidprinter', args: [], env: { PTY_PID_FILE: pidFile } })
+      expect(ack.ok).toBe(true)
+      let pid: number | undefined
+      for (let i = 0; i < 40 && pid === undefined; i++) {
+        const raw = (await readFile(pidFile, 'utf8').catch(() => '')).trim()
+        const parsed = Number(raw)
+        if (raw !== '' && Number.isInteger(parsed) && parsed > 0) pid = parsed
+        else await new Promise((resolve) => setTimeout(resolve, 250))
+      }
+      expect(pid).toBeGreaterThan(0)
+      await execFileAsync('taskkill', ['/pid', String(pid), '/T', '/F'])
+      // 外部杀死后 'close' 事件仍触发 finish：结果通道必须 resolve（不挂起）。
+      const result = await service.processResult(ack.executionId)
+      expect(result.ok).toBe(false)
+      expect(result.cancelled).toBe(false)
+      expect(result.timedOut).toBe(false)
+      expect(result.durationMs).toBeGreaterThan(0)
+      expect(result.exitCode === null || result.exitCode !== 0).toBe(true)
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('spawn 失败路径：不存在的命令以 error 收尾并可取回结果', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'missing', command: 'definitely-not-installed-xyz.exe', args: [] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'missing', args: [] })
+      expect(ack.ok).toBe(true)
+      const result = await service.processResult(ack.executionId)
+      expect(result.ok).toBe(false)
+      expect(result.detail).toContain('spawn')
+      await service.dispose()
     } finally {
       await rm(root, { recursive: true, force: true })
     }

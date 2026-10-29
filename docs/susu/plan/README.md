@@ -70,7 +70,7 @@ flowchart LR
 | W0 | **done（2026-10-28）**：8 卡全部完成——源头脱敏/工程身份/整树迁入/工具适配+引擎修复/行为对照 12 项一致/便携真机冒烟/执行源切换。Sprint 记录 docs/sprints/w0/ | [evidence/W0/](./evidence/W0/) |
 | W1a / W1b / W1c | W1a **done（2026-10-28）**：行为基线、产品主题与三区 titlebar 全绿；W1b **done（2026-10-28）**：注册表元数据+@innate/ui 壳组合+右栏挂载点+回归全绿。最终全仓 build/typecheck 通过，21 个测试文件 132/132，desktop 22/22，完整真机冒烟通过；W1c 已拆解，可进入开工门禁 | [evidence/W1a/](./evidence/W1a/)、[evidence/W1b/smoke/](./evidence/W1b/smoke/) |
 | W2 / W3 | 待执行 | — |
-| W4 / W5 | 待执行 | — |
+| W4 / W5 | W4 **done（2026-10-29）**：7 卡全部完成——PTY 技术 spike、terminal+process capability 契约（通用 handler registry）、主进程 TerminalService、renderer Terminal Surface、root 变更语义、受控 process:execute、安全便携与故障回收验收；Sprint 记录 docs/sprints/w4/。W5 待执行 | [evidence/W4/](./evidence/W4/) |
 | R1 | 待执行 | — |
 | Q1 / Q2 / Q3 | 待执行 | — |
 

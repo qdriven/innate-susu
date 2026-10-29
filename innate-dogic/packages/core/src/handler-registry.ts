@@ -100,7 +100,7 @@ export class HandlerRegistry {
     this.handlers.delete(id)
     for (const [slot, defaultId] of this.defaults) {
       if (defaultId === id) {
-        const next = this.handlers.values().find((item) => item.descriptor.id !== id &&
+        const next = [...this.handlers.values()].find((item) => item.descriptor.id !== id &&
           `${item.descriptor.key}:${item.descriptor.namespace}` === slot)
         this.defaults.set(slot, next?.descriptor.id ?? '')
       }

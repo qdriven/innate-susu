@@ -28,7 +28,7 @@ describe('HandlerRegistry（04 §4bis 通用机制首版）', () => {
   it('非法 descriptor 拒绝', () => {
     const registry = new HandlerRegistry()
     expect(() => registry.register(makeHandler('', 'x') as unknown as Handler)).toThrow()
-    expect(() => registry.register({ descriptor: { key: 'bogus', namespace: 'n', id: 'i', title: 't' }, execute: async () => ({ ok: true }) })).toThrow()
+    expect(() => registry.register({ descriptor: { key: 'bogus', namespace: 'n', id: 'i', title: 't' }, execute: async () => ({ ok: true }) } as unknown as Handler)).toThrow()
   })
 
   it('无 approve 的 handler 直接执行（审批挂钩仅对声明者生效）', async () => {

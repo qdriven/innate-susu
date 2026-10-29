@@ -693,6 +693,25 @@ try {
   if (!retained) throw new Error('标签切换后终端 scrollback 未保留')
   console.log('[smoke] 多终端标签切换保留通过')
 
+  // W4.7：PTY resize 通道 + 标签关闭生命周期（关闭一个不影响另一个）
+  const resizeOk = await evaluate<boolean>(
+    "window.innate.terminalResize('terminal-1-s1', { cols: 100, rows: 30 })",
+  )
+  if (!resizeOk) throw new Error('terminalResize 通道未生效')
+  console.log('[smoke] 终端 PTY resize 通道通过')
+  await evaluate("document.querySelector('[aria-label=\"关闭 终端 2\"]')?.click()")
+  await sleep(1_500)
+  const tabsAfterClose = await evaluate<string[]>(
+    "[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].map(b=>b.textContent ?? '')",
+  ) ?? []
+  if (tabsAfterClose.some((label) => label.includes('终端 2'))) {
+    throw new Error(`关闭终端 2 后标签仍在: ${JSON.stringify(tabsAfterClose)}`)
+  }
+  if (!tabsAfterClose.some((label) => label.includes('终端 1'))) {
+    throw new Error(`关闭终端 2 后终端 1 标签丢失: ${JSON.stringify(tabsAfterClose)}`)
+  }
+  console.log('[smoke] 终端标签关闭生命周期通过（终端 2 移除、终端 1 保留）')
+
   // exit 后显示退出提示；重开派生新 PTY 并可再次交互
   await typeIntoTerminal('exit')
   let exited = false
@@ -721,6 +740,16 @@ try {
   )
   if (forgedTerminal?.ok) throw new Error('伪造 workspaceId 的 terminalCreate 未被拒绝')
   console.log('[smoke] 伪造 workspaceId 被拒绝，终端负路径通过')
+
+  // W4.7 安全：伪造 capability 的 Surface descriptor 必须被解析层拒绝
+  const forgedCapability = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.surfaceShow({ id: 'magpie-console', providerId: 'magpie-console', kind: 'webcontents', title: '伪造能力', capabilities: ['shell:exec'] }, { x: 0, y: 0, width: 10, height: 10 })",
+  )
+  if (forgedCapability?.ok) throw new Error('伪造 capability 未被拒绝')
+  if (!forgedCapability?.detail?.includes('capability')) {
+    throw new Error(`伪造 capability 拒绝 detail 不符合预期: ${forgedCapability?.detail ?? ''}`)
+  }
+  console.log('[smoke] 伪造 capability 被拒绝，Surface 能力白名单通过')
 
   // W4.6：受控 process:execute 窄通道 E2E——profile 注册、受理回执、结果取回、负路径
   const registerProfile = await evaluate<{ ok: boolean; detail?: string }>(

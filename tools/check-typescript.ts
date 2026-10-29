@@ -8,7 +8,12 @@ const roots = ['innate-dogic', 'tools', 'apps', 'packages', 'innate-project-canv
 const ignoredDirectories = new Set(['node_modules', 'dist', 'out', 'dist-package', 'release', '.git'])
 const forbiddenExtensions = new Set(['.js', '.jsx', '.mjs', '.cjs'])
 // W0.5 迁移豁免：desktop 原生工具（81df732 引入）暂为 .mjs，待转 TS 后移除
-const tsOnlyAllowlist = new Set(['tools/ui-sync.mjs', 'tools/compare-palette.mjs'])
+const tsOnlyAllowlist = new Set([
+  'tools/ui-sync.mjs',
+  'tools/compare-palette.mjs',
+  // W4.1 PTY spike：直接由 electron.exe 加载运行的诊断脚本（不经构建管线），必须为 .cjs
+  'innate-dogic/plugins/terminal/scripts/spike-pty.cjs',
+])
 const violations: string[] = []
 
 function scan(directory: string): void {

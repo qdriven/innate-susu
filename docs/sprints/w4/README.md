@@ -111,7 +111,7 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
 ## 交付记录
 
 - 2026-10-28 拆解为计划态（analyzed 前置），未实施任何子任务。
-- 拆解完成（计划态）；实施按门禁：待 W2+W3)
+- 2026-10-29 W4.1–W4.7 全部完成（一 task 一提交）：PTY spike（spike-pty.cjs + spike.md）→ terminal/process capability 契约（handler registry 首版 + contract.md）→ TerminalService（service.md）→ renderer Terminal Surface（renderer.md）→ root 变更语义（root.md）→ 受控 process:execute（process.md）→ 安全便携与故障回收（portable.md）。门禁全绿：全量 `pnpm verify` 退出码 0，plugin-terminal 44/44，desktop 82/82；真实桌面冒烟 dev 与便携 `--packaged` 均 `[smoke] OK`（smoke-w4-7/、smoke-w4-7-portable/）。证据见 docs/susu/plan/evidence/W4/。W5 可进入开工门禁。
 
 ## 来源原文
 
