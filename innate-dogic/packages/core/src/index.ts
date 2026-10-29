@@ -31,3 +31,12 @@ export { readStatus, runChecks } from './verify'
 export { readMode, writeMode } from './mode'
 export type { AppMode } from './mode'
 export { redactLaunchSecrets } from './redact'
+export { HandlerRegistry } from './handler-registry'
+export type {
+  ApprovalHook,
+  Handler,
+  HandlerDescriptor,
+  HandlerKey,
+  HandlerRequest,
+  HandlerResult,
+} from './handler-registry'
