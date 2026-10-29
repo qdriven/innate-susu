@@ -13,6 +13,7 @@ allowBuilds:
   electron: true
   electron-winstaller: true
   esbuild: true
+  node-pty: true
 
 minimumReleaseAgeExclude:
   - '@innate/ui@0.1.2'
