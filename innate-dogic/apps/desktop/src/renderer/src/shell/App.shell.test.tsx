@@ -53,7 +53,8 @@ describe('W1b App 壳组合（T2/T3）', () => {
     expect(container.querySelector('.content')).not.toBeNull()
     expect(screen.getByTestId('right-panel')).not.toBeNull()
     expect((container.querySelector('.nav-item.current') as HTMLElement | null)?.title).toBe('总览')
-    expect(apiMocks.winIsMaximized).toHaveBeenCalled()
+    // 被动 effect（窗口状态）在负载下可能晚一拍：等待而非瞬时断言
+    await waitFor(() => expect(apiMocks.winIsMaximized).toHaveBeenCalled())
     fireEvent.click(screen.getByRole('button', { name: '最小化' }))
     expect(apiMocks.winMin).toHaveBeenCalled()
   })

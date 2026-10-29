@@ -18,6 +18,7 @@ const aliases = {
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
   '@dogic/plugin-terminal/main': resolve(terminalSrc, 'main/index.ts'),
+  '@dogic/plugin-terminal/renderer': resolve(terminalSrc, 'renderer/index.ts'),
   '@dogic/plugin-terminal': resolve(terminalSrc, 'shared/index.ts'),
 }
 const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/plugin-terminal', '@dogic/syntax-highlighting']
@@ -33,6 +34,11 @@ export default defineConfig({
   },
   renderer: {
     plugins: [tailwindcss(), react()],
-    resolve: { alias: aliases },
+    resolve: {
+      // 插件 renderer 源码（TS 直链）没有本地 react：统一从桌面包解析，
+      // 保证自动 JSX 运行时（react/jsx-runtime）与单一 React 实例。
+      dedupe: ['react', 'react-dom'],
+      alias: aliases,
+    },
   },
 })

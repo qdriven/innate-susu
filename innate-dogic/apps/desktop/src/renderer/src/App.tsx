@@ -12,6 +12,7 @@ import { defaultPageId, pagesForMode, resolveActivePage } from './pages'
 import ContentArea from './shell/ContentArea'
 import RightPanelHost from './shell/RightPanelHost'
 import ShellSidebar from './shell/ShellSidebar'
+import TerminalPage from './TerminalPage'
 import { SurfaceTabs } from './surfaces/surface-tabs'
 import { createDesktopSurfaceProviders } from './surfaces/providers/desktop'
 import type { SurfaceProviderRegistry } from './surfaces/provider-registry'
@@ -198,6 +199,14 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
             />
           )}
           {activeTab === 'workspace' && <WorkspacePanel />}
+          {activeTab === 'terminal' && (
+            <TerminalPage
+              tabs={tabs}
+              providers={providers}
+              onSwitchSurface={switchSurface}
+              onCloseSurface={closeSurface}
+            />
+          )}
           {activeTab === 'settings' && (
             <ConsolePage
               tabs={tabs}

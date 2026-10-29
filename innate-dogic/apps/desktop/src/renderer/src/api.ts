@@ -10,11 +10,12 @@ import type {
 import type { AppMode } from '@dogic/core'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi } from '@dogic/plugin-workspace'
+import type { TerminalApi } from '@dogic/plugin-terminal'
 
 // 由 preload contextBridge 注入
 declare global {
   interface Window {
-    innate: WorkspaceApi & {
+    innate: WorkspaceApi & TerminalApi & {
       getStatus: () => Promise<StatusSnapshot>
       winMin: () => Promise<void>
       winToggleMax: () => Promise<void>

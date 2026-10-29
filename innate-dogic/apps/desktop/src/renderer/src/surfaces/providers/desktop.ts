@@ -2,6 +2,7 @@ import { api } from '../../api'
 import { HARNESS_PROVIDER_ID, MAGPIE_CONSOLE_PROVIDER_ID } from '../catalog'
 import { SurfaceProviderRegistry } from '../provider-registry'
 import type { SurfaceProvider } from '../provider-registry'
+import { createTerminalProvider } from './terminal'
 import { createWebContentsProvider } from './webcontents'
 
 /**
@@ -24,6 +25,7 @@ export function createDesktopSurfaceProviders(): SurfaceProviderRegistry {
         { label: '浏览器打开', run: () => api.openMagpieWeb() },
       ],
     }),
+    () => createTerminalProvider(api),
   ]
   for (const factory of factories) {
     try {

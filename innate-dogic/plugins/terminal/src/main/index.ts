@@ -208,7 +208,11 @@ export class TerminalService {
     }
     const root = this.currentRoot
     if (!root) return { ok: false, detail: '未选择工作区目录，请先选择工作区' }
-    if (descriptor.workspaceId !== undefined && descriptor.workspaceId !== root.id) {
+    // renderer 提交的是它已知的工作区路径（或服务端派生 id）：
+    // 两者都必须映射到当前 root，避免任意目录 cwd。
+    if (descriptor.workspaceId !== undefined &&
+        descriptor.workspaceId !== root.id &&
+        workspaceIdFor(descriptor.workspaceId) !== root.id) {
       return { ok: false, detail: 'terminal workspaceId 与当前工作区不匹配' }
     }
     // spawn 前重新校验 root 仍存在（root 被删除/不可访问时不回退到任意目录）。
