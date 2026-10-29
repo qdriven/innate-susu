@@ -156,13 +156,14 @@ export class HarnessRuntime extends EventEmitter {
       void writeFile(logFile, this.logBuffer.join('\n'), 'utf8').catch(() => {})
     })
 
-    // 超时兜底：60s 内未见 "dsh web:" 行则判失败
+    // 超时兜底：默认 60s 内未见 "dsh web:" 行则判失败；慢机器可用环境变量放宽
+    const readyTimeoutMs = Number(process.env.INNATE_HARNESS_READY_TIMEOUT_MS ?? 60_000)
     setTimeout(() => {
       if (this.state.phase === 'starting') {
-        this.setState({ phase: 'failed', message: '60s 内未获得 Harness 启动 URL，见日志' })
+        this.setState({ phase: 'failed', message: `${Math.round(readyTimeoutMs / 1000)}s 内未获得 Harness 启动 URL，见日志` })
         void writeFile(logFile, this.logBuffer.join('\n'), 'utf8').catch(() => {})
       }
-    }, 60_000).unref()
+    }, readyTimeoutMs).unref()
 
     // 等待 running/failed（由 awaitReady 或 exit 回调置位）
     return new Promise((resolve) => {
@@ -187,7 +188,8 @@ export class HarnessRuntime extends EventEmitter {
       try {
         const res = await fetch(url, { signal: AbortSignal.timeout(2000) })
         if (res.status < 500) {
-          this.setState({ phase: 'running', message: `Harness 运行中 (${url})`, url, port })
+          // 认证 URL 只留在内部状态；对外文案只报端口，renderer 与日志都拿不到链接
+          this.setState({ phase: 'running', message: `Harness 运行中（端口 ${port}）`, url, port })
           void writeFile(logFile, this.logBuffer.join('\n'), 'utf8').catch(() => {})
           return
         }

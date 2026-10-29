@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execFile, spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
@@ -48,7 +48,20 @@ const smokeUserData = path.join(appDir, `dist-package/smoke-user-data-${packaged
 const debugPort = 20_000 + (process.pid % 30_000)
 const launchArgs = packaged ? [`--user-data-dir=${smokeUserData}`] : [appDir, `--user-data-dir=${smokeUserData}`]
 const repoName = path.basename(root)
+// 预览断言用包名而不是目录名：工作区副本目录名可能与包名不同（如 w1c-2）。
+const packageName = ((): string => {
+  try {
+    const pkg = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf-8')) as { name?: string }
+    return pkg.name ?? repoName
+  } catch {
+    return repoName
+  }
+})()
 const env: NodeJS.ProcessEnv = { ...process.env, INNATE_WORKSPACE_ROOT: root }
+// 本机 magpie 控制台冷启动实测 40–160s（杀软扫描 + bun 冷启），冒烟放宽控制台启动上限。
+env.INNATE_MAGPIE_CONSOLE_TIMEOUT_MS ??= '240000'
+// dsh 冷启动实测 ~25s（慢机器更久），冒烟放宽就绪上限。
+env.INNATE_HARNESS_READY_TIMEOUT_MS ??= '240000'
 delete env.ELECTRON_RUN_AS_NODE
 const child = spawn(electron, [...launchArgs, `--remote-debugging-port=${debugPort}`], { env, stdio: 'pipe' })
 child.stderr.on('data', (data: Buffer) => process.stderr.write(data))
@@ -56,7 +69,7 @@ const watchdog = setTimeout(() => {
   console.error('[smoke] watchdog timeout, forcing exit')
   spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
   process.exit(3)
-}, withHarness ? 180_000 : 90_000)
+}, withHarness ? (packaged ? 1_800_000 : 1_200_000) : 900_000)
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 let ws: WebSocket | undefined
@@ -67,7 +80,16 @@ function cdp<T>(method: string, params: Record<string, unknown> = {}): Promise<T
   return new Promise((resolve, reject) => {
     if (!ws) return reject(new Error('CDP WebSocket 未连接'))
     const id = ++seq
-    pending.set(id, { resolve: resolve as (value: unknown) => void })
+    const timer = setTimeout(() => {
+      pending.delete(id)
+      reject(new Error(`CDP ${method} 超时（30s）`))
+    }, 30_000)
+    pending.set(id, {
+      resolve: (value) => {
+        clearTimeout(timer)
+        resolve(value as T)
+      },
+    })
     ws.send(JSON.stringify({ id, method, params }))
   })
 }
@@ -136,14 +158,30 @@ async function targets(): Promise<CdpTarget[]> {
 /** 在指定 target（Harness/控制台 WebContents）内执行表达式，用于验证其独立页面状态。 */
 async function evalTarget<T>(target: CdpTarget, expression: string): Promise<T | undefined> {
   const socket = new WebSocket(target.webSocketDebuggerUrl)
-  await new Promise<void>((resolve) => { socket.onopen = () => resolve() })
-  const value = await new Promise<T | undefined>((resolve) => {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`CDP target 连接超时（30s）: ${target.url}`)), 30_000)
+    socket.onopen = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+    socket.onerror = () => {
+      clearTimeout(timer)
+      reject(new Error(`CDP target 连接失败: ${target.url}`))
+    }
+  })
+  const value = await new Promise<T | undefined>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`CDP target 求值超时（30s）: ${target.url}`)), 30_000)
     socket.onmessage = (event) => {
       const message = JSON.parse(String(event.data)) as CdpMessage
       if (message.id === 9002) {
+        clearTimeout(timer)
         const result = (message.result as { result?: { value?: unknown } } | undefined)?.result?.value
         resolve(result as T | undefined)
       }
+    }
+    socket.onclose = () => {
+      clearTimeout(timer)
+      reject(new Error(`CDP target 连接已关闭: ${target.url}`))
     }
     socket.send(JSON.stringify({
       id: 9002,
@@ -156,11 +194,29 @@ async function evalTarget<T>(target: CdpTarget, expression: string): Promise<T |
 }
 async function shotTarget(target: CdpTarget, name: string): Promise<void> {
   const socket = new WebSocket(target.webSocketDebuggerUrl)
-  await new Promise<void>((resolve) => { socket.onopen = () => resolve() })
-  const response = await new Promise<{ data?: string }>((resolve) => {
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`CDP target 连接超时（30s）: ${target.url}`)), 30_000)
+    socket.onopen = () => {
+      clearTimeout(timer)
+      resolve()
+    }
+    socket.onerror = () => {
+      clearTimeout(timer)
+      reject(new Error(`CDP target 连接失败: ${target.url}`))
+    }
+  })
+  const response = await new Promise<{ data?: string }>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`CDP 截图超时（30s）: ${target.url}`)), 30_000)
     socket.onmessage = (event) => {
       const message = JSON.parse(String(event.data)) as CdpMessage
-      if (message.id === 9001) resolve(message.result as { data?: string })
+      if (message.id === 9001) {
+        clearTimeout(timer)
+        resolve(message.result as { data?: string })
+      }
+    }
+    socket.onclose = () => {
+      clearTimeout(timer)
+      reject(new Error(`CDP target 连接已关闭: ${target.url}`))
     }
     socket.send(JSON.stringify({ id: 9001, method: 'Page.captureScreenshot', params: { format: 'png' } }))
   })
@@ -169,6 +225,20 @@ async function shotTarget(target: CdpTarget, name: string): Promise<void> {
     console.log(`[smoke] saved ${name}.png`)
   }
   socket.close()
+}
+
+/** 回收本次冒烟拉起的 dsh web：它以 detached 方式启动，不在 electron 进程树内。 */
+async function killSmokeDsh(): Promise<void> {
+  const script = [
+    "Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" |",
+    `  Where-Object { $_.CommandLine -like '*${root}*' -and $_.CommandLine -like '*dsh*' } |`,
+    '  ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }',
+  ].join(' ')
+  try {
+    await execFileAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { timeout: 30_000 })
+  } catch {
+    /* 清理失败不阻塞冒烟结论 */
+  }
 }
 
 try {
@@ -278,7 +348,7 @@ try {
   await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.textContent.includes(\'模型配置\'))?.click()')
   const consoleTarget = async (): Promise<CdpTarget | undefined> => (await targets()).find((target) =>
     target.type === 'page' && target.url.startsWith('http://127.0.0.1:'))
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 60; i++) {
     await sleep(5_000)
     const view = await consoleTarget()
     console.log(`[smoke] t+${(i + 1) * 5}s view target:`, view ? `${view.url} | ${view.title}` : '(none)')
@@ -286,25 +356,36 @@ try {
   }
   const viewTarget = await consoleTarget()
   if (!viewTarget) {
-    const fallback = await evaluate("document.querySelector('.console-fallback')?.textContent")
+    const fallback = await evaluate("document.querySelector('.surface-error')?.textContent")
     throw new Error(`未找到受管 magpie 控制台 target；页面状态: ${String(fallback ?? '无错误说明')}`)
   }
   const viewSocket = new WebSocket(viewTarget.webSocketDebuggerUrl)
   await new Promise<void>((resolve) => { viewSocket.onopen = () => resolve() })
-  const viewEvalId = ++seq
-  const body = await new Promise<unknown>((resolve) => {
-    viewSocket.onmessage = (event) => {
-      const message = JSON.parse(String(event.data)) as CdpMessage
-      if (message.id === viewEvalId) resolve((message.result as EvaluateResult | undefined)?.result?.value)
-    }
-    viewSocket.send(JSON.stringify({
-      id: viewEvalId,
-      method: 'Runtime.evaluate',
-      params: { expression: "document.title + ' || ' + (document.body?.innerText ?? '').slice(0, 1000)", returnByValue: true },
-    }))
-  })
-  console.log('[smoke] console view content:', body)
-  const bodyText = typeof body === 'string' ? body : ''
+  const readViewBody = async (): Promise<string> => {
+    const evalId = ++seq
+    const value = await new Promise<unknown>((resolve) => {
+      viewSocket.onmessage = (event) => {
+        const message = JSON.parse(String(event.data)) as CdpMessage
+        if (message.id === evalId) resolve((message.result as EvaluateResult | undefined)?.result?.value)
+      }
+      viewSocket.send(JSON.stringify({
+        id: evalId,
+        method: 'Runtime.evaluate',
+        params: { expression: "document.title + ' || ' + (document.body?.innerText ?? '').slice(0, 1000)", returnByValue: true },
+      }))
+    })
+    return typeof value === 'string' ? value : ''
+  }
+  // 控制台是 SPA：target 出现不等于导航已渲染，轮询到真实导航出现为止。
+  let bodyText = ''
+  for (let i = 0; i < 90; i++) {
+    bodyText = await readViewBody()
+    console.log(`[smoke] console view content t+${i * 3}s:`, bodyText.slice(0, 120))
+    if (/this link's key is not|unauthorized|HTTP 401/i.test(bodyText)) break
+    if (/Agents|Providers|Sessions|Library|Settings|Usage|供应商|资源库|设置|用量/i.test(bodyText)) break
+    await sleep(3_000)
+  }
+  console.log('[smoke] console view content:', bodyText.slice(0, 200))
   if (/this link's key is not|unauthorized|HTTP 401/i.test(bodyText)) throw new Error('magpie 控制台认证失败')
   if (!/Agents|Providers|Sessions|Library|Settings|Usage|供应商|资源库|设置|用量/i.test(bodyText)) {
     throw new Error('magpie 控制台实际导航未加载')
@@ -322,15 +403,37 @@ try {
   console.log('[smoke] saved console-view.png')
   viewSocket.close()
   await shot('console')
-  await saveElementBounds('.console-area', 'console-bounds')
-  const consoleFallback = await evaluate("document.querySelector('.console-fallback')?.textContent")
+  await saveElementBounds('.surface-view-area', 'console-bounds')
+  const consoleFallback = await evaluate("document.querySelector('.surface-error')?.textContent")
   if (consoleFallback) throw new Error(`magpie 控制台壳层回退: ${String(consoleFallback)}`)
   console.log('[smoke] 受管 magpie 控制台认证与真实内容通过')
+
+  // W1c：控制台进入统一中栏槽，标签条只认安全 descriptor
+  const tabStrip = await evaluate<{ tabs: string[]; current: string }>(`(() => ({
+    tabs: [...document.querySelectorAll('.surface-tab [role="tab"]')].map((b) => b.textContent ?? ''),
+    current: document.querySelector('.surface-tab.current [role="tab"]')?.textContent ?? '',
+  }))()`)
+  if (!tabStrip?.tabs.includes('magpie 控制台')) {
+    throw new Error(`中栏 Surface 标签缺失: ${JSON.stringify(tabStrip)}`)
+  }
+  console.log('[smoke] 统一中栏标签条:', tabStrip.tabs.join(' | '), '当前:', tabStrip.current)
+
+  // W1c 安全负路径：伪造 providerId 与未运行的 Harness 都必须被主进程拒绝
+  const forged = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.surfaceShow({ id: 'forged', providerId: 'forged', kind: 'webcontents', title: '伪造' }, { x: 0, y: 0, width: 10, height: 10 })",
+  )
+  if (forged?.ok) throw new Error('伪造 providerId 未被拒绝')
+  const harnessBeforeLaunch = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.surfaceShow({ id: 'harness', providerId: 'harness', kind: 'webcontents', title: 'DeepSeek Harness' }, { x: 0, y: 0, width: 10, height: 10 })",
+  )
+  if (harnessBeforeLaunch?.ok) throw new Error('Harness 未运行时不应打开 Surface')
+  console.log('[smoke] 伪造 providerId / 未就绪 provider 均被拒绝，壳仍可用')
+
   // W1a 基线：hide/show 后必须复用同一控制台 target（重建会换端口 → URL 必变）
   const consoleUrlBefore = viewTarget.url
-  await evaluate('window.innate.consoleHide()')
+  await evaluate("window.innate.surfaceHide('magpie-console')")
   await sleep(1_000)
-  await evaluate('window.innate.consoleShow({ x: 8, y: 64, width: 900, height: 600 })')
+  await evaluate("window.innate.surfaceShow({ id: 'magpie-console', providerId: 'magpie-console', kind: 'webcontents', title: 'magpie 控制台' }, { x: 8, y: 64, width: 900, height: 600 })")
   await sleep(2_000)
   const viewTarget2 = await consoleTarget()
   if (!viewTarget2 || viewTarget2.url !== consoleUrlBefore) {
@@ -358,9 +461,22 @@ try {
     if (!installed) throw new Error('桌面端仍未识别 dsh 安装')
     const launched = await evaluate<HarnessLaunchResult>('window.innate.launchHarness()')
     console.log('[smoke] Harness launch:', { ok: launched?.ok, port: launched?.port, detail: launched?.detail })
-    if (!launched?.ok) throw new Error(`Harness 启动失败: ${launched?.detail ?? '未知错误'}`)
+    if (!launched?.ok) {
+      // W1c.3 降级证据：启动失败必须显式可见且壳继续可用
+      await sleep(2_000)
+      const degraded = await evaluate<{ hint: string; logs: boolean; nav: number }>(`(() => ({
+        hint: document.querySelector('.simple-hint, .launch-msg')?.textContent ?? '',
+        logs: Boolean([...document.querySelectorAll('button')].find((b) => b.textContent?.includes('查看日志'))),
+        nav: document.querySelectorAll('.nav-item').length,
+      }))()`)
+      await shot('harness-degraded')
+      console.log('[smoke] Harness 降级状态:', JSON.stringify(degraded))
+      if (!degraded?.logs) throw new Error('Harness 启动失败后缺少「查看日志」恢复入口')
+      if (!degraded.nav) throw new Error('Harness 启动失败后壳导航不可用')
+      throw new Error(`Harness 启动失败: ${launched?.detail ?? '未知错误'}（降级证据已保存）`)
+    }
     await sleep(3_000)
-    const embedded = await evaluate<boolean>("Boolean(document.querySelector('.harness-area'))")
+    const embedded = await evaluate<boolean>("Boolean(document.querySelector('.surface-view'))")
     if (!embedded) throw new Error('Harness 未嵌入当前对话标签页')
     const harnessTarget = (await targets()).find((target) => target.url.includes(`:${launched.port}/`))
     if (!harnessTarget) throw new Error('未找到 Harness Surface target')
@@ -370,7 +486,7 @@ try {
     harnessUrlBefore = harnessTarget.url
     await shotTarget(harnessTarget, 'harness-view')
     await shot('harness-tab')
-    await saveElementBounds('.harness-area', 'harness-bounds')
+    await saveElementBounds('.surface-view-area', 'harness-bounds')
     console.log('[smoke] Harness 内嵌标签启动通过（保持运行，存活断言见后）')
   }
 
@@ -383,6 +499,55 @@ try {
     throw new Error('dev 模式页面或工作区插件注册失败')
   }
 
+  // W1c：Harness 与控制台共用同一中栏槽——交替切换不重载，关闭一个不影响另一个
+  if (harnessPort !== undefined) {
+    const consoleUrl = consoleUrlBefore
+    await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'模型配置\')?.click()')
+    await sleep(3_000)
+    const bothTabs = await evaluate<string[]>("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].map(b=>b.textContent ?? '')") ?? []
+    console.log('[smoke] 多 Surface 标签:', bothTabs.join(' | '))
+    if (!bothTabs.includes('DeepSeek Harness') || !bothTabs.includes('magpie 控制台')) {
+      throw new Error(`统一中栏槽未同时承载 Harness 与控制台: ${JSON.stringify(bothTabs)}`)
+    }
+    await shot('surface-tabs')
+
+    // 切到 Harness 标签：URL 不变、存活标记仍在（= 未 reload）
+    await evaluate("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].find(b=>b.textContent?.includes('DeepSeek Harness'))?.click()")
+    await sleep(2_000)
+    const harnessAfterSwitch = (await targets()).find((target) => target.url.includes(`:${harnessPort}/`))
+    if (!harnessAfterSwitch) throw new Error('切换标签后 Harness target 消失')
+    if (harnessAfterSwitch.url !== harnessUrlBefore) throw new Error(`切换标签后 Harness URL 变化: ${harnessAfterSwitch.url}`)
+    const markerAfterSwitch = await evalTarget<number>(harnessAfterSwitch, 'Number(window.__w1aMarker ?? 0)')
+    if (!markerAfterSwitch) throw new Error('切换标签后 Harness 被 reload（存活标记丢失）')
+
+    // 切回控制台标签：控制台 target 复用，URL 不变
+    await evaluate("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].find(b=>b.textContent?.includes('magpie 控制台'))?.click()")
+    await sleep(2_000)
+    const consoleAfterSwitch = (await targets()).find((target) => target.type === 'page' && target.url === consoleUrl)
+    if (!consoleAfterSwitch) throw new Error(`切换标签后控制台 target 消失或重建: ${consoleUrl ?? '(none)'}`)
+    await shot('surface-tabs-switched')
+
+    // 关闭控制台标签：只销毁控制台视图，Harness 仍存活
+    await evaluate("document.querySelector('[aria-label=\"关闭 magpie 控制台\"]')?.click()")
+    await sleep(2_000)
+    const consoleAfterClose = (await targets()).find((target) => target.type === 'page' && target.url === consoleUrl)
+    if (consoleAfterClose) throw new Error('关闭控制台标签后其视图仍存活')
+    const harnessAfterClose = (await targets()).find((target) => target.url.includes(`:${harnessPort}/`))
+    if (!harnessAfterClose) throw new Error('关闭控制台标签后 Harness 消失（违反关闭隔离）')
+    const tabsAfterClose = await evaluate<string[]>("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].map(b=>b.textContent ?? '')") ?? []
+    if (tabsAfterClose.includes('magpie 控制台')) throw new Error(`关闭后控制台标签仍在: ${JSON.stringify(tabsAfterClose)}`)
+    console.log('[smoke] 多 Surface 交替切换不重载、关闭一个不影响另一个通过')
+
+    // W1c 安全：renderer 状态与标签快照都不含认证 URL / token
+    const harnessStateJson = await evaluate<string>('window.innate.getHarnessState().then((s) => JSON.stringify(s))') ?? ''
+    const tabsSnapshot = await evaluate<string>("localStorage.getItem('innate.surface-tabs:center') ?? ''") ?? ''
+    for (const [name, value] of [['harness state', harnessStateJson], ['surface snapshot', tabsSnapshot]] as const) {
+      if (/token=|[?&]k=|api[-_]?key/i.test(value)) throw new Error(`${name} 含认证信息: ${value.slice(0, 200)}`)
+      if (/https?:\/\/127\.0\.0\.1:\d+\/\?/.test(value)) throw new Error(`${name} 含认证 URL: ${value.slice(0, 200)}`)
+    }
+    console.log('[smoke] renderer 状态与 Surface 快照均无 token/认证 URL')
+  }
+
   await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'工作区\')?.click()')
   await sleep(2_000)
   const workspaceRoot = await evaluate<string>("document.querySelector('.workspace-root-switch')?.textContent")
@@ -390,7 +555,7 @@ try {
   await evaluate("document.querySelector('.file-tree-row[title=\"package.json\"]')?.click()")
   await sleep(800)
   const textPreview = await evaluate<string>("document.querySelector('.text-preview')?.textContent")
-  if (!textPreview?.includes(repoName)) throw new Error('文本文件预览失败')
+  if (!textPreview?.includes(packageName)) throw new Error('文本文件预览失败')
   let syntaxReady = false
   for (let i = 0; i < 10; i++) {
     syntaxReady = await evaluate<boolean>("Boolean(document.querySelector('.code-preview .shiki span[style*=\"--shiki-dark\"]'))") ?? false
@@ -417,7 +582,7 @@ try {
   await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'工作区\')?.click()')
   await sleep(1_000)
   const restoredPreview = await evaluate<string>("document.querySelector('.text-preview')?.textContent")
-  if (!restoredPreview?.includes(repoName)) throw new Error('工作区 Surface 重启恢复失败')
+  if (!restoredPreview?.includes(packageName)) throw new Error('工作区 Surface 重启恢复失败')
   console.log('[smoke] 工作区 Surface 安全快照与重启恢复通过')
   await evaluate("document.querySelector('.file-tree-row[title=\"README.md\"]')?.click()")
   await sleep(800)
@@ -448,13 +613,22 @@ try {
     const t2 = (await targets()).find((target) => target.url.includes(`:${harnessPort}/`))
     if (!t2) throw new Error('Harness target 在导航/重载后消失（违反 detach 不销毁）')
     if (t2.url !== harnessUrlBefore) throw new Error(`Harness URL 变化: ${t2.url}`)
-    const marker = await evalTarget<number>(t2, 'Number(window.__w1aMarker ?? 0)')
+    // 先回到对话页重新附着：分离中的 WebContentsView 会被 Chromium 冻结，CDP 不回包
+    await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'对话\')?.click()')
+    await sleep(2_000)
+    const embedded = await evaluate<boolean>("Boolean(document.querySelector('.surface-view'))")
+    if (!embedded) throw new Error('dev 导航回对话页后 Harness 未重新附着')
+    let marker = 0
+    for (let i = 0; i < 5 && !marker; i++) {
+      try {
+        marker = await evalTarget<number>(t2, 'Number(window.__w1aMarker ?? 0)') ?? 0
+      } catch (reason) {
+        console.log('[smoke] Harness 存活标记读取重试:', String(reason))
+      }
+      if (!marker) await sleep(2_000)
+    }
     if (!marker) throw new Error('Harness 页面被 reload（存活标记丢失）')
     await shotTarget(t2, 'harness-view-after-nav')
-    await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'对话\')?.click()')
-    await sleep(1_500)
-    const embedded = await evaluate<boolean>("Boolean(document.querySelector('.harness-area'))")
-    if (!embedded) throw new Error('dev 导航回对话页后 Harness 未重新附着')
     const stopped = await evaluate('window.innate.stopHarness()')
     console.log('[smoke] Harness 跨导航/重载存活（URL 未变、未 reload、重新附着）；显式停止:', JSON.stringify(stopped))
   }
@@ -466,5 +640,6 @@ try {
   clearTimeout(watchdog)
   try { ws?.close() } catch { /* ignore */ }
   spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+  await killSmokeDsh()
   setTimeout(() => process.exit(process.exitCode ?? 0), 1_000).unref()
 }

@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { readdir, readFile } from 'node:fs/promises'
+import { readdir, readFile, realpath } from 'node:fs/promises'
 import path from 'node:path'
 import os from 'node:os'
 import { promisify } from 'node:util'
@@ -134,6 +134,18 @@ export async function pnpmGlobalRootFromShim(shimPath: string): Promise<string |
 }
 
 /**
+ * 解析真实包入口：pnpm 全局布局下入口是符号链接，且目标写成 POSIX 绝对路径，
+ * Node 在 Windows 上无法据此加载模块（Cannot find module），故统一取 realpath。
+ */
+async function realEntry(entry: string): Promise<string> {
+  try {
+    return await realpath(entry)
+  } catch {
+    return entry
+  }
+}
+
+/**
  * 解析 dsh 安装：
  * 1) INNATE_DSH_ENTRY 显式指定包入口（与 services backend-cli 契约一致）；
  * 2) PATH 上的 dsh 若是包入口 JS 本身（unix bin 链接场景）直接用；
@@ -146,14 +158,14 @@ export async function resolveDshEntry(): Promise<DshEntry> {
   if (envEntry) {
     try {
       await readFile(envEntry, 'utf8')
-      return { entry: envEntry, via: `env: ${envEntry}` }
+      return { entry: await realEntry(envEntry), via: `env: ${envEntry}` }
     } catch {
       /* 环境变量指向不存在文件，继续常规解析 */
     }
   }
   const cmdPath = await commandExists('dsh')
   if (cmdPath && isDirectDshEntry(cmdPath)) {
-    return { entry: cmdPath, via: `PATH: ${cmdPath}` }
+    return { entry: await realEntry(cmdPath), via: `PATH: ${cmdPath}` }
   }
   const roots = [
     cmdPath ? await pnpmGlobalRootFromShim(cmdPath) : undefined,
@@ -167,7 +179,7 @@ export async function resolveDshEntry(): Promise<DshEntry> {
         bin?: string | Record<string, string>
       }
       const rel = typeof pkg.bin === 'string' ? pkg.bin : pkg.bin?.dsh
-      if (rel) return { entry: path.join(pkgDir, rel), via: `global: ${pkgDir}` }
+      if (rel) return { entry: await realEntry(path.join(pkgDir, rel)), via: `global: ${pkgDir}` }
     } catch {
       /* 包不存在或无 bin，继续尝试下一个全局根 */
     }

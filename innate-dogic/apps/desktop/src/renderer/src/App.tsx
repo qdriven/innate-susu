@@ -1,16 +1,32 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
 import type { AppMode, CheckResult, HarnessState, ModelInfo, SmokeResult, StatusSnapshot } from '@dogic/core'
+import type { SurfaceDescriptor } from '@dogic/core/surface'
 import { api } from './api'
 import ConsolePage from './ConsolePage'
 import HarnessPage from './HarnessPage'
 import ModeGate from './ModeGate'
 import { WorkspacePanel } from './plugin-registry'
 import Titlebar from './Titlebar'
-import { pagesForMode, resolveActivePage } from './pages'
+import { defaultPageId, pagesForMode, resolveActivePage } from './pages'
 import ContentArea from './shell/ContentArea'
 import RightPanelHost from './shell/RightPanelHost'
 import ShellSidebar from './shell/ShellSidebar'
+import { SurfaceTabs } from './surfaces/surface-tabs'
+import { createDesktopSurfaceProviders } from './surfaces/providers/desktop'
+import type { SurfaceProviderRegistry } from './surfaces/provider-registry'
+import {
+  HARNESS_PROVIDER_ID,
+  HARNESS_SURFACE_ID,
+  MAGPIE_CONSOLE_PROVIDER_ID,
+  MAGPIE_CONSOLE_SURFACE_ID,
+  harnessSurface,
+  magpieConsoleSurface,
+  surfacePageId,
+} from './surfaces/catalog'
+
+/** 中栏 Surface 标签快照的持久化键；快照只含安全字段。 */
+const SURFACE_TABS_KEY = 'innate.surface-tabs:center'
 
 export default function App({ rightPanel = true }: { rightPanel?: boolean }): JSX.Element {
   const [tab, setTab] = useState('overview')
@@ -18,8 +34,17 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
   const [modeLoaded, setModeLoaded] = useState(false)
   const [status, setStatus] = useState<StatusSnapshot | null>(null)
   const [harness, setHarness] = useState<HarnessState>({ phase: 'idle', message: 'Harness 未运行' })
+  const [harnessLoaded, setHarnessLoaded] = useState(false)
   const [launching, setLaunching] = useState(false)
   const [launchMsg, setLaunchMsg] = useState('')
+
+  // 标签模型与 provider 注册表在整个壳生命周期内唯一；StrictMode 重挂载不影响语义。
+  const tabsRef = useRef<SurfaceTabs | null>(null)
+  if (!tabsRef.current) tabsRef.current = new SurfaceTabs({ key: SURFACE_TABS_KEY })
+  const tabs = tabsRef.current
+  const providersRef = useRef<SurfaceProviderRegistry | null>(null)
+  if (!providersRef.current) providersRef.current = createDesktopSurfaceProviders()
+  const providers = providersRef.current
 
   useEffect(() => {
     void api.getMode().then((m) => {
@@ -31,7 +56,7 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
   const chooseMode = useCallback(async (m: AppMode) => {
     await api.setMode(m)
     setMode(m)
-    setTab(m === 'simple' ? 'chat' : 'overview')
+    setTab(defaultPageId(m))
   }, [])
 
   const refresh = useCallback(async () => {
@@ -45,8 +70,14 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
   }, [refresh])
 
   useEffect(() => {
-    const unsubscribe = api.onHarnessState(setHarness)
-    void api.getHarnessState().then(setHarness)
+    const unsubscribe = api.onHarnessState((state) => {
+      setHarness(state)
+      setHarnessLoaded(true)
+    })
+    void api.getHarnessState().then((state) => {
+      setHarness(state)
+      setHarnessLoaded(true)
+    })
     return unsubscribe
   }, [])
 
@@ -63,12 +94,74 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
   const gwOk = status?.gateway.running === true
   const wired = (status?.dsh.wiredFiles.length ?? 0) > 0
   const canLaunch = gwOk && status?.dsh.installed === true
+  const harnessRunning = harness.phase === 'running'
+  const resolvedTab = mode ? resolveActivePage(mode, tab)?.id : undefined
+
+  // Harness 生命周期：运行中保留标签（可与控制台并存于同一中栏槽），
+  // 停止/失败时摘掉标签；状态未加载前不动，避免重启后误删已恢复的标签。
+  useLayoutEffect(() => {
+    if (!harnessLoaded) return
+    if (harnessRunning) {
+      tabs.open(harnessSurface())
+      return
+    }
+    if (tabs.has(HARNESS_SURFACE_ID)) tabs.close(HARNESS_SURFACE_ID)
+  }, [harnessLoaded, harnessRunning, tabs])
+
+  // 页面 ↔ Surface：对话/设置(控制台)落在统一中栏槽，其它页面只 detach。
+  useLayoutEffect(() => {
+    if (resolvedTab === 'chat') {
+      if (harnessRunning) {
+        tabs.open(harnessSurface())
+        tabs.activate(HARNESS_SURFACE_ID)
+      } else {
+        tabs.deactivate()
+      }
+      return
+    }
+    if (resolvedTab === 'console' || resolvedTab === 'settings') {
+      if (providers.isDisabled(MAGPIE_CONSOLE_PROVIDER_ID)) {
+        tabs.deactivate()
+        return
+      }
+      tabs.open(magpieConsoleSurface())
+      tabs.activate(MAGPIE_CONSOLE_SURFACE_ID)
+      return
+    }
+    tabs.deactivate()
+  }, [resolvedTab, harnessRunning, tabs, providers])
+
+  const switchSurface = useCallback((surface: SurfaceDescriptor) => {
+    const page = surfacePageId(surface.providerId, mode ?? 'dev')
+    if (page) setTab(page)
+    tabs.activate(surface.id)
+  }, [mode, tabs])
+
+  const closeSurface = useCallback((surface: SurfaceDescriptor) => {
+    const provider = providers.get(surface.providerId)
+    void Promise.resolve(provider?.close?.(surface)).catch(() => undefined)
+    tabs.close(surface.id)
+    if (surface.providerId === HARNESS_PROVIDER_ID) {
+      void api.stopHarness()
+      setTab('chat')
+      return
+    }
+    if (surface.providerId === MAGPIE_CONSOLE_PROVIDER_ID &&
+        (resolvedTab === 'console' || resolvedTab === 'settings')) {
+      setTab(harnessRunning ? 'chat' : defaultPageId(mode ?? 'dev'))
+    }
+  }, [providers, tabs, resolvedTab, harnessRunning, mode])
+
+  const reconnectConsole = useCallback(() => {
+    tabs.open(magpieConsoleSurface())
+    tabs.activate(MAGPIE_CONSOLE_SURFACE_ID)
+  }, [tabs])
 
   if (!modeLoaded) return <div className="app" />
   if (mode === null) return <ModeGate onChoose={(m) => void chooseMode(m)} />
 
   const pages = pagesForMode(mode)
-  const activeTab = resolveActivePage(mode, tab)?.id
+  const activeTab = resolvedTab
 
   return (
     <div className="app">
@@ -98,10 +191,22 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
               onLaunch={() => void launch()}
               onStop={() => void api.stopHarness()}
               onOpenSettings={() => setTab(mode === 'simple' ? 'settings' : 'console')}
+              tabs={tabs}
+              providers={providers}
+              onSwitchSurface={switchSurface}
+              onCloseSurface={closeSurface}
             />
           )}
           {activeTab === 'workspace' && <WorkspacePanel />}
-          {activeTab === 'settings' && <ConsolePage />}
+          {activeTab === 'settings' && (
+            <ConsolePage
+              tabs={tabs}
+              providers={providers}
+              onSwitchSurface={switchSurface}
+              onCloseSurface={closeSurface}
+              onReconnect={reconnectConsole}
+            />
+          )}
           {activeTab === 'overview' && (
         <main className="main">
           <section className="hero">
@@ -178,8 +283,16 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
       )}
 
       {activeTab === 'models' && <ModelsTab />}
-      {activeTab === 'console' && <ConsolePage />}
-      {activeTab === 'tools' && <ToolsTab />}
+          {activeTab === 'console' && (
+            <ConsolePage
+              tabs={tabs}
+              providers={providers}
+              onSwitchSurface={switchSurface}
+              onCloseSurface={closeSurface}
+              onReconnect={reconnectConsole}
+            />
+          )}
+          {activeTab === 'tools' && <ToolsTab />}
         </ContentArea>
 
         {mode === 'dev' && rightPanel && <RightPanelHost />}

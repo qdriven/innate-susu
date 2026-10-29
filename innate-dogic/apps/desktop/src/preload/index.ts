@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
   CheckResult,
-  ConsoleReadyResult,
   HarnessLaunchResult,
   HarnessState,
   ModelInfo,
@@ -10,6 +9,7 @@ import type {
   ViewBounds,
 } from '@dogic/core'
 import type { AppMode } from '@dogic/core'
+import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi, WorkspaceRoot } from '@dogic/plugin-workspace'
 
 const api = {
@@ -32,19 +32,18 @@ const api = {
   openMagpieWeb: (): Promise<boolean> => ipcRenderer.invoke('innate:openMagpieWeb'),
   startMagpie: (): Promise<{ ok: boolean; detail: string }> =>
     ipcRenderer.invoke('innate:startMagpie'),
-  consoleShow: (bounds: ViewBounds): Promise<ConsoleReadyResult> =>
-    ipcRenderer.invoke('innate:consoleShow', bounds),
-  consoleHide: (): Promise<boolean> => ipcRenderer.invoke('innate:consoleHide'),
-  consoleBounds: (bounds: ViewBounds): Promise<boolean> =>
-    ipcRenderer.invoke('innate:consoleBounds', bounds),
+  // provider 中立的 Surface 窄接口（无认证 URL、无进程句柄）
+  surfaceShow: (descriptor: SurfaceDescriptor, bounds: ViewBounds): Promise<SurfaceShowResult> =>
+    ipcRenderer.invoke('innate:surfaceShow', descriptor, bounds),
+  surfaceHide: (id: string): Promise<boolean> => ipcRenderer.invoke('innate:surfaceHide', id),
+  surfaceBounds: (id: string, bounds: ViewBounds): Promise<boolean> =>
+    ipcRenderer.invoke('innate:surfaceBounds', id, bounds),
+  surfaceClose: (id: string): Promise<boolean> => ipcRenderer.invoke('innate:surfaceClose', id),
   revealDshHome: (): Promise<string> => ipcRenderer.invoke('innate:revealDshHome'),
   openLogs: (): Promise<string> => ipcRenderer.invoke('innate:openLogs'),
   disconnectDsh: (): Promise<{ ok: boolean; detail: string }> =>
     ipcRenderer.invoke('innate:disconnectDsh'),
   launchHarness: (): Promise<HarnessLaunchResult> => ipcRenderer.invoke('innate:launchHarness'),
-  harnessShow: (bounds: ViewBounds): Promise<HarnessLaunchResult> => ipcRenderer.invoke('innate:harnessShow', bounds),
-  harnessHide: (): Promise<boolean> => ipcRenderer.invoke('innate:harnessHide'),
-  harnessBounds: (bounds: ViewBounds): Promise<boolean> => ipcRenderer.invoke('innate:harnessBounds', bounds),
   getHarnessState: (): Promise<HarnessState> => ipcRenderer.invoke('innate:harnessState'),
   stopHarness: (): Promise<boolean> => ipcRenderer.invoke('innate:stopHarness'),
   onHarnessState: (cb: (state: HarnessState) => void): (() => void) => {

@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
 import type { HarnessState, StatusSnapshot } from '@dogic/core'
-import { api } from './api'
+import type { SurfaceDescriptor } from '@dogic/core/surface'
 import SimpleHome from './SimpleHome'
+import SurfaceSlot from './surfaces/SurfaceSlot'
+import { HARNESS_SURFACE_ID } from './surfaces/catalog'
+import type { SurfaceProviderRegistry } from './surfaces/provider-registry'
+import type { SurfaceTabs } from './surfaces/surface-tabs'
 
 interface Props {
   status: StatusSnapshot | null
@@ -12,55 +15,34 @@ interface Props {
   onLaunch(): void
   onStop(): void
   onOpenSettings(): void
+  tabs: SurfaceTabs
+  providers: SurfaceProviderRegistry
+  onSwitchSurface(descriptor: SurfaceDescriptor): void
+  onCloseSurface(descriptor: SurfaceDescriptor): void
 }
 
-/** Harness 是 SurfaceHost 中的持久标签；离开页面只 detach，不再另开 BrowserWindow。 */
+/**
+ * 对话页（W1c.2）：Harness 是统一中栏槽里的一个 Surface。
+ *
+ * Harness 未运行时回落到本地启动页（不白屏、不阻塞壳）；运行后由 SurfaceSlot
+ * 承载标签条与视图本体，切换标签只 detach。
+ */
 export default function HarnessPage(props: Props): JSX.Element {
-  const { harness, onStop } = props
-  const areaRef = useRef<HTMLDivElement>(null)
-  const [error, setError] = useState('')
-  const running = harness.phase === 'running' && Boolean(harness.url)
-
-  const bounds = useCallback(() => {
-    const rect = areaRef.current?.getBoundingClientRect()
-    if (!rect) return { x: 0, y: 0, width: 0, height: 0 }
-    return {
-      x: Math.round(rect.x),
-      y: Math.round(rect.y),
-      width: Math.round(rect.width),
-      height: Math.round(rect.height),
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!running) {
-      void api.harnessHide()
-      return
-    }
-    const element = areaRef.current
-    const show = async (): Promise<void> => {
-      const result = await api.harnessShow(bounds())
-      setError(result.ok ? '' : result.detail)
-    }
-    void show()
-    const observer = new ResizeObserver(() => void api.harnessBounds(bounds()))
-    if (element) observer.observe(element)
-    return () => {
-      observer.disconnect()
-      void api.harnessHide()
-    }
-  }, [running, harness.url, bounds])
+  const { harness, tabs, providers, onSwitchSurface, onCloseSurface } = props
+  const running = harness.phase === 'running'
 
   return (
     <div className="harness-page">
-      <div className="surface-tabstrip">
-        <span className="surface-tab current">◍ DeepSeek Harness</span>
-        {running && <button className="small" onClick={onStop}>停止</button>}
-      </div>
       {running ? (
-        <div ref={areaRef} className="harness-area">
-          {error && <div className="console-fallback bad-text">{error}</div>}
-        </div>
+        <SurfaceSlot
+          tabs={tabs}
+          providers={providers}
+          focusId={HARNESS_SURFACE_ID}
+          fallback={<SimpleHome {...props} />}
+          trailing={<button className="small" onClick={props.onStop}>停止</button>}
+          onSwitch={onSwitchSurface}
+          onClose={onCloseSurface}
+        />
       ) : (
         <SimpleHome {...props} />
       )}

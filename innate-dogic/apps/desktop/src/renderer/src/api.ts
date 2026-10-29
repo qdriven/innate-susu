@@ -1,6 +1,5 @@
 import type {
   CheckResult,
-  ConsoleReadyResult,
   HarnessLaunchResult,
   HarnessState,
   ModelInfo,
@@ -9,6 +8,7 @@ import type {
   ViewBounds,
 } from '@dogic/core'
 import type { AppMode } from '@dogic/core'
+import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi } from '@dogic/plugin-workspace'
 
 // 由 preload contextBridge 注入
@@ -28,16 +28,15 @@ declare global {
       smokeTest: (model?: string) => Promise<SmokeResult>
       openMagpieWeb: () => Promise<boolean>
       startMagpie: () => Promise<{ ok: boolean; detail: string }>
-      consoleShow: (bounds: ViewBounds) => Promise<ConsoleReadyResult>
-      consoleHide: () => Promise<boolean>
-      consoleBounds: (bounds: ViewBounds) => Promise<boolean>
+      /** provider 中立的 Surface 窄接口：安全 descriptor + bounds，无认证 URL。 */
+      surfaceShow: (descriptor: SurfaceDescriptor, bounds: ViewBounds) => Promise<SurfaceShowResult>
+      surfaceHide: (id: string) => Promise<boolean>
+      surfaceBounds: (id: string, bounds: ViewBounds) => Promise<boolean>
+      surfaceClose: (id: string) => Promise<boolean>
       revealDshHome: () => Promise<string>
       openLogs: () => Promise<string>
       disconnectDsh: () => Promise<{ ok: boolean; detail: string }>
       launchHarness: () => Promise<HarnessLaunchResult>
-      harnessShow: (bounds: ViewBounds) => Promise<HarnessLaunchResult>
-      harnessHide: () => Promise<boolean>
-      harnessBounds: (bounds: ViewBounds) => Promise<boolean>
       getHarnessState: () => Promise<HarnessState>
       stopHarness: () => Promise<boolean>
       onHarnessState: (cb: (state: HarnessState) => void) => () => void

@@ -97,6 +97,9 @@ async function freePort(): Promise<number> {
   })
 }
 
+/** 控制台冷启动上限；慢机器/杀软扫描环境可用环境变量放宽（冒烟用）。 */
+const CONSOLE_START_TIMEOUT_MS = Number(process.env.INNATE_MAGPIE_CONSOLE_TIMEOUT_MS ?? 15_000)
+
 /** 使用独立端口与受管 key，绝不猜测已有 magpie desktop/web 实例的认证信息。 */
 export async function ensureMagpieConsole(): Promise<ConsoleReady> {
   if (consoleChild && consoleUrl) return { ok: true, url: consoleUrl, detail: '控制台运行中' }
@@ -123,8 +126,11 @@ export async function ensureMagpieConsole(): Promise<ConsoleReady> {
         child.kill()
         consoleChild = undefined
         consoleUrl = undefined
-        finish({ ok: false, detail: '控制台启动超时（15s）。请检查 magpie 是否可用后重试。' })
-      }, 15_000)
+        finish({
+          ok: false,
+          detail: `控制台启动超时（${Math.round(CONSOLE_START_TIMEOUT_MS / 1000)}s）。请检查 magpie 是否可用后重试。`,
+        })
+      }, CONSOLE_START_TIMEOUT_MS)
 
       const onData = (data: unknown): void => {
         const match = String(data).match(/magpie web on (http:\/\/\S+)/)

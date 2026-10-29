@@ -9,8 +9,9 @@ import {
   runChecks,
   smokeTest,
   writeMode,
+  redactLaunchSecrets,
 } from '@dogic/core'
-import type { AppMode, HarnessLaunchResult, ViewBounds } from '@dogic/core'
+import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
@@ -18,10 +19,47 @@ import { disconnectDsh, ensureMagpieConsole, startMagpie } from './launcher'
 
 export const harness = new HarnessRuntime()
 
+/** renderer 可见的 Harness 状态：不含认证 URL，message 里的 URL 也已脱敏。 */
+function publicHarnessState(state: HarnessState): HarnessState {
+  const safe = { ...state }
+  delete safe.url
+  safe.message = redactLaunchSecrets(safe.message)
+  return safe
+}
+
+/** 启动结果同理：URL 只留在主进程，renderer 只拿到端口与可展示文本。 */
+function publicLaunchResult(result: HarnessLaunchResult): HarnessLaunchResult {
+  const safe = { ...result }
+  delete safe.url
+  return safe
+}
+
 export function registerIpc(mainWindow: BrowserWindow): void {
   const surfaces = new SurfaceHost(mainWindow)
   const workspace = new WorkspaceService(path.join(app.getPath('userData'), 'workspace.json'))
   mainWindow.on('closed', () => surfaces.dispose())
+
+  // 认证 URL 只在对应 runtime provider 内解析；renderer 只提交安全 descriptor。
+  surfaces.registerProvider({
+    id: 'harness',
+    kind: 'webcontents',
+    resolve: async () => {
+      const state = harness.getState()
+      if (state.phase !== 'running' || !state.url) {
+        return { ok: false, detail: 'Harness 尚未运行，请先启动对话' }
+      }
+      return { ok: true, url: state.url }
+    },
+  })
+  surfaces.registerProvider({
+    id: 'magpie-console',
+    kind: 'webcontents',
+    resolve: async () => {
+      const ready = await ensureMagpieConsole()
+      if (!ready.ok || !ready.url) return { ok: false, detail: ready.detail }
+      return { ok: true, url: ready.url }
+    },
+  })
 
   ipcMain.handle('innate:status', () => readStatus())
 
@@ -69,55 +107,20 @@ export function registerIpc(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('innate:startMagpie', () => startMagpie())
 
-  ipcMain.handle('innate:consoleShow', async (_e, bounds: ViewBounds) => {
-    const ready = await ensureMagpieConsole()
-    if (!ready.ok || !ready.url) return ready
-    await surfaces.show({
-      id: 'magpie-console',
-      providerId: 'magpie-console',
-      kind: 'webcontents',
-      title: 'magpie 控制台',
-      capabilities: ['network:navigate'],
-    }, ready.url, bounds)
-    return ready
-  })
-  ipcMain.handle('innate:consoleHide', () => {
-    surfaces.hide('magpie-console')
-    return true
-  })
-  ipcMain.handle('innate:consoleBounds', (_e, bounds: ViewBounds) => {
-    surfaces.setBounds('magpie-console', bounds)
-    return true
-  })
+  // provider 中立的 Surface 窄接口：安全 descriptor + bounds，无 URL、无进程句柄。
+  ipcMain.handle('innate:surfaceShow', (_e, descriptor: unknown, bounds: unknown) =>
+    surfaces.show(descriptor, bounds))
+  ipcMain.handle('innate:surfaceHide', (_e, id: unknown) => surfaces.hide(id))
+  ipcMain.handle('innate:surfaceBounds', (_e, id: unknown, bounds: unknown) => surfaces.setBounds(id, bounds))
+  ipcMain.handle('innate:surfaceClose', (_e, id: unknown) => surfaces.close(id))
 
   ipcMain.handle('innate:revealDshHome', () => shell.openPath(dshHome()))
   ipcMain.handle('innate:openLogs', () => shell.openPath(path.join(app.getPath('userData'), 'logs')))
   ipcMain.handle('innate:disconnectDsh', () => disconnectDsh())
 
-  ipcMain.handle('innate:harnessState', () => harness.getState())
-  ipcMain.handle('innate:launchHarness', () => harness.launch(app.getPath('userData')))
-  ipcMain.handle('innate:harnessShow', async (_e, bounds: ViewBounds): Promise<HarnessLaunchResult> => {
-    const state = harness.getState()
-    if (state.phase !== 'running' || !state.url) {
-      return { ok: false, detail: 'Harness 尚未运行，请先启动对话' }
-    }
-    await surfaces.show({
-      id: 'harness',
-      providerId: 'harness',
-      kind: 'webcontents',
-      title: 'DeepSeek Harness',
-      capabilities: ['agent:tools'],
-    }, state.url, bounds)
-    return { ok: true, url: state.url, port: state.port, detail: 'Harness 已嵌入当前标签页' }
-  })
-  ipcMain.handle('innate:harnessHide', () => {
-    surfaces.hide('harness')
-    return true
-  })
-  ipcMain.handle('innate:harnessBounds', (_e, bounds: ViewBounds) => {
-    surfaces.setBounds('harness', bounds)
-    return true
-  })
+  ipcMain.handle('innate:harnessState', () => publicHarnessState(harness.getState()))
+  ipcMain.handle('innate:launchHarness', async () =>
+    publicLaunchResult(await harness.launch(app.getPath('userData'))))
   ipcMain.handle('innate:stopHarness', () => {
     surfaces.close('harness')
     void harness.stop()
@@ -143,7 +146,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:workspaceGitDiff', (_e, root: string, relative: string) => workspace.gitDiff(root, relative))
 
   harness.on('state', (state) => {
-    if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', state)
+    if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', publicHarnessState(state))
   })
 }
 

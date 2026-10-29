@@ -108,4 +108,27 @@ describe('resolveDshEntry env override', () => {
       delete process.env.INNATE_DSH_ENTRY
     }
   })
+
+  it('resolves a symlinked entry to its real path (pnpm 全局符号链接布局)', async () => {
+    const { resolveDshEntry } = await import('./dsh.js')
+    const { mkdtempSync, writeFileSync, symlinkSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const dir = mkdtempSync(join(tmpdir(), 'dsh-link-'))
+    const target = join(dir, 'bin.js')
+    const link = join(dir, 'entry.js')
+    writeFileSync(target, '// entry')
+    try {
+      symlinkSync(target, link, 'file')
+    } catch {
+      return // 无符号链接权限的平台跳过
+    }
+    process.env.INNATE_DSH_ENTRY = link
+    try {
+      const resolved = await resolveDshEntry()
+      expect(resolved.entry).toBe(target)
+    } finally {
+      delete process.env.INNATE_DSH_ENTRY
+    }
+  })
 })

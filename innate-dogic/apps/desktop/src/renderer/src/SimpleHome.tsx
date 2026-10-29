@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 import type { HarnessState, StatusSnapshot } from '@dogic/core'
+import { api } from './api'
 
 interface Props {
   status: StatusSnapshot | null
@@ -46,9 +47,15 @@ export default function SimpleHome(props: Props): JSX.Element {
           </button>
           {harness.phase === 'running' && <button onClick={onStop}>停止</button>}
           {level !== 'ok' && <button onClick={onOpenSettings}>去设置</button>}
+          {harness.phase === 'failed' && (
+            <button className="small" onClick={() => void api.openLogs()}>查看日志</button>
+          )}
         </div>
         {!dshOk && (
           <p className="simple-hint">尚未安装 dsh：npm install -g @deepseek-ai/dsh</p>
+        )}
+        {harness.phase === 'failed' && (
+          <p className="simple-hint">启动失败：修复后再次点击「开始对话」，或先查看日志定位原因。</p>
         )}
         {launchMsg && <p className="simple-hint">{launchMsg}</p>}
         {harness.phase !== 'idle' && (

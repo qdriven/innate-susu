@@ -175,14 +175,8 @@ td .dim { font-size: var(--font-xs); }
 .tool-row p { margin: 0; font-size: var(--font-xs); }
 .row-btns { display: flex; gap: 8px; }
 
-/* M1：内嵌 magpie 控制台 */
-.console-page { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.console-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 12px; border-bottom: 1px solid var(--border);
-  font-size: var(--font-xs); flex-shrink: 0;
-}
-.console-area { flex: 1; position: relative; min-height: 0; }
+/* M1：内嵌 magpie 控制台（W1c 起与 Harness 共用统一 Surface 槽） */
+.console-page { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
 .console-fallback {
   position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;
@@ -214,16 +208,39 @@ td .dim { font-size: var(--font-xs); }
 .mode-card-title { font-size: var(--font-title); font-weight: 600; }
 .mode-card-desc { color: var(--dim); font-size: var(--font-xs); line-height: 1.6; }
 
-/* Surface 标签：Harness / 后续 terminal、browser、canvas 共用 */
+/* Surface 标签：Harness / magpie 控制台共用同一中栏槽（W1c） */
 .harness-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.surface-slot { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.surface-slot-body { flex: 1; min-height: 0; position: relative; }
+.surface-view { position: absolute; inset: 0; }
+.surface-view-area { position: absolute; inset: 0; }
 .surface-tabstrip, .workspace-tabstrip {
   min-height: 36px; display: flex; align-items: center; gap: 3px; padding: 4px 7px;
   overflow-x: auto; flex-shrink: 0; background: var(--panel); border-bottom: 1px solid var(--border);
 }
 .surface-tabstrip > button { margin-left: auto; flex-shrink: 0; }
-.surface-tab { padding: 5px 10px; color: var(--dim); font-size: var(--font-xs); white-space: nowrap; }
-.surface-tab.current { color: var(--text); background: var(--panel-2); border-radius: 5px; }
-.harness-area { flex: 1; min-height: 0; position: relative; }
+.surface-tabstrip-trailing { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.surface-tab {
+  display: flex; align-items: center; padding: 0; background: transparent;
+  border: 1px solid transparent; border-radius: 5px; color: var(--dim); font-size: var(--font-xs);
+  white-space: nowrap; max-width: 240px;
+}
+.surface-tab > button[role="tab"] {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; padding: 5px 10px;
+  background: transparent; border: none; color: inherit; font-size: var(--font-xs);
+}
+.surface-tab.current { color: var(--text); background: var(--panel-2); }
+.surface-tab .surface-tab-close {
+  padding: 2px 6px; border: none; background: transparent; color: var(--dim); font-size: var(--font-xs);
+}
+.surface-tab .surface-tab-close:hover { color: var(--text); }
+.surface-error {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center;
+  background: var(--bg);
+}
+.surface-error-title { margin: 0; color: var(--text); font-size: var(--font-title); }
+.surface-error p { margin: 0; max-width: 420px; }
 
 /* 工作区插件：中央文档 + 右侧文件/Git 面板 */
 .workspace-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
