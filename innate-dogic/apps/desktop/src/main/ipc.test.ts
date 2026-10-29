@@ -54,6 +54,43 @@ const terminal = vi.hoisted(() => {
   }
 })
 
+/** 记录调用的 BrowserSurfaceService 桩：验证 browser 窄通道是否放行到服务端。 */
+const browser = vi.hoisted(() => {
+  const calls: Array<{ method: string; args: unknown[] }> = []
+  return {
+    calls,
+    BrowserSurfaceService: class {
+      provider = {
+        id: 'browser',
+        kind: 'webcontents',
+        deferredUrl: true,
+        resolve: async () => ({ ok: true }),
+      }
+      async navigate(id: unknown, request: unknown) {
+        calls.push({ method: 'navigate', args: [id, request] })
+        return { ok: true, url: 'https://example.com/' }
+      }
+      async back(id: unknown) {
+        calls.push({ method: 'back', args: [id] })
+        return { ok: true, url: 'https://example.com/' }
+      }
+      async forward(id: unknown) {
+        calls.push({ method: 'forward', args: [id] })
+        return { ok: true, url: 'https://example.com/' }
+      }
+      async reload(id: unknown) {
+        calls.push({ method: 'reload', args: [id] })
+        return { ok: true, url: 'https://example.com/' }
+      }
+      state(id: unknown) {
+        calls.push({ method: 'state', args: [id] })
+        return undefined
+      }
+      dispose() {}
+    },
+  }
+})
+
 vi.mock('electron', () => ({
   app: { getPath: vi.fn(() => env.userDataDir) },
   BrowserWindow: class {
@@ -84,6 +121,10 @@ vi.mock('@dogic/core', () => ({
 }))
 
 vi.mock('@dogic/plugin-terminal/main', () => ({ TerminalService: terminal.TerminalService }))
+
+vi.mock('@dogic/plugin-browser/main', () => ({ BrowserSurfaceService: browser.BrowserSurfaceService }))
+
+vi.mock('@dogic/plugin-browser/main/electron', () => ({ createElectronBrowserView: vi.fn() }))
 
 vi.mock('./harness', () => ({
   HarnessRuntime: class {
@@ -164,5 +205,27 @@ describe('W4.6 process:execute 窄通道门控（desktop main）', () => {
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
+  })
+})
+
+describe('W5.2 browser 窄通道（desktop main）', () => {
+  beforeEach(() => {
+    ipc.handlers.clear()
+    terminal.calls.length = 0
+    browser.calls.length = 0
+    env.mode = 'dev'
+    env.userDataDir = 'C:/fake-user-data'
+  })
+
+  it('browser 导航/历史/状态通道转发服务端', async () => {
+    registerIpc(new BrowserWindow({}))
+    const nav = await invoke('innate:browserNavigate', 'browser-1', { url: 'https://example.com/' })
+    expect(nav).toEqual({ ok: true, url: 'https://example.com/' })
+    expect(browser.calls.some((call) => call.method === 'navigate')).toBe(true)
+    expect(await invoke('innate:browserBack', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
+    expect(await invoke('innate:browserForward', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
+    expect(await invoke('innate:browserReload', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
+    expect(await invoke('innate:browserState', 'browser-1')).toBeNull()
+    expect(browser.calls.some((call) => call.method === 'state')).toBe(true)
   })
 })

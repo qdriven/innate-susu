@@ -1,5 +1,5 @@
 import { api } from '../../api'
-import { HARNESS_PROVIDER_ID, MAGPIE_CONSOLE_PROVIDER_ID } from '../catalog'
+import { BROWSER_PROVIDER_ID, HARNESS_PROVIDER_ID, MAGPIE_CONSOLE_PROVIDER_ID } from '../catalog'
 import { SurfaceProviderRegistry } from '../provider-registry'
 import type { SurfaceProvider } from '../provider-registry'
 import { createTerminalProvider } from './terminal'
@@ -26,6 +26,8 @@ export function createDesktopSurfaceProviders(): SurfaceProviderRegistry {
       ],
     }),
     () => createTerminalProvider(api),
+    // browser Surface（W5.2）：复用通用 WebContents 渲染；地址栏与导航交互在 W5.3 挂上。
+    () => createWebContentsProvider({ id: BROWSER_PROVIDER_ID }),
   ]
   for (const factory of factories) {
     try {

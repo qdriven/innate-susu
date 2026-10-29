@@ -106,9 +106,9 @@ Sprint W5（docs/sprints/w5/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 多标签/切换/关闭/加载失败/崩溃隔离/窗口关闭
+- F1-V1 [done] 多标签/切换/关闭/加载失败/崩溃隔离/窗口关闭
   - 方法：契约测试+smoke
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W5/webcontents.md
 
 ## 涉及模块
 
@@ -121,6 +121,12 @@ Spec：S1
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 2026-10-29 完成：`BrowserSurfaceService`（plugins/browser/src/main/index.ts）+
+  electron 视图工厂（electron-view.ts）+ SurfaceHost provider 钩子
+  （createView/deferredUrl/onViewAttached/onViewDetached/onViewClosed）+
+  desktop ipc 窄通道 + renderer 挂 W1c registry。browser 34/34、desktop
+  87/87、`pnpm verify` EXIT=0、electron spike 12/12。
+  证据：docs/susu/plan/evidence/W5/webcontents.md。
 
 ## 来源原文
 

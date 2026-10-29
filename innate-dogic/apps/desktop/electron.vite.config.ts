@@ -8,6 +8,7 @@ const coreSrc = resolve(__dirname, '../../packages/core/src/index.ts')
 const kernelSrc = resolve(__dirname, '../../packages/kernel/src')
 const workspaceSrc = resolve(__dirname, '../../plugins/workspace/src')
 const terminalSrc = resolve(__dirname, '../../plugins/terminal/src')
+const browserSrc = resolve(__dirname, '../../plugins/browser/src')
 const aliases = {
   '@dogic/core/surface': resolve(__dirname, '../../packages/core/src/surface.ts'),
   '@dogic/core': coreSrc,
@@ -20,8 +21,11 @@ const aliases = {
   '@dogic/plugin-terminal/main': resolve(terminalSrc, 'main/index.ts'),
   '@dogic/plugin-terminal/renderer': resolve(terminalSrc, 'renderer/index.ts'),
   '@dogic/plugin-terminal': resolve(terminalSrc, 'shared/index.ts'),
+  '@dogic/plugin-browser/main/electron': resolve(browserSrc, 'main/electron-view.ts'),
+  '@dogic/plugin-browser/main': resolve(browserSrc, 'main/index.ts'),
+  '@dogic/plugin-browser': resolve(browserSrc, 'shared/index.ts'),
 }
-const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/plugin-terminal', '@dogic/syntax-highlighting']
+const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/plugin-terminal', '@dogic/plugin-browser', '@dogic/syntax-highlighting']
 
 export default defineConfig({
   main: {

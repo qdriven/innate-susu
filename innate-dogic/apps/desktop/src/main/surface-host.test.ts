@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { BrowserWindow, Rectangle } from 'electron'
+import type { BrowserWindow, Rectangle, WebContentsView } from 'electron'
 import type { SurfaceDescriptor } from '@dogic/core/surface'
 
 const electron = vi.hoisted(() => {
@@ -144,11 +144,15 @@ describe('W1c SurfaceHost 安全负路径', () => {
     expect(electron.views).toHaveLength(0)
   })
 
-  it('id 与 provider 不匹配、kind 不匹配都被拒', async () => {
+  it('kind 不匹配被拒；同 provider 多 Surface（不同 id）合法（browser 多标签）', async () => {
     const { host } = setup()
-    expect((await host.show({ ...harness, id: 'other' }, bounds)).ok).toBe(false)
     expect((await host.show({ ...harness, kind: 'document' }, bounds)).ok).toBe(false)
     expect(electron.views).toHaveLength(0)
+    await host.show(harness, bounds)
+    await host.show({ ...harness, id: 'harness-2' }, bounds)
+    expect(electron.views).toHaveLength(2)
+    expect(electron.views[0]?.webContents.loadURL).toHaveBeenCalledTimes(1)
+    expect(electron.views[1]?.webContents.loadURL).toHaveBeenCalledTimes(1)
   })
 
   it('renderer 提交的 URL 被忽略，实际加载的是 provider 解析出的地址', async () => {
@@ -199,5 +203,126 @@ describe('W1c SurfaceHost 安全负路径', () => {
     expect(() => host.registerProvider({
       id: 'harness', kind: 'webcontents', resolve: async () => ({ ok: true, url: 'http://x/' }),
     })).toThrow('重复注册')
+  })
+})
+
+describe('W5.2 SurfaceHost provider 钩子（browser 多标签）', () => {
+  const browser: SurfaceDescriptor = {
+    id: 'browser-1', providerId: 'browser', kind: 'webcontents', title: '浏览器',
+  }
+
+  function customView() {
+    return {
+      webContents: {
+        loadURL: vi.fn(),
+        close: vi.fn(),
+        setWindowOpenHandler: vi.fn(),
+      },
+      setBounds: vi.fn(),
+    }
+  }
+
+  beforeEach(() => {
+    electron.views.length = 0
+    electron.openExternal.mockReset()
+  })
+
+  it('createView：provider 自建视图被 attach，不走缺省通用视图路径', async () => {
+    const contentView = { addChildView: vi.fn(), removeChildView: vi.fn() }
+    const host = new SurfaceHost({ contentView } as unknown as BrowserWindow)
+    const custom = customView()
+    host.registerProvider({
+      id: 'browser',
+      kind: 'webcontents',
+      deferredUrl: true,
+      createView: () => custom as unknown as WebContentsView,
+      resolve: async () => ({ ok: true }),
+    })
+    const result = await host.show(browser, bounds)
+    expect(result).toEqual({ ok: true })
+    expect(contentView.addChildView).toHaveBeenCalledWith(custom)
+    expect(custom.setBounds).toHaveBeenCalledWith(bounds)
+    expect(electron.views).toHaveLength(0)
+    // deferredUrl：创建视图但不加载 URL（browser 初始空白页）
+    expect(custom.webContents.loadURL).not.toHaveBeenCalled()
+  })
+
+  it('close/dispose 通知 onViewClosed；show/hide 通知 onViewAttached/onViewDetached', async () => {
+    const contentView = { addChildView: vi.fn(), removeChildView: vi.fn() }
+    const host = new SurfaceHost({ contentView } as unknown as BrowserWindow)
+    const custom = customView()
+    const notified: string[] = []
+    host.registerProvider({
+      id: 'browser',
+      kind: 'webcontents',
+      deferredUrl: true,
+      createView: () => custom as unknown as WebContentsView,
+      resolve: async () => ({ ok: true }),
+      onViewAttached: (id) => notified.push(`attached:${id}`),
+      onViewDetached: (id) => notified.push(`detached:${id}`),
+      onViewClosed: (id) => notified.push(`closed:${id}`),
+    })
+    await host.show(browser, bounds)
+    expect(notified).toEqual(['attached:browser-1'])
+    expect(host.hide('browser-1')).toBe(true)
+    expect(notified).toContain('detached:browser-1')
+    expect(custom.webContents.close).not.toHaveBeenCalled()
+    expect(host.close('browser-1')).toBe(true)
+    expect(custom.webContents.close).toHaveBeenCalledTimes(1)
+    expect(notified).toContain('closed:browser-1')
+    // 窗口关闭路径：dispose 同样通知 provider 清理会话
+    await host.show(browser, bounds)
+    host.dispose()
+    expect(notified).toContain('closed:browser-1')
+    expect(custom.webContents.close).toHaveBeenCalledTimes(2)
+  })
+
+  it('createView 抛错时返回可展示错误且不残留 registry 记录', async () => {
+    const contentView = { addChildView: vi.fn(), removeChildView: vi.fn() }
+    const host = new SurfaceHost({ contentView } as unknown as BrowserWindow)
+    host.registerProvider({
+      id: 'browser',
+      kind: 'webcontents',
+      deferredUrl: true,
+      createView: () => {
+        throw new Error('browser 会话超过上限 8')
+      },
+      resolve: async () => ({ ok: true }),
+    })
+    const result = await host.show(browser, bounds)
+    expect(result).toEqual({ ok: false, detail: 'browser 会话超过上限 8' })
+    expect(host.list()).toEqual([])
+    expect(contentView.addChildView).not.toHaveBeenCalled()
+  })
+
+  it('多浏览器标签：同 provider 两个 Surface 各自视图，关闭一个不影响另一个', async () => {
+    const contentView = { addChildView: vi.fn(), removeChildView: vi.fn() }
+    const host = new SurfaceHost({ contentView } as unknown as BrowserWindow)
+    const custom1 = customView()
+    const custom2 = customView()
+    const created: Array<ReturnType<typeof customView>> = []
+    host.registerProvider({
+      id: 'browser',
+      kind: 'webcontents',
+      deferredUrl: true,
+      createView: () => {
+        const view = created.length === 0 ? custom1 : custom2
+        created.push(view)
+        return view as unknown as WebContentsView
+      },
+      resolve: async () => ({ ok: true }),
+    })
+    await host.show(browser, bounds)
+    await host.show({ ...browser, id: 'browser-2' }, bounds)
+    expect(contentView.addChildView).toHaveBeenCalledTimes(2)
+    expect(created).toHaveLength(2)
+    expect(host.close('browser-1')).toBe(true)
+    expect(custom1.webContents.close).toHaveBeenCalledTimes(1)
+    expect(custom2.webContents.close).not.toHaveBeenCalled()
+    expect(host.list()).toEqual(['browser-2'])
+    // 切回 browser-2 不重建视图（切换不重载）
+    await host.show({ ...browser, id: 'browser-2' }, bounds)
+    expect(created).toHaveLength(2)
+    expect(custom2.webContents.loadURL).not.toHaveBeenCalled()
   })
 })

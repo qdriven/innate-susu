@@ -1,5 +1,5 @@
 /**
- * browser 契约（W5.1）：主进程与 renderer 共用的窄类型。
+ * browser 契约（W5.1 定义，W5.2 起消费）：主进程与 renderer 共用的窄类型。
  *
  * 安全默认值（实现前固定，W5.2+ 消费）：
  * - 协议白名单仅 http/https；file/data/javascript/chrome 等默认拒绝，
@@ -60,14 +60,31 @@ export interface BrowserHistoryState {
   canForward: boolean
 }
 
+/** 会话运行态（W5.2）：除历史外，页面加载/崩溃/无响应只影响本会话并如实上报。 */
 export interface BrowserSessionState extends BrowserHistoryState {
   id: string
   title: string
   active: boolean
+  loading: boolean
+  failed: string
+  crashed: boolean
+  unresponsive: boolean
 }
 
 /**
- * browser provider 最小接口（W5.1 定义，W5.2 实现 WebContents 生命周期）：
+ * 页面事件流（主进程 → renderer）：加载中/加载失败/主框架导航完成/崩溃/
+ * 无响应恢复。事件只携带可展示文本与规范化 URL，不携带 webContents 或
+ * session 对象；重定向最终地址的再校验在 W5.3 收紧。
+ */
+export type BrowserSurfaceEvent =
+  | { type: 'loading'; id: string; loading: boolean }
+  | { type: 'failed'; id: string; errorCode: number; message: string }
+  | { type: 'navigated'; id: string; url: string }
+  | { type: 'crashed'; id: string }
+  | { type: 'unresponsive'; id: string; responsive: boolean }
+
+/**
+ * browser provider 最小接口（W5.1 定义，W5.2 起由 BrowserSurfaceService 实现）：
  * open/navigate/back/forward/reload/activate/deactivate/close。
  * 输入一律为不可信 unknown，由实现方在策略层解析。
  */

@@ -8,6 +8,7 @@ export const MAGPIE_CONSOLE_SURFACE_ID = 'magpie-console'
 export const HARNESS_PROVIDER_ID = 'harness'
 export const MAGPIE_CONSOLE_PROVIDER_ID = 'magpie-console'
 export const TERMINAL_PROVIDER_ID = 'terminal'
+export const BROWSER_PROVIDER_ID = 'browser'
 
 export const harnessSurface = (): SurfaceDescriptor => ({
   id: HARNESS_SURFACE_ID,
@@ -33,6 +34,15 @@ export const terminalSurface = (id: string, workspaceId: string, index: number):
   title: `终端 ${index}`,
   workspaceId,
   capabilities: ['process:execute'],
+})
+
+/** browser Surface（W5.2）：id 由浏览器页按打开顺序派生（browser-1、browser-2…）。 */
+export const browserSurface = (id: string, index: number): SurfaceDescriptor => ({
+  id,
+  providerId: BROWSER_PROVIDER_ID,
+  kind: 'webcontents',
+  title: `浏览器 ${index}`,
+  capabilities: ['network:navigate'],
 })
 
 /** Surface → 壳页面映射；simple 模式的控制台落在「设置」页，终端仅 dev 可见。 */

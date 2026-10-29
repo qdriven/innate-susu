@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w5
 title: W5：独立 Browser Surface
 createdAt: 2026-10-28T10:55:18.513563Z
-updatedAt: 2026-10-28T11:01:37.724365Z
+updatedAt: 2026-10-29T00:00:00.000Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -117,6 +117,20 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   与 `BrowserProvider` 策略层实现（会话/历史状态机、activate/deactivate
   不销毁、close 隔离、并发上限 8、dispose 统一回收）；单元测试 26/26，
   全量门禁 `pnpm verify` 退出码 0。证据见 docs/susu/plan/evidence/W5/contract.md。
+- 2026-10-29 W5.2 完成：W5.1 策略层升级为持有真实视图的会话服务
+  `BrowserSurfaceService`（`plugins/browser/src/main/index.ts`）：
+  SurfaceHost 经 provider.createView 创建独立 WebContentsView（新工厂
+  `electron-view.ts`：独立持久分区 + contextIsolation/nodeIntegration
+  禁用 + sandbox、窗口新开拒绝、事件中性上报），多标签按 providerId
+  匹配共存、切换只 detach 不重载、close 只回收本会话、崩溃/失败隔离、
+  dispose 统一回收、禁止 executeJavaScript（类型层断言）。SurfaceHost
+  新增 provider 钩子（createView/deferredUrl/onViewAttached/onViewDetached/
+  onViewClosed），desktop ipc 挂 navigate/back/forward/reload/state 窄
+  通道与 `innate:browser-event` 广播，renderer 挂 W1c registry。
+  单元测试 browser 34/34、desktop 87/87，全量门禁 `pnpm verify` 退出码 0；
+  electron 技术 spike（`plugins/browser/scripts/spike-browser.cjs`，本地
+  HTTP 测试站点真实链路）12/12 通过。证据见
+  docs/susu/plan/evidence/W5/webcontents.md。
 
 ## 来源原文
 

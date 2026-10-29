@@ -15,6 +15,8 @@ import {
 import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
 import { TerminalService } from '@dogic/plugin-terminal/main'
+import { BrowserSurfaceService } from '@dogic/plugin-browser/main'
+import { createElectronBrowserView } from '@dogic/plugin-browser/main/electron'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
 import { disconnectDsh, ensureMagpieConsole, startMagpie } from './launcher'
@@ -45,8 +47,18 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:terminal-event', event)
     },
   })
+  // 独立 Browser Surface（W5.2）：会话/历史由 BrowserSurfaceService 维护，
+  // 视图经 provider.createView 创建（独立分区 + 安全 webPreferences），
+  // 页面事件窄包装到 renderer（不含 webContents/session 对象）。
+  const browser = new BrowserSurfaceService({
+    factory: createElectronBrowserView,
+    onEvent: (event) => {
+      if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:browser-event', event)
+    },
+  })
   mainWindow.on('closed', () => {
     surfaces.dispose()
+    browser.dispose()
     void terminal.dispose()
   })
   // 启动时同步已保存的工作区 root（W4.5 订阅语义的先行接线）。
@@ -76,6 +88,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       return { ok: true, url: ready.url }
     },
   })
+  surfaces.registerProvider(browser.provider)
 
   ipcMain.handle('innate:status', () => readStatus())
 
@@ -129,6 +142,13 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:surfaceHide', (_e, id: unknown) => surfaces.hide(id))
   ipcMain.handle('innate:surfaceBounds', (_e, id: unknown, bounds: unknown) => surfaces.setBounds(id, bounds))
   ipcMain.handle('innate:surfaceClose', (_e, id: unknown) => surfaces.close(id))
+
+  // browser 导航窄通道（W5.2）：renderer 只提交安全字段，URL 一律经服务层白名单。
+  ipcMain.handle('innate:browserNavigate', (_e, id: unknown, request: unknown) => browser.navigate(id, request))
+  ipcMain.handle('innate:browserBack', (_e, id: unknown) => browser.back(id))
+  ipcMain.handle('innate:browserForward', (_e, id: unknown) => browser.forward(id))
+  ipcMain.handle('innate:browserReload', (_e, id: unknown) => browser.reload(id))
+  ipcMain.handle('innate:browserState', (_e, id: unknown) => browser.state(id) ?? null)
 
   ipcMain.handle('innate:revealDshHome', () => shell.openPath(dshHome()))
   ipcMain.handle('innate:openLogs', () => shell.openPath(path.join(app.getPath('userData'), 'logs')))

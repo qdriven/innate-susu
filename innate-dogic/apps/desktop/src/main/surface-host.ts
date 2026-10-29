@@ -17,6 +17,14 @@ export interface SurfaceRuntimeProvider {
   readonly id: string
   readonly kind: SurfaceKind
   resolve(): Promise<SurfaceUrlResult>
+  /** provider 自建视图钩子（browser 用独立分区 + 安全 webPreferences）；缺省时宿主自建通用安全视图。 */
+  createView?(descriptor: SurfaceDescriptor): WebContentsView
+  /** deferredUrl：创建视图但不立即加载 URL（browser 初始空白页，URL 由后续导航决定）。 */
+  readonly deferredUrl?: boolean
+  /** 视图 attach/detach/close 后回调：provider 同步会话状态与清理监听器。 */
+  onViewAttached?(id: string): void
+  onViewDetached?(id: string): void
+  onViewClosed?(id: string): void
 }
 
 interface HostedSurface {
@@ -76,7 +84,7 @@ export class SurfaceHost {
     }
     const provider = this.providers.get(descriptor.providerId)
     if (!provider) return { ok: false, detail: `未注册的 Surface provider: ${descriptor.providerId}` }
-    if (provider.id !== descriptor.id) return { ok: false, detail: 'Surface id 与 provider 不匹配' }
+    if (provider.id !== descriptor.providerId) return { ok: false, detail: 'Surface providerId 与 provider 不匹配' }
     if (provider.kind !== descriptor.kind) return { ok: false, detail: 'Surface kind 与 provider 不匹配' }
 
     let resolved: SurfaceUrlResult
@@ -85,7 +93,7 @@ export class SurfaceHost {
     } catch (reason) {
       return { ok: false, detail: reason instanceof Error ? reason.message : String(reason) }
     }
-    if (!resolved.ok || !resolved.url) {
+    if (!resolved.ok) {
       return { ok: false, detail: resolved.detail ?? 'Surface provider 未就绪' }
     }
 
@@ -98,24 +106,38 @@ export class SurfaceHost {
 
     let record = this.surfaces.get(descriptor.id)
     if (!record) {
-      const view = new WebContentsView({
-        webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
-      })
-      view.webContents.setWindowOpenHandler(({ url: target }) => {
-        if (/^https?:\/\//i.test(target)) void shell.openExternal(target)
-        return { action: 'deny' }
-      })
+      let view: WebContentsView
+      try {
+        view = provider.createView
+          ? provider.createView(descriptor)
+          : new WebContentsView({
+            webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+          })
+      } catch (reason) {
+        this.registry.close(descriptor.id)
+        return { ok: false, detail: reason instanceof Error ? reason.message : String(reason) }
+      }
+      if (!provider.createView) {
+        view.webContents.setWindowOpenHandler(({ url: target }) => {
+          if (/^https?:\/\//i.test(target)) void shell.openExternal(target)
+          return { action: 'deny' }
+        })
+      }
       record = { view, url: '' }
       this.surfaces.set(descriptor.id, record)
     }
-    if (record.url !== resolved.url) {
-      record.url = resolved.url
-      void record.view.webContents.loadURL(resolved.url)
+    if (!provider.deferredUrl) {
+      if (!resolved.url) return { ok: false, detail: resolved.detail ?? 'Surface provider 未就绪' }
+      if (record.url !== resolved.url) {
+        record.url = resolved.url
+        void record.view.webContents.loadURL(resolved.url)
+      }
     }
     if (this.attachedId !== descriptor.id) {
       this.hideAttached()
       this.host.contentView.addChildView(record.view)
       this.attachedId = descriptor.id
+      provider.onViewAttached?.(descriptor.id)
     }
     record.view.setBounds(bounds)
     return { ok: true }
@@ -125,7 +147,10 @@ export class SurfaceHost {
     const id = typeof input === 'string' ? input : ''
     if (!id || !this.registry.has(id)) return false
     this.registry.deactivate(id)
-    if (this.attachedId === id) this.hideAttached()
+    if (this.attachedId === id) {
+      this.hideAttached()
+      this.providers.get(this.registry.get(id)?.providerId ?? '')?.onViewDetached?.(id)
+    }
     return true
   }
 
@@ -146,12 +171,14 @@ export class SurfaceHost {
   close(input: unknown): boolean {
     const id = typeof input === 'string' ? input : ''
     if (!id) return false
-    this.registry.close(id)
-    if (this.attachedId === id) this.hideAttached()
     const record = this.surfaces.get(id)
     if (!record) return false
+    const provider = this.providers.get(this.registry.get(id)?.providerId ?? '')
+    this.registry.close(id)
+    if (this.attachedId === id) this.hideAttached()
     record.view.webContents.close()
     this.surfaces.delete(id)
+    provider?.onViewClosed?.(id)
     return true
   }
 
@@ -161,7 +188,10 @@ export class SurfaceHost {
 
   dispose(): void {
     this.hideAttached()
-    for (const record of this.surfaces.values()) record.view.webContents.close()
+    for (const [id, record] of this.surfaces) {
+      record.view.webContents.close()
+      this.providers.get(this.registry.get(id)?.providerId ?? '')?.onViewClosed?.(id)
+    }
     this.surfaces.clear()
     this.registry.clear()
   }

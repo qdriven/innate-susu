@@ -13,6 +13,8 @@ const tsOnlyAllowlist = new Set([
   'tools/compare-palette.mjs',
   // W4.1 PTY spike：直接由 electron.exe 加载运行的诊断脚本（不经构建管线），必须为 .cjs
   'innate-dogic/plugins/terminal/scripts/spike-pty.cjs',
+  // W5.2 browser spike：同样直接由 electron.exe 运行（导入构建产物 dist/，运行前需先 build）
+  'innate-dogic/plugins/browser/scripts/spike-browser.cjs',
 ])
 const violations: string[] = []
 
