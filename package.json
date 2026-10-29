@@ -25,7 +25,10 @@
     "verify:overlay": "tsx tools/verify-overlay.ts",
     "package": "pnpm --filter @dogic/desktop run package",
     "package:dir": "pnpm --filter @dogic/desktop run package:dir",
-    "package:portable": "tsx tools/package-portable.ts"
+    "package:portable": "tsx tools/package-portable.ts",
+    "launch": "tsx tools/launch-desktop.ts",
+    "launch:check": "tsx tools/launch-desktop.ts --check",
+    "launch:packaged": "tsx tools/launch-desktop.ts --packaged"
   },
   "dependencies": {
     "@innate/ui": "^0.1.2"
