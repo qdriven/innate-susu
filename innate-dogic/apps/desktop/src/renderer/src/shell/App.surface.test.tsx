@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ConsoleStatusEvent, GatewayStatusEvent } from '@dogic/core'
 
 // W1c：壳层多 Surface 标签、provider 中立 IPC 与运行时降级
 interface StatusLike {
@@ -26,6 +27,8 @@ const apiMocks = vi.hoisted(() => ({
     dsh: { installed: true, wiredFiles: ['cordis.patch.yml'], hasGatewayKey: true, defaultModel: 'm' },
   })),
   onHarnessState: vi.fn(() => () => {}),
+  onGatewayStatus: vi.fn((_cb: (s: GatewayStatusEvent) => void) => () => {}),
+  onConsoleStatus: vi.fn((_cb: (s: ConsoleStatusEvent) => void) => () => {}),
   getHarnessState: vi.fn(async (): Promise<HarnessStateLike> => ({ phase: 'idle', message: 'Harness 未运行' })),
   launchHarness: vi.fn(async () => ({ ok: true, port: 12345, detail: 'ok' })),
   stopHarness: vi.fn(async () => true),

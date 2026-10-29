@@ -1,17 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import type { JSX, MouseEvent } from 'react'
 import { Button } from '@innate/ui'
-import type { AppMode } from '@dogic/core'
+import type { AppMode, ConsoleStatusEvent, GatewayStatusEvent } from '@dogic/core'
 import { api } from '../api'
+import StatusPills from './StatusPills'
 
 interface TitlebarStripProps {
   mode: AppMode
   pageLabel: string
   onSwitchMode: () => void
+  gatewayStatus?: GatewayStatusEvent | null
+  consoleStatus?: ConsoleStatusEvent | null
+  onStartGateway?: () => void
 }
 
 /** W1a 窗口铬面：品牌、空标签槽、右栏/状态占位与既有窗口控制。 */
-export default function TitlebarStrip({ mode, pageLabel, onSwitchMode }: TitlebarStripProps): JSX.Element {
+export default function TitlebarStrip({
+  mode,
+  pageLabel,
+  onSwitchMode,
+  gatewayStatus,
+  consoleStatus,
+  onStartGateway,
+}: TitlebarStripProps): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false)
   const [maximized, setMaximized] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -83,7 +94,19 @@ export default function TitlebarStrip({ mode, pageLabel, onSwitchMode }: Titleba
       <div id="titlebar-tabs" className="titlebar-tabs" aria-label="标签槽" />
 
       <div className="titlebar-right">
-        <div id="titlebar-status-slot" className="titlebar-status-slot" data-empty="true" />
+        {/* W2.5 状态槽：网关/控制台 pill（无事件时保持空槽） */}
+        <div
+          id="titlebar-status-slot"
+          className="titlebar-status-slot"
+          data-empty={!gatewayStatus && !consoleStatus ? 'true' : undefined}
+        >
+          <StatusPills
+            gateway={gatewayStatus ?? null}
+            consoleStatus={consoleStatus ?? null}
+            mode={mode}
+            onStartGateway={onStartGateway ?? (() => {})}
+          />
+        </div>
         <div id="titlebar-right-panel-slot" className="titlebar-right-panel-slot" aria-label="右栏开关位" />
         <div className="window-controls-titlebar-spacer" />
         <div className="window-controls">

@@ -11,11 +11,17 @@ import {
   writeMode,
   redactLaunchSecrets,
 } from '@dogic/core'
-import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
+import type {
+  AppMode,
+  GatewayStatusEvent,
+  GatewayStatusState,
+  HarnessLaunchResult,
+  HarnessState,
+} from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
-import { disconnectDsh, ensureMagpieConsole, startMagpie } from './launcher'
+import { ensureMagpieConsole, getConsole, getGateway, startMagpie } from './launcher'
 
 export const harness = new HarnessRuntime()
 
@@ -116,7 +122,43 @@ export function registerIpc(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('innate:revealDshHome', () => shell.openPath(dshHome()))
   ipcMain.handle('innate:openLogs', () => shell.openPath(path.join(app.getPath('userData'), 'logs')))
-  ipcMain.handle('innate:disconnectDsh', () => disconnectDsh())
+
+  // 接线/配额操作全部经类型化 gateway facade（execFile 参数数组 + 超时 + 参数白名单），
+  // 不新增第二套直调；断开结果显式返回恢复结果/失败原因/下一步 hint。
+  ipcMain.handle('innate:disconnectDsh', async () => {
+    try {
+      await getGateway().unwireDsh(dshHome())
+      return {
+        ok: true as const,
+        detail: '已请求断开（magpie 将恢复 dsh 原配置）',
+        hint: '断开后 dsh 使用其原默认模型；重新接线请在 magpie 控制台操作',
+      }
+    } catch (e) {
+      return {
+        ok: false as const,
+        detail: `CLI 执行失败: ${String(e)}`,
+        hint: '可在 magpie Agents 页对 dsh 手动 Disconnect',
+      }
+    }
+  })
+
+  ipcMain.handle('innate:wireDsh', async (_e, model: string) => {
+    try {
+      const stdout = await getGateway().wireDsh(model, dshHome())
+      return { ok: true as const, detail: `已接线 ${model}：${stdout.trim() || '无输出'}` }
+    } catch (e) {
+      return {
+        ok: false as const,
+        detail: `接线失败: ${String(e)}`,
+        hint: '模型名需为 <provider>/<model> 白名单字符',
+      }
+    }
+  })
+
+  ipcMain.handle('innate:quota', async () => {
+    const quota = await getGateway().quota()
+    return { ok: quota !== null, detail: quota?.trim() ?? '配额不可用（magpie CLI 未响应）' }
+  })
 
   ipcMain.handle('innate:harnessState', () => publicHarnessState(harness.getState()))
   ipcMain.handle('innate:launchHarness', async () =>
@@ -148,5 +190,39 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   harness.on('state', (state) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', publicHarnessState(state))
   })
+
+  // 网关/控制台状态事件 → renderer 状态 pill（W2.5：事件驱动 + 低频 reconcile，替代无意义重复轮询）。
+  // 事件脱敏：认证查询串不进事件；url 仅 running 时为回环地址；message 过 redactLaunchSecrets。
+  const sendGatewayStatus = (): void => {
+    if (!mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('innate:gateway-status', publicGatewayStatus(getGateway().status()))
+    }
+  }
+  getGateway().onStatusChange(sendGatewayStatus)
+  sendGatewayStatus()
+
+  const sendConsoleStatus = (): void => {
+    if (!mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('innate:console-status', getConsole().getState())
+    }
+  }
+  getConsole().on('state', sendConsoleStatus)
+  sendConsoleStatus()
+}
+
+/** renderer 可见的网关状态事件：脱敏（认证查询串不进事件；url 仅 running 时为回环地址）。 */
+function publicGatewayStatus(status: {
+  state: string
+  url?: string
+  message?: string
+  recoverable?: boolean
+}): GatewayStatusEvent {
+  const event: GatewayStatusEvent = {
+    state: status.state as GatewayStatusState,
+    recoverable: status.recoverable ?? true,
+  }
+  if (status.state === 'running') event.url = status.url
+  if (status.message) event.message = redactLaunchSecrets(status.message)
+  return event
 }
 

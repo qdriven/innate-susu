@@ -9,6 +9,7 @@ const apiMocks = vi.hoisted(() => ({
   winClose: vi.fn(async () => undefined),
   openMagpieWeb: vi.fn(async () => true),
   openLogs: vi.fn(async () => ''),
+  startMagpie: vi.fn(async () => ({ ok: true, detail: 'ok' })),
 }))
 vi.mock('../api', () => ({ api: apiMocks }))
 
@@ -46,6 +47,38 @@ describe('W1a TitlebarStrip', () => {
     expect(screen.getAllByRole('menuitem')).toHaveLength(3)
     fireEvent.click(screen.getByRole('menuitem', { name: '切换到简易使用' }))
     expect(onSwitchMode).toHaveBeenCalledTimes(1)
+  })
+
+  it('W2.5：状态事件挂入状态槽，空槽标记解除', () => {
+    const { container } = render(
+      <TitlebarStrip
+        mode="dev"
+        pageLabel="总览"
+        onSwitchMode={() => {}}
+        gatewayStatus={{ state: 'not-running' }}
+        consoleStatus={{ phase: 'running', message: '' }}
+      />,
+    )
+    const slot = container.querySelector('#titlebar-status-slot')
+    expect(slot?.getAttribute('data-empty')).toBeNull()
+    expect(slot?.querySelector('[data-testid="pill-gateway"]')).not.toBeNull()
+    expect(slot?.querySelector('[data-testid="pill-console"]')).not.toBeNull()
+    expect(slot?.textContent).toContain('网关未运行')
+    expect(slot?.textContent).toContain('控制台运行中')
+  })
+
+  it('W2.5：点击 网关未运行 pill 经 TitlebarStrip 调 startMagpie', () => {
+    render(
+      <TitlebarStrip
+        mode="dev"
+        pageLabel="总览"
+        onSwitchMode={() => {}}
+        gatewayStatus={{ state: 'not-running' }}
+        onStartGateway={() => { void apiMocks.startMagpie() }}
+      />,
+    )
+    fireEvent.click(screen.getByTestId('pill-gateway'))
+    expect(apiMocks.startMagpie).toHaveBeenCalledTimes(1)
   })
 
   it('顶栏控件由共享 Button 渲染，双击按钮不会重复触发最大化', () => {

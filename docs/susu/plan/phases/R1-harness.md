@@ -6,7 +6,7 @@
 
 桌面只保留一套 Harness 进程实现（壳无关 `services/harness-runtime` 收纳共享逻辑，desktop 保留状态/IPC/Surface adapter），并在隔离环境完成 gateway→裸 boot→wire→chat 的真实闭环。
 
-**前置**：W2 全绿（消费其行为矩阵与网关链路）。可与 Q1/Q2 并行（不触 renderer 工作台 UI）；**Q3 开工前必须全绿**。
+**前置**：W2 全绿（消费其行为矩阵与网关链路）。**W2 移交输入（2026-10-29 网关侧收口完成）**：[W2 行为矩阵](./evidence/W2/behavior-matrix.md) §2 Harness 九项差异对照 + §5 收敛决定（网关侧 A1–A8 已全绿，Harness 差异项待本段逐项收敛）；隔离链路冒烟脚本 `pnpm smoke:magpie`（`tools/smoke-magpie.ts`）可直接复用于 R1.3 隔离环境。可与 Q1/Q2 并行（不触 renderer 工作台 UI）；**Q3 开工前必须全绿**。
 
 ## R1.1 harness.ts 关键路径单测补齐（plan1 并入）
 

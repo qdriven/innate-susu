@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w2-2-magpie-sidecar
 title: W2.2 统一 magpie sidecar 生命周期
 createdAt: 2026-10-28T10:53:33.446092Z
-updatedAt: 2026-10-28T10:53:33.446092Z
-status: draft
+updatedAt: 2026-10-29T07:02:05.423449Z
+status: in_progress
 branch: 
 repository: 
 sourceKind: local
@@ -20,6 +20,7 @@ prState:
 prTitle: 
 prUpdatedAt: 
 ---
+
 ## 任务上下文
 
 ### 问题
@@ -41,7 +42,6 @@ desktop 私有 serve 生命周期与 services MagpieGateway 并存重复。
 
 ### 依赖
 
-前置段全绿（见 Sprint README）；T 序串行。
 
 ### 假设
 
@@ -49,7 +49,6 @@ desktop 私有 serve 生命周期与 services MagpieGateway 并存重复。
 
 ### 未决问题
 
-见 Sprint README。
 
 ## 全局上下文
 
@@ -89,11 +88,9 @@ Sprint W2（docs/sprints/w2/README.md）子任务；需求细节见其来源原�
 
 ### 决策
 
-按 plan 卡与 04 文档约束执行。
 
 ### 风险
 
-行为回退风险由门禁+smoke 兜底。
 
 ### 全局影响
 
@@ -107,12 +104,12 @@ Sprint W2（docs/sprints/w2/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 复用/未安装/超时/恢复/退避/显式停止不重启契约测试全过
+- F1-V1 [passed] 复用/未安装/超时/恢复/退避/显式停止不重启契约测试全过
   - 方法：vitest 契约用例
-  - 证据：-
-- F1-V2 [pending] 桌面不再有第二套等价 serve 生命周期
+  - 证据：vitest 契约测试 8/8 全过（复用不重复启动/not-installed/启动超时 recoverable/crash-once 退避恢复 starting→error→running/显式停止不重启/form desktop 无参与 serve 带参/wireDsh 隔离 DSH_HOME+模型白名单拒绝/quota 透传）；pnpm -r build+typecheck+test 全绿；测试基线只增不减（desktop 53/plugin 22/core 34/sdk 9 等不变，服务层 +8）
+- F1-V2 [passed] 桌面不再有第二套等价 serve 生命周期
   - 方法：代码审查+矩阵回写
-  - 证据：-
+  - 证据：desktop main bundle 含 class MagpieGateway（out/main/index.js 4 处引用）；launcher.ts 私有 fire-and-forget spawn 删除、startMagpie 改经 getGateway().ensureRunning()；electron.vite 打包 @dogic/service-model-gateway 源码；行为矩阵 §1 A1/§5 已回写完成状态
 
 ## 涉及模块
 
@@ -121,14 +118,19 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W2-runtime.md — 验收定义来源
+- S1 [none/-] docs/susu/plan/phases/W2-runtime.md — 验收定义来源
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 实施 W2.2：统一 magpie sidecar 生命周期（MagpieGateway 增强 + desktop 收口 + 契约测试）
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 plan 对应卡；全文快照见 docs/sprints/w2/README.md 来源原文节，此处不重复。
+> （未同步）
+
+### PR
+
+> （未同步）

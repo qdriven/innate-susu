@@ -1,0 +1,56 @@
+{
+  "port": 3425,
+  "checks": [
+    {
+      "name": "真实链路：网关就绪",
+      "ok": true,
+      "detail": "magpie 0.1.1883 @ 127.0.0.1:3425（复用运行中网关）"
+    },
+    {
+      "name": "真实链路：模型目录拉取",
+      "ok": true,
+      "detail": "35 个模型"
+    },
+    {
+      "name": "真实链路：直连最小 LLM 调用",
+      "ok": true,
+      "detail": "xiaomi/mimo-v2.6-flash — 补全成功（16 token 上限；用量归账 key 见 magpie Usage 页）"
+    },
+    {
+      "name": "真实链路：magpie dsh 接线隔离",
+      "ok": true,
+      "detail": "volcengine/ark-code-latest → 隔离 DSH_HOME config.yaml"
+    },
+    {
+      "name": "真实链路：magpie dsh 断开恢复",
+      "ok": true,
+      "detail": "default → config.yaml 恢复"
+    },
+    {
+      "name": "隔离断言：真实 ~/.dsh 零修改",
+      "ok": true,
+      "detail": "顶层文件集合与大小不变"
+    },
+    {
+      "name": "降级链路：健康检查显式失败",
+      "ok": true,
+      "detail": "空闲端口 56166 无网关应答（不挂死）"
+    },
+    {
+      "name": "降级链路：状态汇总显式",
+      "ok": true,
+      "detail": "未发现运行中的 magpie 网关（端口 56166 无应答）"
+    },
+    {
+      "name": "降级链路：直连调用显式失败",
+      "ok": true,
+      "detail": "网关未运行"
+    },
+    {
+      "name": "清理断言：临时目录已删除",
+      "ok": true,
+      "detail": "C:\\Users\\anyda\\AppData\\Local\\Temp\\innate-w26-nVCSbG"
+    }
+  ],
+  "passed": true
+}

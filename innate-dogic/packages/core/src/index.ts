@@ -1,8 +1,12 @@
 export type {
   CheckResult,
   ConsoleReadyResult,
+  ConsoleStatusEvent,
+  ConsoleStatusPhase,
   DshState,
   GatewayInfo,
+  GatewayStatusEvent,
+  GatewayStatusState,
   HarnessLaunchResult,
   HarnessPhase,
   HarnessState,

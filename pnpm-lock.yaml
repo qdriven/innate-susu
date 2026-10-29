@@ -219,6 +219,9 @@ importers:
       '@dogic/plugin-workspace':
         specifier: workspace:*
         version: link:../../plugins/workspace
+      '@dogic/service-model-gateway':
+        specifier: workspace:*
+        version: link:../../services/model-gateway
       '@innate-desktop/theme':
         specifier: workspace:*
         version: link:../../../packages/theme
@@ -403,7 +406,21 @@ importers:
         specifier: workspace:*
         version: link:../model-gateway
 
-  innate-dogic/services/model-gateway: {}
+  innate-dogic/services/model-gateway:
+    dependencies:
+      '@dogic/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+    devDependencies:
+      '@types/node':
+        specifier: ^22.7.5
+        version: 22.20.5
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(supports-color@7.2.0))(lightningcss@1.32.0)(supports-color@7.2.0)
 
   innate-project-canvas:
     devDependencies:

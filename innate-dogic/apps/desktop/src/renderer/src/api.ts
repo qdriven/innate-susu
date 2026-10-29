@@ -1,5 +1,7 @@
 import type {
   CheckResult,
+  ConsoleStatusEvent,
+  GatewayStatusEvent,
   HarnessLaunchResult,
   HarnessState,
   ModelInfo,
@@ -35,11 +37,20 @@ declare global {
       surfaceClose: (id: string) => Promise<boolean>
       revealDshHome: () => Promise<string>
       openLogs: () => Promise<string>
-      disconnectDsh: () => Promise<{ ok: boolean; detail: string }>
+      /** 断开 dsh 接线（经 gateway facade；返回恢复结果/失败原因/下一步 hint） */
+      disconnectDsh: () => Promise<{ ok: boolean; detail: string; hint?: string }>
+      /** 接线 dsh（用户动作触发；模型名白名单校验在 facade 层） */
+      wireDsh: (model: string) => Promise<{ ok: boolean; detail: string; hint?: string }>
+      /** 配额/用量（经 gateway facade） */
+      quota: () => Promise<{ ok: boolean; detail: string }>
       launchHarness: () => Promise<HarnessLaunchResult>
       getHarnessState: () => Promise<HarnessState>
       stopHarness: () => Promise<boolean>
       onHarnessState: (cb: (state: HarnessState) => void) => () => void
+      /** 网关状态事件（W2.5；脱敏：无认证查询串） */
+      onGatewayStatus: (cb: (status: GatewayStatusEvent) => void) => () => void
+      /** 控制台生命周期事件（W2.5；不含认证 URL） */
+      onConsoleStatus: (cb: (status: ConsoleStatusEvent) => void) => () => void
     }
   }
 }

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ConsoleStatusEvent, GatewayStatusEvent } from '@dogic/core'
 
 // App 依赖的窗口 API 全量 mock（W1b F2-V1：窗口调用、轮询一次、卸载清理）
 const apiMocks = vi.hoisted(() => ({
@@ -11,6 +12,8 @@ const apiMocks = vi.hoisted(() => ({
     dsh: { installed: true, wiredFiles: ['cordis.patch.yml'], hasGatewayKey: true, defaultModel: 'm' },
   })),
   onHarnessState: vi.fn(() => () => {}),
+  onGatewayStatus: vi.fn((_cb: (s: GatewayStatusEvent) => void) => () => {}),
+  onConsoleStatus: vi.fn((_cb: (s: ConsoleStatusEvent) => void) => () => {}),
   getHarnessState: vi.fn(async () => ({ phase: 'idle' as const, message: 'Harness 未运行' })),
   launchHarness: vi.fn(async () => ({ ok: true, port: 12345, url: 'http://127.0.0.1:12345', detail: 'ok' })),
   stopHarness: vi.fn(async () => true),
@@ -70,6 +73,15 @@ describe('W1b App 壳组合（T2/T3）', () => {
     await new Promise((resolve) => setTimeout(resolve, 30))
     // 卸载后轮询不再触发
     expect(apiMocks.getStatus.mock.calls.length).toBe(callsAtUnmount)
+  })
+
+  it('W2.5：网关状态事件即发即更 pill，并触发一次 reconcile refresh', async () => {
+    render(<App />)
+    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
+    const callsBefore = apiMocks.getStatus.mock.calls.length
+    apiMocks.onGatewayStatus.mock.calls[0]?.[0]({ state: 'not-running' })
+    await waitFor(() => expect(screen.getByTestId('pill-gateway').textContent).toContain('网关未运行'))
+    await waitFor(() => expect(apiMocks.getStatus.mock.calls.length).toBeGreaterThan(callsBefore))
   })
 
   it('simple：右栏不渲染、开发入口隐藏，对话默认页（F1-V3/T3-V3）', async () => {

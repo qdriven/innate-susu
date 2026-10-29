@@ -24,7 +24,7 @@ if (!gotLock) {
 
   app.on('window-all-closed', () => {
     void harness.stop()
-    stopMagpieConsole()
+    void stopMagpieConsole()
     app.quit()
   })
 }

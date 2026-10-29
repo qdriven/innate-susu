@@ -64,6 +64,7 @@ main/preload → 完整 Node 入口
 - **现状**：真实 Electron 主产品。main 管窗口、DSH/magpie 进程、SurfaceHost、工作区服务；preload 暴露 `window.innate`；renderer 在单个 `App.tsx` 组合全部页面。
 - **主要耦合**：Harness 与控制台各有专用 show/hide/bounds IPC；页面、状态轮询和布局集中在 App；工作区通过静态 `plugin-registry.ts` 装配。
 - **迁移动作**：W0 原样恢复；W1 拆壳组合与 Surface provider 接口；W2/W3 分域收窄 main 编排。
+- **W2 收口（2026-10-29）**：main 编排网关侧收口——`MagpieGateway` 单例打包进 main bundle（ensureRunning/wire/unwire/quota），launcher 私有 spawn/直调删除；控制台接 W1c 通用生命周期（`MagpieConsole` phase 状态机）；运行状态改事件驱动（`innate:gateway-status`/`innate:console-status` + 30s reconcile 兜底），顶栏网关/控制台双 pill；IPC 新增 `wireDsh`/`quota`（见 [evidence/W2/ipc-inventory.md](./evidence/W2/ipc-inventory.md)）。Harness 私有实现保留至 R1 收敛（behavior-matrix.md §2）。
 - **禁止**：在 renderer 开放 Node、任意 shell 或通用 `executeJavaScript`。
 
 ### 2.3 `innate-dogic/apps/shell`
@@ -77,10 +78,10 @@ main/preload → 完整 Node 入口
 
 ### 3.1 `@dogic/core`
 
-包含 DSH 入口解析、状态检查、模式存储、网关发现、共享类型，以及浏览器安全的 `/surface`。
+包含 DSH 入口解析、状态检查、模式存储、网关发现、共享类型，以及浏览器安全的 `/surface` 与 `/redact`。
 
 - **直接复用**：类型、模式、检查和 SurfaceRegistry。
-- **边界**：`/surface` 不得引入 Node/Electron；Node 能力不从该子入口导出。
+- **边界**：`/surface`、`/redact` 不得引入 Node/Electron；Node 能力不从该子入口导出。`/redact`（W2.5 新增）供 renderer 二次脱敏纯函数复用，与主入口共享 `redactLaunchSecrets` 同一边界。
 - **后续调整**：W1 增加 provider 中立描述时保持 snapshot v1 兼容；新增字段必须可选并验证旧快照恢复。
 - **注意**：核心状态读取不等于完整 ModelGateway 生命周期，W2 不用它替代 SDK 契约。
 
@@ -142,6 +143,7 @@ main/preload → 完整 Node 入口
 - **优势**：壳无关，已有生命周期和退避。
 - **风险**：测试若操作真实配置会越权；desktop launcher 另有进程与控制逻辑。
 - **W2 策略**：sidecar 生命周期优先复用该模块；console 认证与 WebContents 仍由桌面适配层负责。
+- **W2 收口（2026-10-29）**：`MagpieGateway` 经桌面构建打包进 main bundle（T2），desktop `getGateway()` 单例收口 ensureRunning/wire/unwire/quota；CLI 解析集中 `MagpieCli`（T3）；契约测试 8 例入基线。W2.6 隔离链路冒烟（`pnpm smoke:magpie`）验证 gateway 起→模型→直连调用 + 降级显式失败。
 
 ### 5.2 `services/harness-runtime`
 

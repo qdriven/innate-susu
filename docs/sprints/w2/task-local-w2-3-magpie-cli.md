@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w2-3-magpie-cli
 title: W2.3 收口 magpie CLI 模型与接线操作
 createdAt: 2026-10-28T10:55:12.446169Z
-updatedAt: 2026-10-28T10:55:12.446169Z
-status: draft
+updatedAt: 2026-10-29T07:21:29.096114Z
+status: in_progress
 branch: 
 repository: 
 sourceKind: local
@@ -20,6 +20,7 @@ prState:
 prTitle: 
 prUpdatedAt: 
 ---
+
 ## 任务上下文
 
 ### 问题
@@ -41,7 +42,6 @@ prUpdatedAt:
 
 ### 依赖
 
-前置段全绿（见 Sprint README）；T 序串行。
 
 ### 假设
 
@@ -49,7 +49,6 @@ prUpdatedAt:
 
 ### 未决问题
 
-见 Sprint README。
 
 ## 全局上下文
 
@@ -89,11 +88,9 @@ Sprint W2（docs/sprints/w2/README.md）子任务；需求细节见其来源原�
 
 ### 决策
 
-按 plan 卡与 04 文档约束执行。
 
 ### 风险
 
-行为回退风险由门禁+smoke 兜底。
 
 ### 全局影响
 
@@ -107,12 +104,12 @@ Sprint W2（docs/sprints/w2/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] ModelGateway 契约测试+CLI 解析+超时/非零退出负路径
+- F1-V1 [passed] ModelGateway 契约测试+CLI 解析+超时/非零退出负路径
   - 方法：vitest
-  - 证据：-
-- F1-V2 [pending] 真实用户配置零修改
+  - 证据：T3: ModelGateway 契约套件（runModelGatewayContractTests 10 例）+ CLI 解析 3 例 + 超时/非零退出 2 例 + 参数白名单守卫 2 例 + 隔离 HOME 零修改 1 例，共 18 例全过（plugin model-gateway 39 = 22 基线 + 17 新增）；pnpm -r build/typecheck/test 全绿（desktop 53 / service 8 / core 34 / sdk 9 / kernel 28 基线保持，只增不减）
+- F1-V2 [passed] 真实用户配置零修改
   - 方法：隔离 HOME 断言
-  - 证据：-
+  - 证据：T3: wire/unwire 只写隔离临时 DSH_HOME（fake 记录 env + wired-*.txt 断言）；真实 ~/.dsh 前后目录对比断言零新增 wired-* 文件；测试基线只增不减（39=22+17）
 
 ## 涉及模块
 
@@ -121,14 +118,19 @@ Spec：S1
 
 ## Spec 关联
 
-- S1 [none] docs/susu/plan/phases/W2-runtime.md — 验收定义来源
+- S1 [none/-] docs/susu/plan/phases/W2-runtime.md — 验收定义来源
 
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 实施 W2.3：收口 magpie CLI 模型与接线操作（MagpieCli facade 定型 + desktop ipc 改走 facade）
 
 ## 来源原文
 
-### 本地任务
+### Issue
 
-需求来自 plan 对应卡；全文快照见 docs/sprints/w2/README.md 来源原文节，此处不重复。
+> （未同步）
+
+### PR
+
+> （未同步）

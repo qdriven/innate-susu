@@ -21,6 +21,7 @@
     "dev:shell": "pnpm --filter @dogic/shell run build && pnpm --filter @dogic/shell run start",
     "start": "tsx tools/start-all.ts",
     "smoke:desktop": "tsx tools/smoke-desktop.ts",
+    "smoke:magpie": "tsx tools/smoke-magpie.ts",
     "verify:overlay": "tsx tools/verify-overlay.ts",
     "package": "pnpm --filter @dogic/desktop run package",
     "package:dir": "pnpm --filter @dogic/desktop run package:dir",
