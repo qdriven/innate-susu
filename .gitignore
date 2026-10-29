@@ -13,6 +13,9 @@ __pycache__/
 .innate-fe-cli.json
 artifacts/
 
+# 外部调研仓（只读、不入库；总计划硬约束 §6.1：references/ 只读）
+reference/
+
 # smoke 截图、DOM 与 bounds 由测试脚本重建；仓库只保留 Markdown 验收摘要
 docs/susu/plan/evidence/**/smoke/
 docs/susu/plan/evidence/**/smoke-probe/
