@@ -7,10 +7,21 @@ interface TreeProps {
   root: WorkspaceRoot
   selectedPath?: string
   refreshToken: number
+  /** 展开状态由侧栏统一管理（经 WorkspaceUiStore 持久化）。 */
+  expandedDirs: string[]
+  onToggleDir(path: string, expanded: boolean): void
   onOpen(path: string): void
 }
 
-export function FileTree({ api, root, selectedPath, refreshToken, onOpen }: TreeProps): JSX.Element {
+export function FileTree({
+  api,
+  root,
+  selectedPath,
+  refreshToken,
+  expandedDirs,
+  onToggleDir,
+  onOpen,
+}: TreeProps): JSX.Element {
   const [entries, setEntries] = useState<WorkspaceEntry[]>([])
   const [error, setError] = useState('')
 
@@ -36,6 +47,8 @@ export function FileTree({ api, root, selectedPath, refreshToken, onOpen }: Tree
           entry={entry}
           depth={0}
           selectedPath={selectedPath}
+          expandedDirs={expandedDirs}
+          onToggleDir={onToggleDir}
           onOpen={onOpen}
         />
       ))}
@@ -50,13 +63,24 @@ interface NodeProps {
   entry: WorkspaceEntry
   depth: number
   selectedPath?: string
+  expandedDirs: string[]
+  onToggleDir(path: string, expanded: boolean): void
   onOpen(path: string): void
 }
 
-function FileTreeNode({ api, root, entry, depth, selectedPath, onOpen }: NodeProps): JSX.Element {
-  const [expanded, setExpanded] = useState(false)
+function FileTreeNode({
+  api,
+  root,
+  entry,
+  depth,
+  selectedPath,
+  expandedDirs,
+  onToggleDir,
+  onOpen,
+}: NodeProps): JSX.Element {
   const [children, setChildren] = useState<WorkspaceEntry[]>([])
   const [loaded, setLoaded] = useState(false)
+  const expanded = expandedDirs.includes(entry.path)
 
   const toggle = async (): Promise<void> => {
     if (entry.kind === 'file') {
@@ -64,10 +88,15 @@ function FileTreeNode({ api, root, entry, depth, selectedPath, onOpen }: NodePro
       return
     }
     if (!expanded && !loaded) {
-      setChildren(await api.workspaceList(root.path, entry.path))
-      setLoaded(true)
+      try {
+        setChildren(await api.workspaceList(root.path, entry.path))
+        setLoaded(true)
+      } catch {
+        /* 目录加载失败不展开 */
+        return
+      }
     }
-    setExpanded((value) => !value)
+    onToggleDir(entry.path, !expanded)
   }
 
   return (
@@ -80,7 +109,7 @@ function FileTreeNode({ api, root, entry, depth, selectedPath, onOpen }: NodePro
         aria-expanded={entry.kind === 'directory' ? expanded : undefined}
         onClick={() => void toggle()}
       >
-        <span className="file-tree-icon">{entry.kind === 'directory' ? expanded ? '▾' : '▸' : '·'}</span>
+        <span className="file-tree-icon">{entry.kind === 'directory' ? (expanded ? '▾' : '▸') : '·'}</span>
         <span className="file-tree-name">{entry.name}</span>
       </button>
       {expanded && children.map((child) => (
@@ -91,6 +120,8 @@ function FileTreeNode({ api, root, entry, depth, selectedPath, onOpen }: NodePro
           entry={child}
           depth={depth + 1}
           selectedPath={selectedPath}
+          expandedDirs={expandedDirs}
+          onToggleDir={onToggleDir}
           onOpen={onOpen}
         />
       ))}

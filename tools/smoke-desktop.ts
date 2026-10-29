@@ -495,9 +495,12 @@ try {
   await sleep(3_000)
   const devNav = await evaluate<string[]>("[...document.querySelectorAll('.nav-item')].map(b=>b.getAttribute('title'))")
   console.log('[smoke] dev nav:', devNav)
-  if (!Array.isArray(devNav) || devNav.length !== 6 || !devNav.includes('工作区') || !devNav.includes('对话')) {
-    throw new Error('dev 模式页面或工作区插件注册失败')
+  // W3：工作区不再是中栏导航项（迁至右栏常驻 Panel）
+  if (!Array.isArray(devNav) || devNav.length !== 5 || devNav.includes('工作区') || !devNav.includes('对话')) {
+    throw new Error('dev 模式页面门控不符合预期（W3：工作区迁至右栏）')
   }
+  const rightPanelReady = await evaluate<boolean>("Boolean(document.querySelector('.right-panel'))")
+  if (!rightPanelReady) throw new Error('dev 右栏工作区面板未渲染')
 
   // W1c：Harness 与控制台共用同一中栏槽——交替切换不重载，关闭一个不影响另一个
   if (harnessPort !== undefined) {
@@ -548,12 +551,17 @@ try {
     console.log('[smoke] renderer 状态与 Surface 快照均无 token/认证 URL')
   }
 
-  await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'工作区\')?.click()')
+  // W3：工作区迁至 dev 右栏常驻 Panel（不再是中栏导航页）
   await sleep(2_000)
   const workspaceRoot = await evaluate<string>("document.querySelector('.workspace-root-switch')?.textContent")
   if (!workspaceRoot?.includes(repoName)) throw new Error(`工作区根目录未加载: ${workspaceRoot}`)
+  const fileTreeReady = await evaluate<boolean>("Boolean(document.querySelector('.file-tree-row[title=\"package.json\"]'))")
+  if (!fileTreeReady) throw new Error('右栏文件树未加载')
   await evaluate("document.querySelector('.file-tree-row[title=\"package.json\"]')?.click()")
   await sleep(800)
+  // W3.4：文件点击在中栏打开文档标签（surface-tab）并渲染预览
+  const surfaceTabReady = await evaluate<boolean>("Boolean(document.querySelector('.surface-tab [role=\"tab\"]'))")
+  if (!surfaceTabReady) throw new Error('文件点击未在中栏打开文档标签')
   const textPreview = await evaluate<string>("document.querySelector('.text-preview')?.textContent")
   if (!textPreview?.includes(packageName)) throw new Error('文本文件预览失败')
   let syntaxReady = false
@@ -570,20 +578,26 @@ try {
   if (!darkSyntaxReady) throw new Error('暗色代码语法高亮主题未加载')
   await shot('workspace-file-dark')
   await evaluate("localStorage.setItem('color-mode', 'light'); window.dispatchEvent(new Event('innate-theme-storage'))")
-  const surfacePersisted = await evaluate<boolean>(`Object.keys(localStorage).some((key) => {
-    if (!key.startsWith('innate.workspace.surfaces:')) return false
+  // W3.6：UI 状态快照（root + 展开目录）与中栏文档标签快照均安全持久化（无 URL/token）
+  const uiPersisted = await evaluate<boolean>(`Object.keys(localStorage).some((key) => {
+    if (!key.startsWith('innate.workspace.ui:')) return false
     const value = JSON.parse(localStorage.getItem(key) ?? '{}')
-    return value.version === 1 && value.activeId === 'file:package.json' &&
-      value.surfaces?.some((surface) => surface.id === 'file:package.json' && !surface.url)
+    return value.version === 1 && typeof value.root === 'string' && value.root.length > 0
   })`)
-  if (!surfacePersisted) throw new Error('工作区 Surface 快照未安全持久化')
+  if (!uiPersisted) throw new Error('工作区 UI 状态快照未安全持久化')
+  const tabsPersisted = await evaluate<boolean>(`(() => {
+    const value = JSON.parse(localStorage.getItem('innate.surface-tabs:center') ?? '{}')
+    return value.version === 1 && value.surfaces?.some((surface: { id: string; url?: string }) => surface.id.startsWith('file:') && !surface.url)
+  })()`)
+  if (!tabsPersisted) throw new Error('中栏文档标签快照未安全持久化')
   await evaluate('location.reload()')
   await sleep(3_000)
-  await evaluate('[...document.querySelectorAll(\'.nav-item\')].find(b=>b.getAttribute(\'title\')===\'工作区\')?.click()')
-  await sleep(1_000)
+  // 重启恢复：root 经 ui:* 恢复；文档标签经 surface-tabs:center 恢复并激活
+  const restoredRoot = await evaluate<string>("document.querySelector('.workspace-root-switch')?.textContent")
+  if (!restoredRoot?.includes(repoName)) throw new Error('重启后工作区 root 未恢复')
   const restoredPreview = await evaluate<string>("document.querySelector('.text-preview')?.textContent")
-  if (!restoredPreview?.includes(packageName)) throw new Error('工作区 Surface 重启恢复失败')
-  console.log('[smoke] 工作区 Surface 安全快照与重启恢复通过')
+  if (!restoredPreview?.includes(packageName)) throw new Error('重启后文档标签预览恢复失败')
+  console.log('[smoke] 工作区 UI/文档快照与重启恢复通过')
   await evaluate("document.querySelector('.file-tree-row[title=\"README.md\"]')?.click()")
   await sleep(800)
   const markdownReady = await evaluate<boolean>("Boolean(document.querySelector('.markdown-preview'))")

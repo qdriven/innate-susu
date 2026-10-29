@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { open, readFile, realpath, stat, writeFile, mkdir } from 'node:fs/promises'
+import { open, readFile, realpath, stat } from 'node:fs/promises'
 import path from 'node:path'
 import type {
   GitChange,
@@ -8,8 +8,11 @@ import type {
   WorkspaceEntry,
   WorkspaceFile,
   WorkspaceFileKind,
-  WorkspaceRoot,
+  WorkspaceContext,
+  WorkspaceRootChanged,
+  WorkspaceRootSource,
 } from '../shared/index.js'
+import { WorkspaceSnapshotStore } from './snapshot-store.js'
 
 const MAX_TEXT_BYTES = 2 * 1024 * 1024
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -115,28 +118,68 @@ function truncateDiff(value: string): { value: string; truncated: boolean } {
 
 /** 主进程工作区服务：只读文件系统与只读 Git，不暴露任意命令执行。 */
 export class WorkspaceService {
-  constructor(private readonly stateFile: string) {}
+  private readonly snapshotStore: WorkspaceSnapshotStore
+  private readonly listeners = new Set<(changed: WorkspaceRootChanged) => void>()
+  /** 当前选定的 canonical root；未设置时 assertContext 为 no-op（兼容直接调用测试）。 */
+  private currentRoot?: string
 
-  async getRoot(): Promise<WorkspaceRoot | null> {
-    try {
-      const saved = JSON.parse(await readFile(this.stateFile, 'utf8')) as { root?: string }
-      if (!saved.root) return null
-      const canonical = await canonicalRoot(saved.root)
-      return { path: canonical, name: path.basename(canonical) }
-    } catch {
-      return null
+  constructor(stateFile: string) {
+    this.snapshotStore = new WorkspaceSnapshotStore(stateFile)
+  }
+
+  /**
+   * 上下文守卫：currentRoot 未设时 no-op（向后兼容直接 service 调用测试）；
+   * 已设时，任何 list/read/Git 必须传入同一 canonical root，否则抛「上下文不匹配」。
+   * 该守卫不跳过既有的 canonical + containment 校验，只做二次错误隔离。
+   */
+  private assertContext(root: string): void {
+    if (this.currentRoot === undefined) return
+    if (root !== this.currentRoot) {
+      throw new Error('工作区上下文不匹配：请求的 root 与当前选定工作区不一致')
     }
   }
 
-  async setRoot(root: string): Promise<WorkspaceRoot> {
+  async getRoot(): Promise<WorkspaceContext | null> {
+    const load = await this.snapshotStore.load()
+    if (!load.ok || !load.snapshot.root) return null
+    const canonical = await canonicalRoot(load.snapshot.root)
+    // 加载持久化 root 时同步恢复内存上下文，使 assertContext 生效
+    if (this.currentRoot !== canonical) {
+      this.currentRoot = canonical
+    }
+    return this.toContext(canonical)
+  }
+
+  private toContext(canonical: string): WorkspaceContext {
+    return { path: canonical, name: path.basename(canonical), workspaceId: canonical }
+  }
+
+  async setRoot(root: string, source: WorkspaceRootSource = 'picker'): Promise<WorkspaceContext> {
     const canonical = await canonicalRoot(root)
     if (!(await stat(canonical)).isDirectory()) throw new Error('工作区必须是目录')
-    await mkdir(path.dirname(this.stateFile), { recursive: true })
-    await writeFile(this.stateFile, JSON.stringify({ root: canonical }, null, 2), 'utf8')
-    return { path: canonical, name: path.basename(canonical) }
+    await this.snapshotStore.save({ version: 1, root: canonical })
+    this.currentRoot = canonical
+    const changed: WorkspaceRootChanged = { rootPath: canonical, source }
+    for (const listener of this.listeners) {
+      try {
+        listener(changed)
+      } catch {
+        // 监听器异常隔离：单个订阅者不得阻断其他订阅者或主流程
+      }
+    }
+    return this.toContext(canonical)
+  }
+
+  /** root 变更订阅：类型化事件，renderer 不持有 main 进程句柄。返回取消订阅函数。 */
+  onRootChanged(cb: (changed: WorkspaceRootChanged) => void): () => void {
+    this.listeners.add(cb)
+    return () => {
+      this.listeners.delete(cb)
+    }
   }
 
   async list(root: string, relative = '.'): Promise<WorkspaceEntry[]> {
+    this.assertContext(root)
     const { target } = await resolveExisting(root, relative)
     const { readdir } = await import('node:fs/promises')
     const entries = await readdir(target, { withFileTypes: true })
@@ -156,6 +199,7 @@ export class WorkspaceService {
   }
 
   async read(root: string, relative: string): Promise<WorkspaceFile> {
+    this.assertContext(root)
     const { target } = await resolveExisting(root, relative)
     const metadata = await stat(target)
     if (!metadata.isFile()) throw new Error('只能预览普通文件')
@@ -178,6 +222,7 @@ export class WorkspaceService {
   }
 
   async gitStatus(root: string): Promise<GitStatus> {
+    this.assertContext(root)
     const canonical = await canonicalRoot(root)
     try {
       await runGit(['-C', canonical, 'rev-parse', '--is-inside-work-tree'])
@@ -194,6 +239,7 @@ export class WorkspaceService {
   }
 
   async gitDiff(root: string, relative: string): Promise<GitDiff> {
+    this.assertContext(root)
     const resolved = await resolveGitPath(root, relative)
     const [unstagedOutput, stagedOutput] = await Promise.all([
       runGit(['-C', resolved.root, 'diff', '--no-color', '--unified=3', '--', resolved.relative]),

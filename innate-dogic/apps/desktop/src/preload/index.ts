@@ -12,7 +12,7 @@ import type {
 } from '@dogic/core'
 import type { AppMode } from '@dogic/core'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
-import type { WorkspaceApi, WorkspaceRoot } from '@dogic/plugin-workspace'
+import type { WorkspaceApi, WorkspaceContext, WorkspaceRootChanged } from '@dogic/plugin-workspace'
 
 const api = {
   getStatus: (): Promise<StatusSnapshot> => ipcRenderer.invoke('innate:status'),
@@ -71,12 +71,17 @@ const api = {
     ipcRenderer.on('innate:console-status', listener)
     return () => ipcRenderer.removeListener('innate:console-status', listener)
   },
-  workspaceGetRoot: (): Promise<WorkspaceRoot | null> => ipcRenderer.invoke('innate:workspaceGetRoot'),
-  workspacePickRoot: (): Promise<WorkspaceRoot | null> => ipcRenderer.invoke('innate:workspacePickRoot'),
+  workspaceGetRoot: (): Promise<WorkspaceContext | null> => ipcRenderer.invoke('innate:workspaceGetRoot'),
+  workspacePickRoot: (): Promise<WorkspaceContext | null> => ipcRenderer.invoke('innate:workspacePickRoot'),
   workspaceList: (root: string, relative?: string) => ipcRenderer.invoke('innate:workspaceList', root, relative),
   workspaceRead: (root: string, relative: string) => ipcRenderer.invoke('innate:workspaceRead', root, relative),
   workspaceGitStatus: (root: string) => ipcRenderer.invoke('innate:workspaceGitStatus', root),
   workspaceGitDiff: (root: string, relative: string) => ipcRenderer.invoke('innate:workspaceGitDiff', root, relative),
+  workspaceOnRootChanged: (cb: (changed: WorkspaceRootChanged) => void): (() => void) => {
+    const listener = (_e: unknown, changed: WorkspaceRootChanged): void => cb(changed)
+    ipcRenderer.on('innate:workspace-root-changed', listener)
+    return () => ipcRenderer.removeListener('innate:workspace-root-changed', listener)
+  },
 } satisfies WorkspaceApi & Record<string, unknown>
 
 contextBridge.exposeInMainWorld('innate', api)

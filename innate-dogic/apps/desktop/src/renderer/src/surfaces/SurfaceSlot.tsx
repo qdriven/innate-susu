@@ -17,6 +17,11 @@ export interface SurfaceSlotProps {
    * 避免恢复出来的旧激活项在别的页面抢先 attach。
    */
   focusId?: string
+  /**
+   * 内容页模式（W3.4）：标签条与正文只显示 workspace-* provider 的 Surface；
+   * 无活跃 workspace 文档时回落 fallback（页面内容）。
+   */
+  contentMode?: boolean
   onSwitch(descriptor: SurfaceDescriptor): void
   onClose(descriptor: SurfaceDescriptor): void
 }
@@ -59,6 +64,7 @@ export default function SurfaceSlot({
   fallback,
   trailing,
   focusId,
+  contentMode,
   onSwitch,
   onClose,
 }: SurfaceSlotProps): JSX.Element {
@@ -66,7 +72,11 @@ export default function SurfaceSlot({
   useSyncExternalStore(providers.subscribe, providers.getRevision, providers.getRevision)
 
   const snapshot = tabs.snapshot()
-  const visible = snapshot.surfaces.filter((surface) => !providers.isDisabled(surface.providerId))
+  const visible = snapshot.surfaces.filter((surface) => {
+    if (providers.isDisabled(surface.providerId)) return false
+    if (contentMode && !surface.providerId.startsWith('workspace-')) return false
+    return true
+  })
   if (visible.length === 0) return <>{fallback}</>
 
   const focused = focusId ? visible.find((surface) => surface.id === focusId) : undefined

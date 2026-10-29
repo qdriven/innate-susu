@@ -18,6 +18,7 @@ const aliases = {
   '@dogic/service-model-gateway': serviceGatewaySrc,
   '@dogic/plugin-workspace/main': resolve(workspaceSrc, 'main/index.ts'),
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
+  '@dogic/plugin-workspace/renderer': resolve(workspaceSrc, 'renderer/index.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
 }
 const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/service-model-gateway', '@dogic/syntax-highlighting']

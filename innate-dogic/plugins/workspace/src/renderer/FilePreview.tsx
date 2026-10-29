@@ -49,6 +49,9 @@ export function FilePreview({ api, root, file, onOpenFile }: PreviewProps): JSX.
                 onClick={(event) => {
                   event.preventDefault()
                   if (!href) return
+                  // defense in depth：显式拒绝 javascript:/vbscript:/data: 等非 http(s) scheme
+                  const scheme = href.match(/^\s*([a-z][a-z\d+.-]*):/i)?.[1].toLowerCase()
+                  if (scheme && scheme !== 'http' && scheme !== 'https') return
                   if (/^https?:\/\//i.test(href)) {
                     window.open(href, '_blank', 'noopener,noreferrer')
                     return
@@ -76,13 +79,15 @@ function CodePreview({ file }: { file: WorkspaceFile }): JSX.Element {
   const [highlighted, setHighlighted] = useState<{ path: string; html: string }>()
 
   useEffect(() => {
+    // 截断文件跳过高亮：只保留纯文本，避免对部分内容做语法着色
+    if (file.truncated) return
     let active = true
     setHighlighted(undefined)
     void highlightCode(file.content, file.path).then((html) => {
       if (active && html) setHighlighted({ path: file.path, html })
     })
     return () => { active = false }
-  }, [file.path, file.content])
+  }, [file.path, file.content, file.truncated])
 
   const html = highlighted?.path === file.path ? highlighted.html : undefined
   return (

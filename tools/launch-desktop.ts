@@ -62,7 +62,7 @@ if (!existsSync(electronExe)) {
 // ── 4. magpie 孤儿进程（smoke/控制台超时的历史根因）────────────────────
 if (win) {
   const list = spawnSync('tasklist', ['/FI', 'IMAGENAME eq magpie.exe'], { encoding: 'utf8' })
-  const pids = [...String(list.stdout ?? '').matchAll(/^magpie\.exe\s+(\d+)/gm)].map((m) => m[1])
+  const pids = [...String(list.stdout ?? '').matchAll(/^magpie\.exe\s+(\d+)/gm)].map((m) => m[1]!)
   if (pids.length > 0) {
     fix(`发现 ${pids.length} 个 magpie 孤儿进程（PID ${pids.join(', ')}）→ taskkill /F`)
     for (const pid of pids) spawnSync('taskkill', ['/PID', pid, '/F'], { stdio: 'ignore' })

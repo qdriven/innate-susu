@@ -21,8 +21,8 @@ describe('W1b ShellSidebar（@innate/ui Sidebar 原语承载）', () => {
       />,
     )
     expect(container.querySelector('[data-sidebar="sidebar"]')).not.toBeNull()
-    const items = screen.getAllByRole('button', { name: /对话|总览|工作区|模型|工具/ })
-    expect(items.length).toBeGreaterThanOrEqual(5)
+    const items = screen.getAllByRole('button', { name: /对话|总览|模型|工具/ })
+    expect(items).toHaveLength(5)
     for (const item of items) {
       expect(item.className).toContain('nav-item')
       expect(item.title).not.toBe('')
@@ -30,7 +30,7 @@ describe('W1b ShellSidebar（@innate/ui Sidebar 原语承载）', () => {
     expect((container.querySelector('.nav-item.current') as HTMLElement | null)?.title).toBe('总览')
   })
 
-  it('simple 只渲染对话/设置，dev 渲染六个入口（W1a 门控基线）', () => {
+  it('simple 只渲染对话/设置，dev 渲染五个入口（W3：工作区迁出中栏导航）', () => {
     const { rerender } = render(
       <ShellSidebar
         pages={pagesForMode('simple')}
@@ -50,7 +50,9 @@ describe('W1b ShellSidebar（@innate/ui Sidebar 原语承载）', () => {
         onSwitchMode={() => {}}
       />,
     )
-    expect(screen.getByTitle('工作区')).toBeTruthy()
+    expect(screen.getAllByRole('button', { name: /对话|总览|模型|工具/ })).toHaveLength(5)
+    // W3：工作区不再是中栏导航项（迁至 dev 右栏常驻 Panel）
+    expect(screen.queryByTitle('工作区')).toBeNull()
     expect(screen.queryByTitle('设置')).toBeNull()
     expect(containerDotOk(document)).toBe(true)
   })
@@ -67,8 +69,8 @@ describe('W1b ShellSidebar（@innate/ui Sidebar 原语承载）', () => {
         onSwitchMode={onSwitchMode}
       />,
     )
-    fireEvent.click(screen.getByTitle('工作区'))
-    expect(onNavigate).toHaveBeenCalledWith('workspace')
+    fireEvent.click(screen.getByTitle('工具'))
+    expect(onNavigate).toHaveBeenCalledWith('tools')
     fireEvent.click(screen.getByTitle('切换模式'))
     expect(onSwitchMode).toHaveBeenCalledTimes(1)
   })

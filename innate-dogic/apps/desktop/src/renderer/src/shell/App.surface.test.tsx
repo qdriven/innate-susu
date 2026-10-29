@@ -49,12 +49,22 @@ const apiMocks = vi.hoisted(() => ({
   smokeTest: vi.fn(async () => ({ ok: true, detail: '' })),
   disconnectDsh: vi.fn(async () => ({ ok: true, detail: '' })),
   revealDshHome: vi.fn(async () => ''),
+  // W3：root 变更订阅（关闭旧 root 文档标签）
+  workspaceOnRootChanged: vi.fn(() => () => {}),
 }))
 
 vi.mock('../api', () => ({ api: apiMocks }))
-vi.mock('../plugin-registry', () => ({
-  WorkspacePanel: () => <div data-testid="workspace-panel">workspace</div>,
-}))
+vi.mock('../plugin-registry', async () => {
+  const React = await import('react')
+  return {
+    // W3：工作区侧栏迁至右栏常驻 Panel；mock 只验证挂载点，
+    // 真实侧栏行为由 @dogic/plugin-workspace 组件测试覆盖。
+    WorkspaceSidebar: () =>
+      React.createElement('div', { 'data-testid': 'workspace-sidebar' }, 'workspace'),
+    createWorkspaceDocumentProviders: () => [],
+    WorkspaceDocumentContext: React.createContext(null),
+  }
+})
 
 import App from '../App'
 
@@ -85,7 +95,7 @@ afterEach(() => {
 describe('W1c 壳层多 Surface 标签', () => {
   it('控制台进入统一中栏槽：只提交安全 descriptor 与 bounds，不带 URL', async () => {
     render(<App />)
-    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTitle('总览')).toBeTruthy())
     fireEvent.click(screen.getByTitle('模型配置'))
 
     await waitFor(() => expect(screen.getByTestId('surface-tabs')).toBeTruthy())
@@ -148,7 +158,7 @@ describe('W1c 运行时降级', () => {
   it('控制台 provider 打开失败：错误与恢复动作显式，壳与其它页面仍可用', async () => {
     apiMocks.surfaceShow.mockResolvedValue({ ok: false, detail: '控制台启动失败' })
     render(<App />)
-    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTitle('总览')).toBeTruthy())
     fireEvent.click(screen.getByTitle('模型配置'))
 
     await waitFor(() => expect(screen.getByTestId('surface-error')).toBeTruthy())
@@ -157,8 +167,9 @@ describe('W1c 运行时降级', () => {
     expect(screen.getByRole('button', { name: '启动 magpie 并重试' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '浏览器打开' })).toBeTruthy()
 
-    fireEvent.click(screen.getByTitle('工作区'))
-    await waitFor(() => expect(screen.getByTestId('workspace-panel')).toBeTruthy())
+    // W3：工作区不再是导航页；返回总览页验证壳与内容页仍可用
+    fireEvent.click(screen.getByTitle('总览'))
+    await waitFor(() => expect(screen.getByText('dsh × magpie 工作台')).toBeTruthy())
   })
 
   it('DSH 未安装：对话页给出明确提示，导航与其它页面不受影响', async () => {
