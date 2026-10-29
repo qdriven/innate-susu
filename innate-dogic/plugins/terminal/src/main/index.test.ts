@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -267,6 +267,105 @@ describe('孤儿进程回收（Windows）', () => {
       expect(listed.stdout).not.toMatch(/ping\.exe/i)
     } finally {
       await rm(root, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('TerminalService root 订阅语义（W4.5）', () => {
+  it('root 切换：活会话保持原 cwd 且仍可交互，新会话使用新 root', async () => {
+    const rootA = await tempRoot()
+    const rootB = await tempRoot()
+    try {
+      await mkdir(path.join(rootA, 'marker-a'))
+      await mkdir(path.join(rootB, 'marker-b'))
+      const events: TerminalEvent[] = []
+      const service = await makeService(rootA, events)
+      await service.create(descriptor('a'))
+      // a 的 cwd 进入 A 的标记子目录
+      await service.input('a', 'cd marker-a\r\n')
+      await service.input('a', 'cd\r\n')
+      await waitFor(() => outputOf(events, 'a').includes('marker-a'))
+
+      // root 切换：活会话 a 不受影响、仍可交互
+      expect(await service.setRoot(rootB)).not.toBeNull()
+      await service.input('a', 'echo ALIVE-AFTER-SWITCH\r\n')
+      await waitFor(() => outputOf(events, 'a').includes('ALIVE-AFTER-SWITCH'))
+      // a 的 cwd 仍是 A（不是 B）：cd 输出仍含 marker-a、不含 marker-b
+      const before = outputOf(events, 'a').length
+      await service.input('a', 'cd\r\n')
+      await waitFor(() => outputOf(events, 'a').length > before)
+      const afterSwitch = outputOf(events, 'a').slice(before)
+      expect(afterSwitch).toContain('marker-a')
+      expect(afterSwitch).not.toContain('marker-b')
+
+      // 新会话 b 使用新 root B
+      expect(await service.create(descriptor('b'))).toEqual({ ok: true })
+      await service.input('b', 'cd marker-b\r\n')
+      await service.input('b', 'cd\r\n')
+      await waitFor(() => outputOf(events, 'b').includes('marker-b'))
+      await service.close('a')
+      await service.close('b')
+    } finally {
+      await rm(rootA, { recursive: true, force: true })
+      await rm(rootB, { recursive: true, force: true })
+    }
+  })
+
+  it('失效 root 负路径：root 被删除后创建失败给 hint，不回退系统目录', async () => {
+    const rootA = await tempRoot()
+    try {
+      const events: TerminalEvent[] = []
+      const service = await makeService(rootA, events)
+      await service.create(descriptor('a'))
+      // root 被删除：新会话创建必须失败且不 spawn（列表不变，无隐式回退）
+      await rm(rootA, { recursive: true, force: true })
+      const result = await service.create(descriptor('b'))
+      expect(result.ok).toBe(false)
+      expect(result.detail).toContain('失效')
+      expect(service.list()).toEqual(['a'])
+      // 活会话 a 仍保留（PTY 持有已删除 cwd 的句柄，不受 root 删除影响）
+      expect(await service.input('a', 'echo KEEP-ALIVE\r\n')).toBe(true)
+      await waitFor(() => outputOf(events, 'a').includes('KEEP-ALIVE'))
+      await service.close('a')
+    } finally {
+      // rootA 已删，force 清理兜底
+      await rm(rootA, { recursive: true, force: true })
+    }
+  })
+
+  it('setRoot 无效路径：拒绝且不改变当前 root', async () => {
+    const rootA = await tempRoot()
+    try {
+      const service = await makeService(rootA, [])
+      const before = service.getRoot()
+      expect(before).not.toBeNull()
+      // 不存在的目录：setRoot 返回 null，当前 root 保持不变（不丢工作区）
+      expect(await service.setRoot(path.join(rootA, 'ghost-dir'))).toBeNull()
+      expect(service.getRoot()).toEqual(before)
+      // 原 root 仍可正常创建会话
+      expect(await service.create(descriptor('t1'))).toEqual({ ok: true })
+      await service.close('t1')
+    } finally {
+      await rm(rootA, { recursive: true, force: true })
+    }
+  })
+
+  it('workspaceId 必须映射当前 root：指向另一 root 的路径被拒绝', async () => {
+    const rootA = await tempRoot()
+    const rootB = await tempRoot()
+    try {
+      const service = await makeService(rootA, [])
+      const canonicalA = service.getRoot()?.path
+      // renderer 已知的另一 root 路径：映射不到当前 root → 拒绝（防 cwd 劫持）
+      const steered = await service.create(descriptor('steer', { workspaceId: rootB }))
+      expect(steered.ok).toBe(false)
+      expect(steered.detail).toContain('不匹配')
+      // renderer 已知的当前 root 路径（服务端 canonical）：接受
+      expect(await service.create(descriptor('ok', { workspaceId: canonicalA }))).toEqual({ ok: true })
+      await service.close('ok')
+    } finally {
+      await rm(rootA, { recursive: true, force: true })
+      await rm(rootB, { recursive: true, force: true })
     }
   })
 })
