@@ -59,6 +59,18 @@ export class SurfaceTabs {
     this.commit()
   }
 
+  /**
+   * 仅当当前激活项是该 provider 时摘掉激活；标签本身保留（可再激活）。
+   * W3：内容页切换时摘掉 Harness/控制台激活，但保留 workspace 文档激活。
+   */
+  deactivateProvider(providerId: string): void {
+    const active = this.registry.active()
+    if (active && active.providerId === providerId) {
+      this.registry.deactivate()
+      this.commit()
+    }
+  }
+
   close(id: string): void {
     this.registry.close(id)
     this.commit()

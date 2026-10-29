@@ -31,12 +31,22 @@ const apiMocks = vi.hoisted(() => ({
   smokeTest: vi.fn(async () => ({ ok: true, detail: '' })),
   disconnectDsh: vi.fn(async () => ({ ok: true, detail: '' })),
   revealDshHome: vi.fn(async () => ''),
+  // W3：root 变更订阅（关闭旧 root 文档标签）
+  workspaceOnRootChanged: vi.fn(() => () => {}),
 }))
 
 vi.mock('../api', () => ({ api: apiMocks }))
-vi.mock('../plugin-registry', () => ({
-  WorkspacePanel: () => <div data-testid="workspace-panel">workspace</div>,
-}))
+vi.mock('../plugin-registry', async () => {
+  const React = await import('react')
+  return {
+    // W3：工作区不再是中栏导航页，而是 dev 模式常驻右栏 Panel；mock 只验证挂载点，
+    // 真实侧栏行为由 @dogic/plugin-workspace 组件测试覆盖。
+    WorkspaceSidebar: () =>
+      React.createElement('div', { 'data-testid': 'workspace-sidebar' }, 'workspace'),
+    createWorkspaceDocumentProviders: () => [],
+    WorkspaceDocumentContext: React.createContext(null),
+  }
+})
 
 import App from '../App'
 
@@ -48,10 +58,12 @@ afterEach(() => {
 describe('W1b App 壳组合（T2/T3）', () => {
   it('dev：三栏结构（Sidebar 原语 + ContentArea + RightPanelHost），默认页总览，窗口控制走原有 API', async () => {
     const { container } = render(<App />)
-    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTitle('总览')).toBeTruthy())
     expect(container.querySelector('[data-sidebar="sidebar"]')).not.toBeNull()
     expect(container.querySelector('.content')).not.toBeNull()
     expect(screen.getByTestId('right-panel')).not.toBeNull()
+    // W3：右栏常驻工作区侧栏（非导航页）
+    expect(screen.getByTestId('workspace-sidebar')).not.toBeNull()
     expect((container.querySelector('.nav-item.current') as HTMLElement | null)?.title).toBe('总览')
     expect(apiMocks.winIsMaximized).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: '最小化' }))
@@ -60,9 +72,9 @@ describe('W1b App 壳组合（T2/T3）', () => {
 
   it('点击导航切换既有页面；卸载时清理轮询订阅（F2-V1）', async () => {
     const { unmount } = render(<App />)
-    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
-    fireEvent.click(screen.getByTitle('工作区'))
-    await waitFor(() => expect(screen.getByTestId('workspace-panel')).not.toBeNull())
+    await waitFor(() => expect(screen.getByTitle('总览')).toBeTruthy())
+    fireEvent.click(screen.getByTitle('工具'))
+    await waitFor(() => expect(screen.getByRole('heading', { name: '工具' })).toBeTruthy())
     const intervalsBefore = (apiMocks.getStatus.mock.calls.length as number) > 0
     expect(intervalsBefore).toBe(true)
     unmount()
@@ -77,6 +89,7 @@ describe('W1b App 壳组合（T2/T3）', () => {
     const { container } = render(<App />)
     await waitFor(() => expect(screen.queryByTitle('设置')).not.toBeNull())
     expect(screen.queryByTestId('right-panel')).toBeNull()
+    // W3：工作区不再作为导航页出现（dev 右栏常驻，simple 完全不可见）
     expect(screen.queryByTitle('工作区')).toBeNull()
     await waitFor(() => {
       expect((container.querySelector('.nav-item[data-current="true"]') as HTMLElement | null)?.title).toBe('对话')
@@ -85,10 +98,10 @@ describe('W1b App 壳组合（T2/T3）', () => {
 
   it('RightPanelHost 可拆卸：rightPanel=false 时导航与页面不受影响（T3 F1-V2）', async () => {
     const { container } = render(<App rightPanel={false} />)
-    await waitFor(() => expect(screen.getByTitle('工作区')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTitle('总览')).toBeTruthy())
     expect(screen.queryByTestId('right-panel')).toBeNull()
-    fireEvent.click(screen.getByTitle('工作区'))
-    await waitFor(() => expect(screen.getByTestId('workspace-panel')).not.toBeNull())
+    fireEvent.click(screen.getByTitle('工具'))
+    await waitFor(() => expect(screen.getByRole('heading', { name: '工具' })).toBeTruthy())
     expect(container.querySelector('.content')).not.toBeNull()
   })
 })

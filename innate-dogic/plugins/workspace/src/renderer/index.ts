@@ -1,13 +1,7 @@
-import { createElement } from 'react'
-import type { ComponentType, ReactNode } from 'react'
 import type { WorkspaceApi } from '../shared/index.js'
-import WorkspacePage from './WorkspacePage.js'
-
-export { WorkspacePage }
+export { createWorkspaceSidebar } from './WorkspaceSidebar.js'
+export { createWorkspaceDocumentProviders } from './document-provider.js'
+export { WorkspaceDocumentContext, useWorkspaceDocument } from './document-context.js'
+export type { WorkspaceDocumentOpener } from './document-context.js'
 export { resolveWorkspaceRelative } from './FilePreview.js'
-
-export function createWorkspacePanel(api: WorkspaceApi): ComponentType {
-  return function WorkspacePanel(): ReactNode {
-    return createElement(WorkspacePage, { api })
-  }
-}
+export type { WorkspaceSurfaceProvider, WorkspaceSurfaceViewProps } from './document-provider.js'

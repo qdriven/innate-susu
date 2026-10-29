@@ -37,7 +37,14 @@ function publicLaunchResult(result: HarnessLaunchResult): HarnessLaunchResult {
 export function registerIpc(mainWindow: BrowserWindow): void {
   const surfaces = new SurfaceHost(mainWindow)
   const workspace = new WorkspaceService(path.join(app.getPath('userData'), 'workspace.json'))
-  mainWindow.on('closed', () => surfaces.dispose())
+  // root 变更事件转发：service 内监听器异常隔离，单个订阅者不阻断主流程。
+  const unsubscribeRoot = workspace.onRootChanged((changed) => {
+    if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:workspace-root-changed', changed)
+  })
+  mainWindow.on('closed', () => {
+    unsubscribeRoot()
+    surfaces.dispose()
+  })
 
   // 认证 URL 只在对应 runtime provider 内解析；renderer 只提交安全 descriptor。
   surfaces.registerProvider({
@@ -130,7 +137,8 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:workspaceGetRoot', async () => {
     const saved = await workspace.getRoot()
     if (saved || !process.env.INNATE_WORKSPACE_ROOT) return saved
-    return await workspace.setRoot(process.env.INNATE_WORKSPACE_ROOT)
+    // env 回退：以 env 为 source 设 root，触发 root-changed 事件
+    return await workspace.setRoot(process.env.INNATE_WORKSPACE_ROOT, 'env')
   })
   ipcMain.handle('innate:workspacePickRoot', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
@@ -138,8 +146,10 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       properties: ['openDirectory'],
     })
     const selected = result.filePaths[0]
-    return result.canceled || !selected ? null : await workspace.setRoot(selected)
+    return result.canceled || !selected ? null : await workspace.setRoot(selected, 'picker')
   })
+  ipcMain.handle('innate:workspaceSetRoot', async (_e, root: string, source?: 'saved' | 'env' | 'picker') =>
+    workspace.setRoot(root, source ?? 'picker'))
   ipcMain.handle('innate:workspaceList', (_e, root: string, relative?: string) => workspace.list(root, relative))
   ipcMain.handle('innate:workspaceRead', (_e, root: string, relative: string) => workspace.read(root, relative))
   ipcMain.handle('innate:workspaceGitStatus', (_e, root: string) => workspace.gitStatus(root))

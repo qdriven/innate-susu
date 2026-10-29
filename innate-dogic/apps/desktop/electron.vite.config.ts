@@ -15,6 +15,7 @@ const aliases = {
   '@dogic/syntax-highlighting': resolve(__dirname, '../../packages/syntax-highlighting/src/index.ts'),
   '@dogic/plugin-workspace/main': resolve(workspaceSrc, 'main/index.ts'),
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
+  '@dogic/plugin-workspace/renderer': resolve(workspaceSrc, 'renderer/index.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
 }
 const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/syntax-highlighting']

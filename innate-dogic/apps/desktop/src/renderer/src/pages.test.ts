@@ -8,13 +8,15 @@ describe('W1a 页面注册基线', () => {
     expect(pages[0]?.id).toBe('chat')
   })
 
-  it('dev 保留六个公开页面及总览默认落点', () => {
+  it('dev 保留五个公开页面（W3：工作区迁至右栏，移出中栏导航）及总览默认落点', () => {
     const pages = pagesForMode('dev')
     expect(pages.map((page) => page.id)).toEqual([
-      'chat', 'overview', 'workspace', 'models', 'console', 'tools',
+      'chat', 'overview', 'models', 'console', 'tools',
     ])
     expect(pages.some((page) => page.id === 'overview')).toBe(true)
     expect(pages.some((page) => page.id === 'settings')).toBe(false)
+    // W3：工作区不再是中栏导航页，而是 dev 模式常驻右栏 Panel
+    expect(pages.some((page) => page.id === 'workspace')).toBe(false)
   })
 
   it('两种模式共享对话页面但门控集合互不污染', () => {
@@ -23,6 +25,6 @@ describe('W1a 页面注册基线', () => {
     expect(simple).toContain('chat')
     expect(dev).toContain('chat')
     expect(simple.filter((id) => id !== 'chat')).toEqual(['settings'])
-    expect(dev).toHaveLength(6)
+    expect(dev).toHaveLength(5)
   })
 })

@@ -95,7 +95,10 @@ body {
   background: transparent; border: none; color: var(--dim);
 }
 .mode-switch:hover { color: var(--text); background: var(--panel-2); }
-.content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.content { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; }
+
+/* W3.3：右栏可拖拽分隔；shell-main 填充中栏剩余空间，承载 ResizablePanelGroup。 */
+.shell-main { flex: 1 1 0%; min-width: 0; min-height: 0; display: flex; }
 
 .main { flex: 1; overflow-y: auto; padding: 16px 18px; }
 
@@ -262,8 +265,8 @@ td .dim { font-size: var(--font-xs); }
 .workspace-layout { flex: 1; min-height: 0; display: flex; }
 .workspace-document { flex: 1; min-width: 0; min-height: 0; overflow: auto; background: var(--bg); }
 .workspace-sidebar {
-  width: 300px; flex-shrink: 0; display: flex; flex-direction: column; min-height: 0;
-  background: var(--panel); border-left: 1px solid var(--border);
+  width: 100%; height: 100%; min-width: 0; display: flex; flex-direction: column; min-height: 0;
+  background: var(--panel);
 }
 .workspace-activity { display: flex; gap: 3px; padding: 6px; border-bottom: 1px solid var(--border); }
 .workspace-activity button { padding: 3px 9px; border-color: transparent; background: transparent; color: var(--dim); font-size: var(--font-xs); }
@@ -292,12 +295,17 @@ td .dim { font-size: var(--font-xs); }
 .workspace-empty h2 { margin: 0; color: var(--text); font-size: 15px; }
 .workspace-empty p { margin: 0 0 8px; font-size: var(--font-xs); }
 .workspace-error { padding: 7px 12px; color: var(--bad); background: var(--panel); border-bottom: 1px solid var(--border); font-size: var(--font-xs); }
-.text-preview:not(.code-preview), .diff-preview pre, .code-preview .shiki {
+.text-preview:not(.code-preview), .diff-preview pre {
   margin: 0; padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere;
   color: var(--text); font: var(--font-xs)/1.65 'Cascadia Code', Consolas, monospace;
 }
-.code-preview .shiki { min-height: 100%; background-color: transparent !important; }
+.code-preview .shiki {
+  margin: 0; padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere;
+  min-height: 100%; background-color: transparent !important;
+  color: var(--shiki-light); font: var(--font-xs)/1.65 'Cascadia Code', Consolas, monospace;
+}
 .code-preview .shiki code { display: block; font: inherit; }
+.code-preview .shiki span { color: var(--shiki-light); }
 .dark .code-preview .shiki { color: var(--shiki-dark) !important; }
 .dark .code-preview .shiki span {
   color: var(--shiki-dark) !important;
@@ -323,13 +331,13 @@ td .dim { font-size: var(--font-xs); }
 .markdown-preview table { display: block; max-width: 100%; overflow-x: auto; }
 
 @media (max-width: 980px) {
-  .workspace-sidebar { width: 250px; }
   .markdown-preview { padding: 16px 20px 36px; }
 }
 
-/* ── W1b：右栏挂载点（空容器；W3 接业务 Panel）── */
+/* ── W1b：右栏挂载点（W3 接业务 Panel，宽度由 ResizablePanelGroup 控制）── */
 .right-panel {
-  width: 280px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; display: flex; flex-direction: column;
   background: var(--panel); border-left: 1px solid var(--border);
+  min-width: 0; min-height: 0;
 }
 .right-panel-empty { color: var(--dim); font-size: var(--font-xs); }
