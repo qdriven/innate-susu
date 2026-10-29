@@ -448,7 +448,7 @@ function ToolsTab(): JSX.Element {
         <button
           onClick={async () => {
             const r = await api.disconnectDsh()
-            setDisc(`${r.ok ? '✓' : '✗'} ${r.detail}`)
+            setDisc(`${r.ok ? '✓' : '✗'} ${r.detail}${r.hint ? ` — ${r.hint}` : ''}`)
           }}
         >
           断开

@@ -12,8 +12,8 @@
 | A2 | magpie 桌面形态（desktop 版） | `startMagpie()`：`INNATE_MAGPIE_FORM=desktop` 时不带参 spawn | — | — | — | **保留并参数化**：`MagpieGateway` 增加 `form` 注入（`desktop`/`serve`），复用同一 ensureRunning/健康检查；桌面形态的 healthcheck 语义与 serve 相同（测试：T2 form 参数契约） |
 | A3 | 健康检查 | — | `core discoverGatewayPort/probeHello`（HTTP `/api/hello`，运行期发现） | `MagpieCli.healthcheck()`（CLI，启动探测） | `MagpieGateway.healthy()`（CLI `healthcheck`，启动探测） | **保留双实现并明确分工**：CLI `healthcheck` 只用于启动/复用判定（T2）；HTTP `/api/hello` 只用于运行期状态与 UI 目录（T5 事件 + 低频 reconcile）。两者不互相替代（测试：T2/T5 各自断言） |
 | A4 | 网关模型目录 | — | `core fetchModels(port)`（HTTP `/v1/models`）→ `innate:models` | `MagpieModelGateway.listProviders()`（CLI `providers`） | — | **保留双路径、UI 走类型化 facade**：桌面 UI 的模型目录经 `innate:models`（HTTP）不变，但通道语义收口到 facade；CLI providers 供插件侧（测试：T3 契约测试 + 解析测试） |
-| A5 | 接线操作 | `disconnectDsh()`：`magpie dsh default` 直调 | — | `MagpieModelGateway.wireAgent/unwireAgent`（CLI 参数数组） | `MagpieGateway.wireDsh/unwireDsh`（CLI `dsh <model>`/`dsh default`） | **收敛**：desktop 接线/断开改走类型化 gateway facade（含 execFile 参数数组 + 超时）；不新增第二套直调（测试：T3 负路径 + 隔离 DSH_HOME） |
-| A6 | 配额/用量 | — | — | `MagpieModelGateway.quota()`（CLI `quota`） | `MagpieGateway.quota()`（CLI `usage today`） | **收敛到 facade**：统一 `MagpieCli.quota()` 单一实现，service 层不再自造 CLI 调用（测试：T3 CLI 解析/超时/非零退出） |
+| A5 | 接线操作 | `disconnectDsh()`：`magpie dsh default` 直调 | — | `MagpieModelGateway.wireAgent/unwireAgent`（CLI 参数数组） | `MagpieGateway.wireDsh/unwireDsh`（CLI `dsh <model>`/`dsh default`） | **收敛（T2/T3 完成）**：desktop `innate:disconnectDsh` 改经 `getGateway().unwireDsh()`，launcher 私有直调删除；新增 `innate:wireDsh`/`innate:quota` 类型化通道；`MagpieCli` 对 agent/model 参数做白名单校验（win32 shell 拼接防注入）；断开显式返回恢复结果/失败原因/下一步 hint（测试：T2 契约 + T3 负路径 + 隔离 DSH_HOME） |
+| A6 | 配额/用量 | — | — | `MagpieModelGateway.quota()`（CLI `quota`） | `MagpieGateway.quota()`（CLI `usage today`） | **收敛到 facade（T3 完成）**：解析集中 `MagpieCli`（导出 `parseProviders/parseAgents/parseQuota`），`MagpieModelGateway` 惰性 cli 构造 + 可注入；退出码映射修正（status/数值 code 即真实退出码）；桌面新增 `innate:quota` 通道走 `MagpieGateway.quota()`（测试：T3 CLI 解析/超时/非零退出） |
 | A7 | 控制台（magpie web） | `ensureMagpieConsole()`：freePort + 受管 key（userData `console-key.json`）+ stdout `magpie web on <url?k=>` 解析 + 超时 | `innate:openMagpieWeb` | — | — | **保留**（W2.4 适配生命周期，不移动 key 管理）：独立回环端口 + 每安装稳定 key，绝不猜测已有实例认证（测试：T4 控制台契约 + key 存储测试） |
 | A8 | 运行状态 | — | `readStatus()`（gateway/webUi/dsh/magpieCli 汇总）+ App.tsx 5s 轮询 | `GatewayStatus`（ModelGateway 契约，`onStatusChange`） | — | **收敛**：网关状态改事件驱动（`innate:gateway-status`），5s 轮询降为低频 reconcile；直连降级状态显式区分（测试：T5 四态 UI 转换 + 断连提示） |
 
@@ -60,8 +60,8 @@ gateway ensureRunning ──► 模型目录 ──► 接线操作 ──► �
 | --- | --- | --- |
 | serve 生命周期双实现 | 收敛至 services `MagpieGateway`，desktop 私有 spawn 删除（T2 完成：`class MagpieGateway` 已打包进 desktop main bundle，launcher 经 `getGateway()` 收口） | T2 契约测试（8 例全过，基线只增不减） |
 | 健康检查双实现 | 保留：CLI 启动探测（T2）/ HTTP 运行期发现（T5） | T2 + T5 断言 |
-| 接线直调双实现 | 收敛至类型化 facade | T3 负路径 + 隔离 HOME |
-| 配额双实现 | 收敛至 `MagpieCli.quota()` | T3 解析/超时测试 |
+| 接线直调双实现 | 收敛至类型化 facade（T3 完成：`MagpieCli` 白名单守卫 + `MagpieGateway` 单一通道 + 解析集中） | T3 负路径 + 隔离 HOME |
+| 配额双实现 | 收敛至 `MagpieCli` 解析集中（T3 完成：`parseProviders/Agents/Quota` 导出 + 退出码修正） | T3 解析/超时测试 |
 | Harness 九项差异 | 记录 + R1 收敛方案（本矩阵 §2） | R1 开工时逐项对照 |
 | 状态轮询 | 收敛为事件驱动 + 低频 reconcile | T5 UI 状态转换测试 |
 | console 生命周期 | 保留 + W1c 通用生命周期适配 | T4 契约测试 |

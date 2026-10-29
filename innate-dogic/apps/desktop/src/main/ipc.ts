@@ -15,7 +15,7 @@ import type { AppMode, HarnessLaunchResult, HarnessState } from '@dogic/core'
 import { WorkspaceService } from '@dogic/plugin-workspace/main'
 import { HarnessRuntime } from './harness'
 import { SurfaceHost } from './surface-host'
-import { disconnectDsh, ensureMagpieConsole, startMagpie } from './launcher'
+import { ensureMagpieConsole, getGateway, startMagpie } from './launcher'
 
 export const harness = new HarnessRuntime()
 
@@ -116,7 +116,43 @@ export function registerIpc(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('innate:revealDshHome', () => shell.openPath(dshHome()))
   ipcMain.handle('innate:openLogs', () => shell.openPath(path.join(app.getPath('userData'), 'logs')))
-  ipcMain.handle('innate:disconnectDsh', () => disconnectDsh())
+
+  // 接线/配额操作全部经类型化 gateway facade（execFile 参数数组 + 超时 + 参数白名单），
+  // 不新增第二套直调；断开结果显式返回恢复结果/失败原因/下一步 hint。
+  ipcMain.handle('innate:disconnectDsh', async () => {
+    try {
+      await getGateway().unwireDsh(dshHome())
+      return {
+        ok: true as const,
+        detail: '已请求断开（magpie 将恢复 dsh 原配置）',
+        hint: '断开后 dsh 使用其原默认模型；重新接线请在 magpie 控制台操作',
+      }
+    } catch (e) {
+      return {
+        ok: false as const,
+        detail: `CLI 执行失败: ${String(e)}`,
+        hint: '可在 magpie Agents 页对 dsh 手动 Disconnect',
+      }
+    }
+  })
+
+  ipcMain.handle('innate:wireDsh', async (_e, model: string) => {
+    try {
+      const stdout = await getGateway().wireDsh(model, dshHome())
+      return { ok: true as const, detail: `已接线 ${model}：${stdout.trim() || '无输出'}` }
+    } catch (e) {
+      return {
+        ok: false as const,
+        detail: `接线失败: ${String(e)}`,
+        hint: '模型名需为 <provider>/<model> 白名单字符',
+      }
+    }
+  })
+
+  ipcMain.handle('innate:quota', async () => {
+    const quota = await getGateway().quota()
+    return { ok: quota !== null, detail: quota?.trim() ?? '配额不可用（magpie CLI 未响应）' }
+  })
 
   ipcMain.handle('innate:harnessState', () => publicHarnessState(harness.getState()))
   ipcMain.handle('innate:launchHarness', async () =>

@@ -12,7 +12,7 @@ import type {
   QuotaInfo,
 } from '@dogic/sdk'
 import { MagpieProcess, type ProcessStatus } from './process.js'
-import { MagpieCli } from './magpie-cli.js'
+import { MagpieCli, parseProviders, parseAgents, parseQuota } from './magpie-cli.js'
 import { detectMagpie, MIN_MAGPIE_VERSION } from './detect.js'
 
 export class MagpieModelGateway implements ModelGateway {
@@ -27,11 +27,24 @@ export class MagpieModelGateway implements ModelGateway {
     private options: {
       binaryPath?: string
       env?: Record<string, string>
+      /** 注入 CLI（测试/定制用；缺省按 binaryPath 构造） */
+      cli?: MagpieCli
     } = {},
   ) {}
 
   status(): GatewayStatus {
     return this._status
+  }
+
+  /** 惰性取得 CLI：支持注入（测试/定制），缺省按 binaryPath 构造。 */
+  private ensureCli(): MagpieCli | null {
+    if (this.cli) return this.cli
+    if (!this.options.cli && !this.binaryPath && !this.options.binaryPath) return null
+    this.cli = this.options.cli ?? new MagpieCli({
+      binaryPath: this.binaryPath ?? this.options.binaryPath ?? 'magpie',
+      env: this.options.env,
+    })
+    return this.cli
   }
 
   /**
@@ -62,7 +75,7 @@ export class MagpieModelGateway implements ModelGateway {
 
     // 2. 启动进程（如果需要）
     if (!this.process) {
-      this.cli = new MagpieCli({ binaryPath: this.binaryPath, env: this.options.env })
+      this.cli = this.options.cli ?? new MagpieCli({ binaryPath: this.binaryPath, env: this.options.env })
       this.process = new MagpieProcess(this.binaryPath, { env: this.options.env })
       this.process.on('status', ({ status, error }) => {
         this.handleProcessStatus(status, error)
@@ -76,34 +89,37 @@ export class MagpieModelGateway implements ModelGateway {
   }
 
   async listProviders(): Promise<Provider[]> {
-    if (!this.cli) return []
-    const result = await this.cli.providers()
-    // 解析 providers 输出（简化版，实际需要根据 CLI 输出格式解析）
-    return this.parseProviders(result.stdout)
+    const cli = this.ensureCli()
+    if (!cli) return []
+    const result = await cli.providers()
+    return parseProviders(result.stdout)
   }
 
   async listAgents(): Promise<AgentWiring[]> {
-    if (!this.cli) return []
-    const result = await this.cli.ls()
-    return this.parseAgents(result.stdout)
+    const cli = this.ensureCli()
+    if (!cli) return []
+    const result = await cli.ls()
+    return parseAgents(result.stdout)
   }
 
   async wireAgent(agentId: string, model: ModelRef): Promise<void> {
-    if (!this.cli) {
+    const cli = this.ensureCli()
+    if (!cli) {
       throw new Error('magpie CLI not initialized')
     }
     const modelStr = `${model.provider}/${model.model}`
-    const result = await this.cli.wireAgent(agentId, modelStr)
+    const result = await cli.wireAgent(agentId, modelStr)
     if (result.exitCode !== 0) {
       throw new Error(`wireAgent failed: ${result.stderr || result.stdout}`)
     }
   }
 
   async unwireAgent(agentId: string): Promise<void> {
-    if (!this.cli) {
+    const cli = this.ensureCli()
+    if (!cli) {
       throw new Error('magpie CLI not initialized')
     }
-    const result = await this.cli.unwireAgent(agentId)
+    const result = await cli.unwireAgent(agentId)
     if (result.exitCode !== 0) {
       throw new Error(`unwireAgent failed: ${result.stderr || result.stdout}`)
     }
@@ -117,11 +133,12 @@ export class MagpieModelGateway implements ModelGateway {
   }
 
   async quota(): Promise<QuotaInfo[]> {
-    if (!this.cli) return this.quotaCache
+    const cli = this.ensureCli()
+    if (!cli) return this.quotaCache
     try {
-      const result = await this.cli.quota()
+      const result = await cli.quota()
       if (result.exitCode === 0) {
-        this.quotaCache = this.parseQuota(result.stdout)
+        this.quotaCache = parseQuota(result.stdout)
         return this.quotaCache
       }
       // 返回缓存 + 陈旧标记
@@ -181,70 +198,5 @@ export class MagpieModelGateway implements ModelGateway {
         })
         break
     }
-  }
-
-  // —— 输出解析 ——
-
-  private parseProviders(stdout: string): Provider[] {
-    // 简化解析：实际需根据 magpie providers 输出格式调整
-    const providers: Provider[] = []
-    const lines = stdout.split(/\r?\n/)
-    for (const line of lines) {
-      const trimmed = line.trim()
-      if (!trimmed) continue
-      // 尝试匹配 "id  name  type" 格式
-      const parts = trimmed.split(/\s{2,}/)
-      if (parts.length >= 2) {
-        providers.push({
-          id: parts[0],
-          name: parts[1] ?? parts[0],
-          type: 'api-key',
-          models: [],
-          enabled: true,
-        })
-      }
-    }
-    return providers
-  }
-
-  private parseAgents(stdout: string): AgentWiring[] {
-    // 简化解析
-    const agents: AgentWiring[] = []
-    const lines = stdout.split(/\r?\n/)
-    for (const line of lines) {
-      const trimmed = line.trim()
-      if (!trimmed) continue
-      const parts = trimmed.split(/\s{2,}/)
-      if (parts.length >= 1) {
-        agents.push({
-          agentId: parts[0],
-          wired: parts.length > 1,
-          mode: 'gateway',
-        })
-      }
-    }
-    return agents
-  }
-
-  private parseQuota(stdout: string): QuotaInfo[] {
-    // 简化解析
-    const quotas: QuotaInfo[] = []
-    const lines = stdout.split(/\r?\n/)
-    for (const line of lines) {
-      const trimmed = line.trim()
-      if (!trimmed) continue
-      const parts = trimmed.split(/\s{2,}/)
-      if (parts.length >= 2) {
-        const match = parts[1]?.match(/(\d+(?:\.\d+)?)/)
-        quotas.push({
-          provider: parts[0],
-          used: match ? parseFloat(match[1]) : 0,
-          unit: 'tokens',
-          stale: false,
-          updatedAt: Date.now(),
-        })
-      }
-    }
-    return quotas
   }
 }

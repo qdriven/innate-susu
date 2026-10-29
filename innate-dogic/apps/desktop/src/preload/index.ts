@@ -41,8 +41,14 @@ const api = {
   surfaceClose: (id: string): Promise<boolean> => ipcRenderer.invoke('innate:surfaceClose', id),
   revealDshHome: (): Promise<string> => ipcRenderer.invoke('innate:revealDshHome'),
   openLogs: (): Promise<string> => ipcRenderer.invoke('innate:openLogs'),
-  disconnectDsh: (): Promise<{ ok: boolean; detail: string }> =>
+  /** 断开 dsh 接线（经 gateway facade；返回恢复结果/失败原因/下一步 hint） */
+  disconnectDsh: (): Promise<{ ok: boolean; detail: string; hint?: string }> =>
     ipcRenderer.invoke('innate:disconnectDsh'),
+  /** 接线 dsh（用户动作触发；模型名白名单校验在 facade 层） */
+  wireDsh: (model: string): Promise<{ ok: boolean; detail: string; hint?: string }> =>
+    ipcRenderer.invoke('innate:wireDsh', model),
+  /** 配额/用量（经 gateway facade） */
+  quota: (): Promise<{ ok: boolean; detail: string }> => ipcRenderer.invoke('innate:quota'),
   launchHarness: (): Promise<HarnessLaunchResult> => ipcRenderer.invoke('innate:launchHarness'),
   getHarnessState: (): Promise<HarnessState> => ipcRenderer.invoke('innate:harnessState'),
   stopHarness: (): Promise<boolean> => ipcRenderer.invoke('innate:stopHarness'),

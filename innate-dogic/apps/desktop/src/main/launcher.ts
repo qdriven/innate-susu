@@ -1,15 +1,12 @@
-import { spawn, execFile } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import type { ChildProcess } from 'node:child_process'
 import { createServer } from 'node:net'
-import { promisify } from 'node:util'
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
 import path from 'node:path'
 import { app } from 'electron'
 import { MagpieGateway } from '@dogic/service-model-gateway'
 import { dshHome, redactLaunchSecrets } from '@dogic/core'
-
-const execFileAsync = promisify(execFile)
 
 let gateway: MagpieGateway | undefined
 
@@ -44,23 +41,6 @@ export async function startMagpie(): Promise<{ ok: boolean; detail: string }> {
     }
   } catch (e) {
     return { ok: false, detail: `启动失败: ${String(e)}（可手动打开 magpie 桌面版）` }
-  }
-}
-
-/** 断开 dsh 接线：magpie dsh default（原子恢复 dsh 原配置） */
-export async function disconnectDsh(): Promise<{ ok: boolean; detail: string }> {
-  try {
-    const { stdout, stderr } = await execFileAsync(resolveMagpieBin(), ['dsh', 'default'], {
-      timeout: 30_000,
-      shell: process.platform === 'win32',
-    })
-    const out = `${stdout}${stderr}`.trim()
-    return { ok: true, detail: out || '已请求断开（magpie 将恢复 dsh 原配置）' }
-  } catch (e) {
-    return {
-      ok: false,
-      detail: `CLI 执行失败: ${String(e)}。可在 magpie Agents 页对 dsh 手动 Disconnect`,
-    }
   }
 }
 
