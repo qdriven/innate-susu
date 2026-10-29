@@ -5,6 +5,7 @@ import path from 'node:path'
 import { promisify } from 'node:util'
 import { describe, expect, it } from 'vitest'
 import { TerminalService } from './index.js'
+import { MAX_PROCESS_OUTPUT_CHARS } from '../shared/index.js'
 import type { TerminalEvent } from '../shared/index.js'
 
 const execFileAsync = promisify(execFile)
@@ -34,7 +35,8 @@ async function waitFor(predicate: () => boolean, timeoutMs = 10_000): Promise<vo
 
 function outputOf(events: TerminalEvent[], terminalId: string): string {
   return events
-    .filter((event): event is Extract<TerminalEvent, { data: string }> => event.terminalId === terminalId && 'data' in event)
+    .filter((event): event is Extract<TerminalEvent, { terminalId: string; data: string }> =>
+      'terminalId' in event && event.terminalId === terminalId && 'data' in event)
     .map((event) => event.data)
     .join('')
 }
@@ -53,8 +55,8 @@ describe('TerminalService（W4.3）', () => {
       expect(await service.input('t1', 'echo hello-terminal\r\n')).toBe(true)
       await waitFor(() => outputOf(events, 't1').includes('hello-terminal'))
       expect(await service.input('t1', 'exit 0\r\n')).toBe(true)
-      await waitFor(() => events.some((event) => event.terminalId === 't1' && 'exitCode' in event))
-      const exit = events.find((event) => event.terminalId === 't1' && 'exitCode' in event)
+      await waitFor(() => events.some((event) => 'terminalId' in event && event.terminalId === 't1' && 'exitCode' in event))
+      const exit = events.find((event) => 'terminalId' in event && event.terminalId === 't1' && 'exitCode' in event)
       expect(exit).toEqual({ terminalId: 't1', exitCode: 0, signal: undefined })
       await service.close('t1')
     } finally {
@@ -92,7 +94,7 @@ describe('TerminalService（W4.3）', () => {
       await waitFor(() => outputOf(events, 'big').length > 0, 15_000)
       await service.input('big', 'echo TAIL-MARKER-9\r\n')
       await service.input('big', 'exit 0\r\n')
-      await waitFor(() => events.some((event) => event.terminalId === 'big' && 'exitCode' in event), 15_000)
+      await waitFor(() => events.some((event) => 'terminalId' in event && event.terminalId === 'big' && 'exitCode' in event), 15_000)
       const snapshot = service.snapshot('big')
       expect(snapshot.ok).toBe(true)
       expect(snapshot.truncated).toBe(true)
@@ -156,7 +158,7 @@ describe('TerminalService（W4.3）', () => {
       await service.input('a', 'cd\r\n')
       await waitFor(() => outputOf(events, 'a').includes(rootA.split(path.sep).pop() ?? ''))
       await service.input('a', 'exit 0\r\n')
-      await waitFor(() => events.some((event) => event.terminalId === 'a' && 'exitCode' in event))
+      await waitFor(() => events.some((event) => 'terminalId' in event && event.terminalId === 'a' && 'exitCode' in event))
 
       // root 替换：setRoot 到 B 后新会话用 B，旧会话（已退出但未关闭）仍保留
       expect(await service.setRoot(rootB)).not.toBeNull()
@@ -366,6 +368,232 @@ describe('TerminalService root 订阅语义（W4.5）', () => {
     } finally {
       await rm(rootA, { recursive: true, force: true })
       await rm(rootB, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('TerminalService process:execute（W4.6）', () => {
+  it('正路径真命令：受理回执 + 结果通道取回 + 审计事件（脱敏）', async () => {
+    const root = await tempRoot()
+    try {
+      const events: TerminalEvent[] = []
+      const service = await makeService(root, events)
+      expect(service.registerProcessProfile({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'echoer', args: ['echo', 'process-ok-123'] })
+      expect(ack.ok).toBe(true)
+      expect(ack.executionId).toMatch(/^exec-\d+$/)
+      const result = await service.processResult(ack.executionId)
+      expect(result.ok).toBe(true)
+      expect(result.exitCode).toBe(0)
+      expect(result.timedOut).toBe(false)
+      expect(result.cancelled).toBe(false)
+      expect(result.truncated).toBe(false)
+      expect(result.stdout).toContain('process-ok-123')
+      expect(result.durationMs).toBeGreaterThanOrEqual(0)
+      // 审计事件：字段齐全，脱敏（不含输出与 env）
+      const audit = events.find((event): event is Extract<TerminalEvent, { executionId: string }> => 'executionId' in event)
+      expect(audit).toBeDefined()
+      expect(audit?.executionId).toBe(ack.executionId)
+      expect(audit?.profileId).toBe('echoer')
+      expect(audit?.cwd).toBe(service.getRoot()?.path)
+      expect(audit?.ok).toBe(true)
+      expect(audit?.exitCode).toBe(0)
+      expect(audit?.durationMs).toBeGreaterThanOrEqual(0)
+      expect(audit?.startedAt).toBeTruthy()
+      expect(audit?.finishedAt).toBeTruthy()
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('未注册 profile / 绕 preload 垃圾输入全拒', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+      const ghost = await service.execute({ profileId: 'ghost', args: [] })
+      expect(ghost.ok).toBe(false)
+      expect(ghost.detail).toContain('未注册')
+      const result = await service.processResult(ghost.executionId)
+      expect(result.ok).toBe(false)
+      expect(result.detail).toContain('未注册')
+      // 绕 preload：非对象、args 字符串（命令拼接）在解析层拒绝
+      expect((await service.execute('not-an-object')).ok).toBe(false)
+      const badArgs = await service.execute({ profileId: 'echoer', args: 'rm -rf /' })
+      expect(badArgs.ok).toBe(false)
+      expect(badArgs.detail).toContain('args')
+      // 未知执行 id 显式失败
+      const missing = await service.processResult('exec-ghost')
+      expect(missing.ok).toBe(false)
+      expect(missing.detail).toContain('不存在')
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('cwd 逃逸拒绝：请求级与 profile 级 .. 越界、cwd 不存在', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'escape', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+      expect(service.registerProcessProfile({ id: 'esc-profile', command: 'cmd.exe', args: ['/c'], cwdRelative: '..' })).toEqual({ ok: true })
+      const reqEscape = await service.execute({ profileId: 'escape', args: ['echo', 'x'], cwdRelative: '../outside' })
+      expect(reqEscape.ok).toBe(false)
+      expect(reqEscape.detail).toContain('越出')
+      const profileEscape = await service.execute({ profileId: 'esc-profile', args: ['echo', 'x'] })
+      expect(profileEscape.ok).toBe(false)
+      expect(profileEscape.detail).toContain('越出')
+      const missing = await service.execute({ profileId: 'escape', args: ['echo', 'x'], cwdRelative: 'ghost-dir' })
+      expect(missing.ok).toBe(false)
+      expect(missing.detail).toContain('不存在')
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('超时：显式 timedOut 状态，进程树回收', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'sleeper', command: 'node', args: ['-e'] })).toEqual({ ok: true })
+      const ack = await service.execute({
+        profileId: 'sleeper',
+        args: ['setTimeout(() => {}, 60000)'],
+        timeoutMs: 800,
+      })
+      expect(ack.ok).toBe(true)
+      const result = await service.processResult(ack.executionId)
+      expect(result.timedOut).toBe(true)
+      expect(result.ok).toBe(false)
+      expect(result.exitCode).toBeNull()
+      expect(result.detail).toContain('超时')
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('取消：cancel 后 cancelled 状态；重复/未知取消显式失败', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'sleeper', command: 'node', args: ['-e'] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'sleeper', args: ['setTimeout(() => {}, 60000)'] })
+      expect(ack.ok).toBe(true)
+      expect(await service.cancel(ack.executionId)).toBe(true)
+      const result = await service.processResult(ack.executionId)
+      expect(result.cancelled).toBe(true)
+      expect(result.ok).toBe(false)
+      expect(result.detail).toContain('取消')
+      expect(await service.cancel(ack.executionId)).toBe(false)
+      expect(await service.cancel('exec-ghost')).toBe(false)
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('非零退出：显式 exitCode 与 detail', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'exiter', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'exiter', args: ['exit', '3'] })
+      const result = await service.processResult(ack.executionId)
+      expect(result.ok).toBe(false)
+      expect(result.exitCode).toBe(3)
+      expect(result.detail).toContain('3')
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('输出截断：超限环形保留尾部；secret env 不注入且审计脱敏', async () => {
+    const root = await tempRoot()
+    try {
+      const events: TerminalEvent[] = []
+      const service = new TerminalService({
+        onEvent: (event) => {
+          events.push(event)
+        },
+        env: { ...process.env, PATH: process.env.PATH ?? '', SECRET_TOKEN: 'super-secret' },
+      })
+      await service.setRoot(root)
+      expect(service.registerProcessProfile({ id: 'big', command: 'node', args: ['-e'] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'big', args: ['process.stdout.write("X".repeat(300000))'] })
+      const result = await service.processResult(ack.executionId)
+      expect(result.ok).toBe(true)
+      expect(result.truncated).toBe(true)
+      expect(result.stdout.length).toBeLessThanOrEqual(MAX_PROCESS_OUTPUT_CHARS)
+      // 白名单基座不注入 secret env：进程内读取为空
+      const echoAck = await service.execute({
+        profileId: 'big',
+        args: ['process.stdout.write(process.env.SECRET_TOKEN ?? "NO-SECRET")'],
+      })
+      const echoResult = await service.processResult(echoAck.executionId)
+      expect(echoResult.stdout).toContain('NO-SECRET')
+      expect(echoResult.stdout).not.toContain('super-secret')
+      // 事件流（审计）不含 secret 与输出内容
+      const serialized = JSON.stringify(events)
+      expect(serialized).not.toContain('super-secret')
+      expect(serialized).not.toContain('XXXXX')
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('process profile 注册负路径：非法 command/绝对路径拒绝、重复注册失败', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      const metachar = service.registerProcessProfile({ id: 'git', command: 'git; rm -rf /', args: [] })
+      expect(metachar.ok).toBe(false)
+      expect(metachar.detail).toContain('非法字符')
+      const absolute = service.registerProcessProfile({ id: 'abs', command: 'C:/Windows/System32/cmd.exe', args: [] })
+      expect(absolute.ok).toBe(false)
+      expect(service.registerProcessProfile({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+      const dup = service.registerProcessProfile({ id: 'echoer', command: 'x.exe', args: [] })
+      expect(dup.ok).toBe(false)
+      expect(dup.detail).toContain('重复注册')
+      expect(service.processProfileIds()).toEqual(['echoer'])
+      await service.dispose()
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
+  })
+
+  it('无 root 时执行拒绝并给 hint', async () => {
+    const service = await makeService(null, [])
+    expect(service.registerProcessProfile({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })).toEqual({ ok: true })
+    const ack = await service.execute({ profileId: 'echoer', args: ['echo', 'x'] })
+    expect(ack.ok).toBe(false)
+    expect(ack.detail).toContain('工作区')
+    const result = await service.processResult(ack.executionId)
+    expect(result.ok).toBe(false)
+    await service.dispose()
+  })
+
+  it('dispose 统一回收执行中的 process', async () => {
+    const root = await tempRoot()
+    try {
+      const service = await makeService(root, [])
+      expect(service.registerProcessProfile({ id: 'sleeper', command: 'node', args: ['-e'] })).toEqual({ ok: true })
+      const ack = await service.execute({ profileId: 'sleeper', args: ['setTimeout(() => {}, 60000)'] })
+      const pending = service.processResult(ack.executionId)
+      await service.dispose()
+      const result = await pending
+      expect(result.cancelled).toBe(true)
+      // dispose 后新执行被拒
+      const after = await service.execute({ profileId: 'sleeper', args: ['echo', 'x'] })
+      expect(after.ok).toBe(false)
+      expect(after.detail).toContain('已关闭')
+    } finally {
+      await rm(root, { recursive: true, force: true })
     }
   })
 })

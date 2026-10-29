@@ -1,5 +1,6 @@
 /**
- * 主进程 TerminalService（W4.3）：按 terminalId 管理 PTY 会话。
+ * 主进程 TerminalService（W4.3 + W4.6）：按 terminalId 管理 PTY 会话，
+ * 并按 executionId 管理受控 process:execute 执行。
  *
  * 安全边界：
  * - renderer 只提交安全 descriptor（profile 引用/尺寸/workspaceId），
@@ -8,9 +9,13 @@
  * - 环境变量按白名单注入（PATH/HOME/...），profile env 可追加，绝不输出 secret env；
  * - 输出缓冲环形截断（每会话上限），事件分片转发，渲染端断连不阻塞 PTY；
  * - close 才终止会话（Windows taskkill /T /F 进程树回收），deactivate 不杀会话；
- * - dispose 统一回收（应用退出路径）。
+ * - dispose 统一回收（应用退出路径）；
+ * - process:execute（W4.6）：profile 白名单（userData 可编辑）+ 结构化请求，
+ *   参数数组直接 spawn（无 shell 拼接），超时/取消走进程树回收，
+ *   输出环形截断，终态发审计事件（脱敏：不含输出与 env）。
  */
-import { execFile } from 'node:child_process'
+import { execFile, spawn as spawnProcess } from 'node:child_process'
+import type { ChildProcess } from 'node:child_process'
 import { realpath, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -25,6 +30,14 @@ import {
   TerminalEvent,
   TerminalProfile,
   TerminalShowResult,
+  parseProcessProfile,
+  parseProcessRequest,
+  DEFAULT_PROCESS_TIMEOUT_MS,
+  MAX_PROCESS_OUTPUT_CHARS,
+  ProcessExecuteAck,
+  ProcessProfile,
+  ProcessRequest,
+  ProcessResult,
 } from '../shared/index.js'
 
 const execFileAsync = promisify(execFile)
@@ -35,6 +48,8 @@ export const MAX_OUTPUT_CHARS = 1024 * 1024
 export const EVENT_CHUNK_CHARS = 64 * 1024
 /** 默认会话数上限。 */
 export const MAX_SESSIONS = 8
+/** process:execute 并发执行上限（资源受控）。 */
+export const MAX_PROCESS_EXECUTIONS = 8
 /** 环境变量注入白名单：只注入必要项，不注入 secret。 */
 export const ENV_ALLOWLIST = [
   'PATH',
@@ -94,6 +109,25 @@ interface Session {
   buffer: RingBuffer
 }
 
+/** 一次受控 process 执行（W4.6）：node:child_process 直接 spawn（参数数组，无 shell 拼接）。 */
+interface Execution {
+  id: string
+  profileId: string
+  cwd: string
+  startedAt: string
+  process: ChildProcess
+  stdout: RingBuffer
+  stderr: RingBuffer
+  finished: boolean
+  timedOut: boolean
+  cancelled: boolean
+  exitCode: number | null
+  signal: string | null
+  spawnError?: string
+  timer?: NodeJS.Timeout
+  resolve: (result: ProcessResult) => void
+}
+
 export interface TerminalServiceLimits {
   maxSessions: number
   maxOutputChars: number
@@ -130,6 +164,12 @@ function workspaceIdFor(rootPath: string): string {
   return `${base}-${(hash >>> 0).toString(16)}`
 }
 
+/** root 包含性判定（防 .. 逃逸）：candidate 必须等于 root 或位于其内部。 */
+function isPathInside(root: string, candidate: string): boolean {
+  const rel = path.relative(root, candidate)
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel))
+}
+
 /** Windows 进程树回收：taskkill /T /F（与 W4.1 spike 验证一致）。 */
 async function reclaimProcessTree(pid: number): Promise<void> {
   if (process.platform === 'win32' && pid > 0) {
@@ -148,6 +188,12 @@ async function reclaimProcessTree(pid: number): Promise<void> {
 export class TerminalService {
   private readonly sessions = new Map<string, Session>()
   private readonly profiles = new Map<string, TerminalProfile>()
+  /** W4.6：process profile 白名单（userData 可编辑 + 显式注册）。 */
+  private readonly processProfiles = new Map<string, ProcessProfile>()
+  /** W4.6：执行中的 process（finish 后移除；结果保留在 results 供 processResult 取回）。 */
+  private readonly executions = new Map<string, Execution>()
+  private readonly results = new Map<string, Promise<ProcessResult>>()
+  private executionCounter = 0
   private currentRoot: { id: string; path: string } | null = null
   private disposed = false
 
@@ -173,6 +219,24 @@ export class TerminalService {
     if (this.profiles.has(profile.id)) return { ok: false, detail: `shell profile 重复注册: ${profile.id}` }
     this.profiles.set(profile.id, profile)
     return { ok: true }
+  }
+
+  /** 注册 process profile（W4.6 可信配置：userData 白名单可编辑；重复 id 显式失败）。 */
+  registerProcessProfile(input: unknown): TerminalShowResult {
+    let profile: ProcessProfile
+    try {
+      profile = parseProcessProfile(input)
+    } catch (reason) {
+      return { ok: false, detail: reason instanceof Error ? reason.message : String(reason) }
+    }
+    if (this.processProfiles.has(profile.id)) return { ok: false, detail: `process profile 重复注册: ${profile.id}` }
+    this.processProfiles.set(profile.id, profile)
+    return { ok: true }
+  }
+
+  /** 当前 process profile 白名单 id（renderer 只能引用其中之一）。 */
+  processProfileIds(): string[] {
+    return [...this.processProfiles.keys()]
   }
 
   /** 当前 root（W4.5 订阅入口：root 变更时宿主调用）。 */
@@ -316,10 +380,206 @@ export class TerminalService {
     return [...this.sessions.keys()]
   }
 
-  /** 应用退出/卸载统一回收：关闭全部会话（等待进程树回收完成）。 */
+  /**
+   * process:execute（W4.6 受控执行）：
+   * - profileId 必须命中白名单（renderer 无法指定可执行文件；绕 preload 的垃圾输入在解析层拒绝）；
+   * - cwd 解析到当前 root 内（isPathInside 防 .. 逃逸），不存在即失败、不回退；
+   * - 参数数组直接 spawn（无 shell 拼接）；超时/取消走 taskkill 进程树回收；
+   * - stdout/stderr 各自环形截断；终态发审计事件（脱敏：不含输出与 env），结果经 processResult 取回。
+   */
+  async execute(input: unknown): Promise<ProcessExecuteAck> {
+    const nextId = (): string => `exec-${++this.executionCounter}`
+    const reject = (detail: string): ProcessExecuteAck => {
+      const executionId = nextId()
+      this.results.set(executionId, Promise.resolve(this.failedResult(executionId, detail)))
+      return { executionId, ok: false, detail }
+    }
+    if (this.disposed) return reject('终端服务已关闭')
+    let request: ProcessRequest
+    try {
+      request = parseProcessRequest(input, new Set(this.processProfileIds()))
+    } catch (reason) {
+      return reject(reason instanceof Error ? reason.message : String(reason))
+    }
+    const root = this.currentRoot
+    if (!root) return reject('未选择工作区目录，请先选择工作区')
+    if (this.executions.size >= MAX_PROCESS_EXECUTIONS) {
+      return reject(`process 执行数超过上限 ${MAX_PROCESS_EXECUTIONS}`)
+    }
+    const profile = this.processProfiles.get(request.profileId)
+    if (!profile) return reject(`未注册的 process profile: ${request.profileId}`)
+    // cwd：请求级 cwdRelative 优先于 profile 级；解析后必须落在 root 内（防 .. 逃逸）。
+    const cwdRelative = request.cwdRelative ?? profile.cwdRelative
+    let cwd = root.path
+    if (cwdRelative !== undefined && cwdRelative !== '') {
+      const resolved = path.resolve(root.path, cwdRelative)
+      if (!isPathInside(root.path, resolved)) return reject('process cwd 越出工作区 root')
+      cwd = resolved
+    }
+    // spawn 前校验 cwd 存在（profile 默认 cwd 失效时不回退 root）。
+    try {
+      const metadata = await stat(cwd)
+      if (!metadata.isDirectory()) return reject('process cwd 不存在或不是目录')
+    } catch {
+      return reject('process cwd 不存在或不是目录')
+    }
+    const timeoutMs = request.timeoutMs ?? profile.timeoutMs ?? DEFAULT_PROCESS_TIMEOUT_MS
+    const executionId = nextId()
+    let child: ChildProcess
+    try {
+      child = spawnProcess(profile.command, [...profile.args, ...request.args], {
+        cwd,
+        env: this.buildProcessEnv(profile, request),
+        windowsHide: true,
+      })
+    } catch (reason) {
+      return reject(`process spawn 失败: ${reason instanceof Error ? reason.message : String(reason)}`)
+    }
+    const execution: Execution = {
+      id: executionId,
+      profileId: profile.id,
+      cwd,
+      startedAt: new Date().toISOString(),
+      process: child,
+      stdout: new RingBuffer(MAX_PROCESS_OUTPUT_CHARS),
+      stderr: new RingBuffer(MAX_PROCESS_OUTPUT_CHARS),
+      finished: false,
+      timedOut: false,
+      cancelled: false,
+      exitCode: null,
+      signal: null,
+      resolve: () => undefined,
+    }
+    const finishPromise = new Promise<ProcessResult>((resolve) => {
+      execution.resolve = resolve
+    })
+    this.executions.set(executionId, execution)
+    this.results.set(executionId, finishPromise)
+    const timer = setTimeout(() => {
+      if (execution.finished) return
+      execution.timedOut = true
+      void reclaimProcessTree(child.pid ?? 0).finally(() => this.finish(execution))
+    }, timeoutMs)
+    timer.unref()
+    execution.timer = timer
+    child.stdout?.on('data', (chunk: Buffer) => execution.stdout.append(chunk.toString('utf8')))
+    child.stderr?.on('data', (chunk: Buffer) => execution.stderr.append(chunk.toString('utf8')))
+    child.on('error', (reason: Error) => {
+      if (execution.finished) return
+      execution.spawnError = reason.message
+      this.finish(execution)
+    })
+    child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
+      if (execution.finished) return
+      execution.exitCode = code
+      execution.signal = signal
+      this.finish(execution)
+    })
+    return { executionId, ok: true }
+  }
+
+  /** 结果通道：按执行 id 取回终态结果（不存在时显式失败）。 */
+  async processResult(executionId: unknown): Promise<ProcessResult> {
+    const id = typeof executionId === 'string' ? executionId : ''
+    const pending = this.results.get(id)
+    if (!pending) return this.failedResult(id, 'process 执行不存在')
+    return pending
+  }
+
+  /** 取消执行：终止进程树；已结束/未知的执行显式失败。 */
+  async cancel(executionId: unknown): Promise<boolean> {
+    const id = typeof executionId === 'string' ? executionId : ''
+    const execution = this.executions.get(id)
+    if (!execution || execution.finished) return false
+    execution.cancelled = true
+    if (execution.finished) return false
+    await reclaimProcessTree(execution.process.pid ?? 0)
+    try {
+      execution.process.kill()
+    } catch {
+      /* 已退出则忽略 */
+    }
+    return true
+  }
+
+  /** 执行终态：组装结果 + 审计事件（脱敏）；幂等（finished 守卫）。 */
+  private finish(execution: Execution): void {
+    if (execution.finished) return
+    execution.finished = true
+    if (execution.timer) {
+      clearTimeout(execution.timer)
+      execution.timer = undefined
+    }
+    this.executions.delete(execution.id)
+    const finishedAt = new Date()
+    const durationMs = finishedAt.getTime() - Date.parse(execution.startedAt)
+    let detail: string | undefined
+    if (execution.timedOut) detail = '执行超时'
+    else if (execution.cancelled) detail = '执行已取消'
+    else if (execution.spawnError !== undefined) detail = `process spawn 失败: ${execution.spawnError}`
+    else if (execution.exitCode !== 0) detail = `进程以非零退出码 ${execution.exitCode ?? 'null'} 结束`
+    const result: ProcessResult = {
+      executionId: execution.id,
+      ok: execution.exitCode === 0 && !execution.timedOut && !execution.cancelled,
+      exitCode: execution.exitCode,
+      signal: execution.signal,
+      durationMs,
+      stdout: execution.stdout.snapshot(),
+      stderr: execution.stderr.snapshot(),
+      truncated: execution.stdout.truncated || execution.stderr.truncated,
+      timedOut: execution.timedOut,
+      cancelled: execution.cancelled,
+      ...(detail ? { detail } : {}),
+    }
+    execution.resolve(result)
+    // 审计事件：不含 stdout/stderr 与 env（脱敏）；结果保留在 results 供 processResult 取回。
+    this.options.onEvent({
+      executionId: execution.id,
+      profileId: execution.profileId,
+      cwd: execution.cwd,
+      startedAt: execution.startedAt,
+      finishedAt: finishedAt.toISOString(),
+      durationMs,
+      exitCode: execution.exitCode,
+      ok: result.ok,
+      ...(detail ? { detail } : {}),
+    })
+  }
+
+  private failedResult(executionId: string, detail: string): ProcessResult {
+    return {
+      executionId,
+      ok: false,
+      exitCode: null,
+      signal: null,
+      durationMs: 0,
+      stdout: '',
+      stderr: '',
+      truncated: false,
+      timedOut: false,
+      cancelled: false,
+      detail,
+    }
+  }
+
+  /** 应用退出/卸载统一回收：终止执行中的 process 与全部会话（等待进程树回收完成）。 */
   async dispose(): Promise<void> {
     if (this.disposed) return
     this.disposed = true
+    // W4.6：执行中的 process 一并回收（取消标记 + 进程树终止，终态经 finish 落定）。
+    const executionReclaims = [...this.executions.values()].map((execution) => {
+      if (execution.finished) return Promise.resolve()
+      execution.cancelled = true
+      return reclaimProcessTree(execution.process.pid ?? 0).finally(() => {
+        try {
+          execution.process.kill()
+        } catch {
+          /* 已退出则忽略 */
+        }
+        this.finish(execution)
+      })
+    })
+    this.executions.clear()
     const reclaims = [...this.sessions.values()].map((session) => {
       session.closed = true
       return reclaimProcessTree(session.process.pid).finally(() => {
@@ -331,10 +591,12 @@ export class TerminalService {
       })
     })
     this.sessions.clear()
-    await Promise.all(reclaims)
+    await Promise.all([...executionReclaims, ...reclaims])
+    // 回收完成后再清理结果表（执行中的终态仍可被已捕获的 promise 取回）。
+    this.results.clear()
   }
 
-  private buildEnv(profile: TerminalProfile): Record<string, string> {
+  private buildEnv(profile: { env?: Record<string, string> }): Record<string, string> {
     const base = this.options.env ?? process.env
     const env: Record<string, string> = {}
     for (const key of ENV_ALLOWLIST) {
@@ -343,6 +605,13 @@ export class TerminalService {
     }
     env.TERM = 'xterm-256color'
     for (const [key, value] of Object.entries(profile.env ?? {})) env[key] = value
+    return env
+  }
+
+  /** process env（W4.6）：白名单基座 + profile env + 请求显式 env（后者覆盖）。 */
+  private buildProcessEnv(profile: ProcessProfile, request: ProcessRequest): Record<string, string> {
+    const env = this.buildEnv(profile)
+    for (const [key, value] of Object.entries(request.env ?? {})) env[key] = value
     return env
   }
 

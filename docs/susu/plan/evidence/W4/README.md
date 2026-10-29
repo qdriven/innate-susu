@@ -9,14 +9,16 @@
 - W4.3 主进程 TerminalService：会话生命周期、root 安全注入、shell 受控、env 白名单、环形截断、进程树回收、desktop main 组合（见 `service.md`）。
 - W4.4 renderer Terminal Surface：TerminalSessionStore/TerminalPanel（xterm.js + fit、标签切换保留、退出重开、dispose-token 竞态守卫）、desktop TerminalPage + catalog + provider、simple 门控（见 `renderer.md`）。
 - W4.5 root 订阅语义：setRoot 切换语义契约验证——活会话保持原 cwd、新会话用新 root、失效/无效 root 负路径、workspaceId 绑定当前 root（见 `root.md`）。
+- W4.6 受控 process:execute：profile 白名单（userData 可编辑）+ 结构化请求 + 参数数组禁拼接、cwd 强制 root 子树防 `..` 逃逸、超时/取消（taskkill 进程树回收）、输出环形截断、审计事件脱敏、ack/result 分离窄通道、simple 模式门控（见 `process.md`）。
 
 ## 门禁结果
 
 - `pnpm --filter @dogic/core test`：handler-registry 10/10 通过（注册/并列/默认/审批挂钩/热插/键空间隔离）。
-- `pnpm --filter @dogic/plugin-terminal test`：**31/31** 通过（契约 15 + 服务 12 + W4.5 root 订阅 4：root 切换活会话保持/失效 root 负路径/无效 setRoot 拒绝/workspaceId 绑定当前 root）。
-- `pnpm --filter @dogic/plugin-terminal typecheck`、`pnpm --filter @dogic/desktop typecheck`、`pnpm --filter @dogic/desktop test`（**79/79**，12 文件；W4.4 新增 26：store 19 + page 7）：通过。
+- `pnpm --filter @dogic/plugin-terminal test`：**41/41** 通过（契约 15 + 服务 12 + W4.5 root 订阅 4 + W4.6 process 契约 10：正路径真命令、未注册 profile、绕 preload 垃圾输入、cwd 逃逸（请求级 + profile 级 + 幽灵目录）、超时、取消、非零退出、输出截断 + env 脱敏、profile 注册负路径、无 root、dispose 统一回收）。
+- `pnpm --filter @dogic/plugin-terminal typecheck`/`build`、`pnpm --filter @dogic/desktop typecheck`：通过（plugin dist 重建后 desktop 可见新契约）。
+- `pnpm --filter @dogic/desktop test`：**82/82** 通过（13 文件；W4.6 新增 `src/main/ipc.test.ts` 3 项：dev 转发服务端、simple 全拒且不触达服务端、userData 白名单启动加载）。
 - `pnpm --filter @dogic/desktop build`：通过，node-pty 在 main bundle 中 externalize（`require("node-pty")`）。
-- 真实桌面冒烟（`tools/smoke-desktop.ts`）：退出码 0，`[smoke] OK`；W4.4 冒烟证据见 `smoke-w4-4/`（终端 PTY 交互、多标签切换保留、退出重开、伪造 workspaceId 负路径）。
+- 真实桌面冒烟（`tools/smoke-desktop.ts`）：退出码 0，`[smoke] OK`；W4.6 冒烟证据见 `smoke-w4-6/`（process profile 注册与白名单、process:execute 正路径受理→结果→stdout、负路径四件套全拒、simple 模式门控全拒；含终端 PTY、工作区、主题等既有回归）。
 
 ## 安全结论
 

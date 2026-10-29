@@ -86,6 +86,19 @@ function makeApi(overrides: Partial<TerminalApi> = {}): FakeTerminalApi {
     terminalInput: input,
     terminalResize: resize,
     terminalOnEvent: onEvent,
+    // W4.6 process:execute 窄通道桩（渲染端测试不直接消费）
+    processProfileRegister: vi.fn(async (): Promise<{ ok: boolean }> => ({ ok: true })),
+    processProfiles: vi.fn(async (): Promise<string[]> => []),
+    processExecute: vi.fn(async (): Promise<{ executionId: string; ok: boolean }> => ({ executionId: 'exec-1', ok: true })),
+    processResult: vi.fn(async (): Promise<{
+      executionId: string; ok: boolean; exitCode: number | null; signal: string | null;
+      durationMs: number; stdout: string; stderr: string; truncated: boolean;
+      timedOut: boolean; cancelled: boolean;
+    }> => ({
+      executionId: 'exec-1', ok: true, exitCode: 0, signal: null, durationMs: 1,
+      stdout: '', stderr: '', truncated: false, timedOut: false, cancelled: false,
+    })),
+    processCancel: vi.fn(async (): Promise<boolean> => true),
     ...overrides,
   }
   return {

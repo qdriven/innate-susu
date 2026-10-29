@@ -81,6 +81,8 @@ export class TerminalSessionStore {
   }
 
   private dispatch(event: TerminalEvent): void {
+    // W4.6 审计事件（ProcessAuditEvent）不属于任何会话：直接忽略。
+    if (!('terminalId' in event)) return
     const session = this.sessionByTerminalId(event.terminalId)
     if (!session || session.disposed) return
     if ('data' in event) {

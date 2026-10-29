@@ -12,6 +12,7 @@ import type { AppMode } from '@dogic/core'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi, WorkspaceRoot } from '@dogic/plugin-workspace'
 import type { TerminalApi, TerminalDescriptor, TerminalEvent, TerminalShowResult } from '@dogic/plugin-terminal'
+import type { ProcessExecuteAck, ProcessProfile, ProcessRequest, ProcessResult } from '@dogic/plugin-terminal'
 
 const api = {
   getStatus: (): Promise<StatusSnapshot> => ipcRenderer.invoke('innate:status'),
@@ -71,6 +72,17 @@ const api = {
     ipcRenderer.on('innate:terminal-event', listener)
     return () => ipcRenderer.removeListener('innate:terminal-event', listener)
   },
+  // 受控 process:execute 窄通道（W4.6）：profile 白名单 + 结构化请求；
+  // 受理即返回执行 id，结果经 processResult 取回，simple 模式由主进程门控拒绝。
+  processProfileRegister: (profile: ProcessProfile): Promise<TerminalShowResult> =>
+    ipcRenderer.invoke('innate:processProfileRegister', profile),
+  processProfiles: (): Promise<string[]> => ipcRenderer.invoke('innate:processProfiles'),
+  processExecute: (request: ProcessRequest): Promise<ProcessExecuteAck> =>
+    ipcRenderer.invoke('innate:processExecute', request),
+  processResult: (executionId: string): Promise<ProcessResult> =>
+    ipcRenderer.invoke('innate:processResult', executionId),
+  processCancel: (executionId: string): Promise<boolean> =>
+    ipcRenderer.invoke('innate:processCancel', executionId),
 } satisfies WorkspaceApi & TerminalApi & Record<string, unknown>
 
 contextBridge.exposeInMainWorld('innate', api)

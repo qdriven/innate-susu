@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { readFile } from 'node:fs/promises'
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import {
   dshHome,
@@ -170,6 +171,48 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:terminalInput', (_e, terminalId: unknown, data: unknown) => terminal.input(terminalId, data))
   ipcMain.handle('innate:terminalResize', (_e, terminalId: unknown, size: unknown) => terminal.resize(terminalId, size))
   ipcMain.handle('innate:terminalClose', (_e, terminalId: unknown) => terminal.close(terminalId))
+
+  // W4.6 受控 process:execute 窄通道：profile 白名单 + 结构化请求；simple 模式全拒。
+  // 白名单来源：userData/process-profiles.json（可编辑 JSON 数组）+ 显式注册（受控开发入口）。
+  void (async () => {
+    try {
+      const raw = await readFile(path.join(app.getPath('userData'), 'process-profiles.json'), 'utf8')
+      const parsed: unknown = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        for (const item of parsed) terminal.registerProcessProfile(item)
+      }
+    } catch {
+      /* 无白名单文件/格式非法：跳过（白名单为空时执行一律拒绝） */
+    }
+  })()
+  const isSimple = (): boolean => readMode(app.getPath('userData')) === 'simple'
+  const simpleDetail = 'simple 模式不提供 process:execute'
+  ipcMain.handle('innate:processProfileRegister', (_e, profile: unknown) => {
+    if (isSimple()) return { ok: false, detail: simpleDetail }
+    return terminal.registerProcessProfile(profile)
+  })
+  ipcMain.handle('innate:processProfiles', () => {
+    if (isSimple()) return []
+    return terminal.processProfileIds()
+  })
+  ipcMain.handle('innate:processExecute', (_e, request: unknown) => {
+    if (isSimple()) return { executionId: '', ok: false, detail: simpleDetail }
+    return terminal.execute(request)
+  })
+  ipcMain.handle('innate:processResult', (_e, executionId: unknown) => {
+    if (isSimple()) {
+      return {
+        executionId: '', ok: false, exitCode: null, signal: null, durationMs: 0,
+        stdout: '', stderr: '', truncated: false, timedOut: false, cancelled: false,
+        detail: simpleDetail,
+      }
+    }
+    return terminal.processResult(executionId)
+  })
+  ipcMain.handle('innate:processCancel', (_e, executionId: unknown) => {
+    if (isSimple()) return false
+    return terminal.cancel(executionId)
+  })
 
   harness.on('state', (state) => {
     if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:harness-state', publicHarnessState(state))

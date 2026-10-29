@@ -494,6 +494,17 @@ try {
   if (!simpleOk) throw new Error('simple 模式页面门控不符合预期')
   if (simpleNav.includes('终端')) throw new Error('simple 模式出现终端导航（门控失效）')
   console.log('[smoke] simple 模式门控通过')
+  // W4.6：simple 模式下 process:execute 窄通道必须全拒（主进程门控，不触达服务端）
+  const simpleProcess = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: [] })",
+  )
+  if (simpleProcess?.ok) throw new Error('simple 模式 process:execute 未被拒绝')
+  if (simpleProcess?.detail !== 'simple 模式不提供 process:execute') {
+    throw new Error(`simple 模式 process 拒绝 detail 不符合预期: ${simpleProcess?.detail ?? ''}`)
+  }
+  const simpleCancel = await evaluate<boolean>("window.innate.processCancel('exec-1')")
+  if (simpleCancel) throw new Error('simple 模式 processCancel 未被拒绝')
+  console.log('[smoke] simple 模式 process:execute 门控全拒通过')
   await shot('simple-home')
   console.log('[smoke] simple hero:', await evaluate("document.querySelector('.simple-hero')?.textContent?.slice(0, 120)"))
   let harnessPort: number | undefined
@@ -710,6 +721,59 @@ try {
   )
   if (forgedTerminal?.ok) throw new Error('伪造 workspaceId 的 terminalCreate 未被拒绝')
   console.log('[smoke] 伪造 workspaceId 被拒绝，终端负路径通过')
+
+  // W4.6：受控 process:execute 窄通道 E2E——profile 注册、受理回执、结果取回、负路径
+  const registerProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processProfileRegister({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })",
+  )
+  if (!registerProfile?.ok) throw new Error(`process profile 注册失败: ${registerProfile?.detail ?? ''}`)
+  const profiles = await evaluate<string[]>('window.innate.processProfiles()')
+  if (!Array.isArray(profiles) || !profiles.includes('echoer')) {
+    throw new Error(`process profile 白名单未生效: ${JSON.stringify(profiles)}`)
+  }
+  console.log('[smoke] process profile 注册与白名单通过')
+
+  const ack = await evaluate<{ executionId: string; ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: ['echo', 'smoke-process-ok'] })",
+  )
+  if (!ack?.ok || !ack.executionId) {
+    throw new Error(`processExecute 受理回执不符合预期: ${JSON.stringify(ack)}`)
+  }
+  let processOutcome: {
+    ok: boolean; exitCode: number | null; stdout: string; timedOut: boolean; cancelled: boolean; detail?: string
+  } | undefined
+  for (let i = 0; i < 30 && !processOutcome?.ok; i++) {
+    processOutcome = await evaluate(`window.innate.processResult('${ack.executionId}')`)
+    if (!processOutcome?.ok) await sleep(500)
+  }
+  if (!processOutcome?.ok) throw new Error(`process 执行未成功: ${JSON.stringify(processOutcome)}`)
+  if (processOutcome.exitCode !== 0) throw new Error(`process 退出码非零: ${JSON.stringify(processOutcome)}`)
+  if (processOutcome.timedOut || processOutcome.cancelled) {
+    throw new Error(`process 终态异常: ${JSON.stringify(processOutcome)}`)
+  }
+  if (!processOutcome.stdout.includes('smoke-process-ok')) {
+    throw new Error(`process stdout 未捕获: ${JSON.stringify(processOutcome)}`)
+  }
+  console.log('[smoke] process:execute 正路径（受理→结果→stdout）通过')
+
+  // 负路径：未注册 profile / cwd 逃逸 / 非法 profile 注册 / 未知 executionId
+  const ghostProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'ghost', args: ['echo', 'x'] })",
+  )
+  if (ghostProfile?.ok) throw new Error('未注册 profile 未被拒绝')
+  const escapeCwd = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: ['echo', 'x'], cwdRelative: '../..' })",
+  )
+  if (escapeCwd?.ok) throw new Error('cwd 逃逸未被拒绝')
+  const badProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processProfileRegister({ id: 'bad', command: 'cmd.exe &', args: [] })",
+  )
+  if (badProfile?.ok) throw new Error('含非法字符的 profile 未被拒绝')
+  const ghostResult = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processResult('ghost-exec')",
+  )
+  if (ghostResult?.ok) throw new Error('未知 executionId 未被拒绝')
+  console.log('[smoke] process 负路径（未注册 profile/cwd 逃逸/非法 profile/未知执行）全拒通过')
 
   if (harnessPort !== undefined) {
     // W1a 基线：跨 simple 重载与 dev 多页导航后，Harness 仍是同一页面（URL 未变 + 存活标记在 = 未 reload）

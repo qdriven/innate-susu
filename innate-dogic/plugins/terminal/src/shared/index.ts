@@ -57,7 +57,7 @@ export interface TerminalErrorEvent {
   message: string
 }
 
-export type TerminalEvent = TerminalOutputEvent | TerminalExitEvent | TerminalErrorEvent
+export type TerminalEvent = TerminalOutputEvent | TerminalExitEvent | TerminalErrorEvent | ProcessAuditEvent
 
 export const MIN_COLS = 2
 export const MAX_COLS = 500
@@ -183,15 +183,28 @@ export interface ProcessRequest {
 }
 
 export interface ProcessResult {
+  executionId: string
   ok: boolean
   exitCode: number | null
-  signal: number | null
+  /** node:child_process 信号（Windows 恒为 null；POSIX 为 SIGTERM 等）。 */
+  signal: string | null
   durationMs: number
   stdout: string
   stderr: string
   truncated: boolean
   timedOut: boolean
   cancelled: boolean
+  detail?: string
+}
+
+/**
+ * processExecute 受理回执（W4.6）：受理即返回执行 id；
+ * 完整结果（exitCode/输出摘要/超时/取消）经 processResult 通道取回，
+ * 审计事件经 terminal-event 流式推送（脱敏：不含输出与 env）。
+ */
+export interface ProcessExecuteAck {
+  executionId: string
+  ok: boolean
   detail?: string
 }
 
@@ -286,6 +299,19 @@ export interface AuditRecord {
   detail?: string
 }
 
+/** 执行审计事件（W4.6）：终态经 terminal-event 流式推送；脱敏——不含 stdout/stderr 与 env。 */
+export interface ProcessAuditEvent {
+  executionId: string
+  profileId: string
+  cwd: string
+  startedAt: string
+  finishedAt: string
+  durationMs: number
+  exitCode: number | null
+  ok: boolean
+  detail?: string
+}
+
 // ---------------------------------------------------------------- preload 窄通道
 
 /**
@@ -300,5 +326,11 @@ export interface TerminalApi {
   terminalResize(terminalId: string, size: { cols: number; rows: number }): Promise<boolean>
   terminalClose(terminalId: string): Promise<boolean>
   terminalOnEvent(cb: (event: TerminalEvent) => void): (() => void)
+  /** W4.6 受控 process:execute 窄通道：profile 白名单 + 结构化请求；simple 模式由宿主门控拒绝。 */
+  processProfileRegister(profile: ProcessProfile): Promise<TerminalShowResult>
+  processProfiles(): Promise<string[]>
+  processExecute(request: ProcessRequest): Promise<ProcessExecuteAck>
+  processResult(executionId: string): Promise<ProcessResult>
+  processCancel(executionId: string): Promise<boolean>
 }
 
