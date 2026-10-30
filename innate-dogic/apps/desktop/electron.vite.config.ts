@@ -23,6 +23,7 @@ const aliases = {
   '@dogic/plugin-terminal': resolve(terminalSrc, 'shared/index.ts'),
   '@dogic/plugin-browser/main/electron': resolve(browserSrc, 'main/electron-view.ts'),
   '@dogic/plugin-browser/main': resolve(browserSrc, 'main/index.ts'),
+  '@dogic/plugin-browser/renderer': resolve(browserSrc, 'renderer/index.ts'),
   '@dogic/plugin-browser': resolve(browserSrc, 'shared/index.ts'),
 }
 const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/plugin-terminal', '@dogic/plugin-browser', '@dogic/syntax-highlighting']

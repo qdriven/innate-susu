@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * W5.2 browser 技术 spike（开发环境）：
+ * W5.2+W5.3 browser 技术 spike（开发环境）：
  * 在 Electron 主进程内验证独立 WebContentsView 生命周期全链路——
  * 独立持久分区、安全 webPreferences、导航/历史、加载失败、多标签
- * 切换不重载、关闭回收与窗口关闭统一回收。
+ * 切换不重载、关闭回收、窗口关闭统一回收；以及 W5.3 导航守卫——
+ * 页面内导航（will-frame-navigate）与重定向（will-redirect）逐跳拦截、
+ * 合法重定向放行、window.open 外链交系统浏览器、地址栏凭据拒绝。
  *
  * 运行前先构建插件：pnpm --filter @dogic/plugin-browser build
  * 运行：innate-dogic/apps/desktop/node_modules/electron/dist/electron.exe \
@@ -29,11 +31,38 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/** 本地测试站点：只读静态页（无脚本注入、无下载）。 */
+/** 本地测试站点：只读静态页（无脚本注入、无下载），按路由返回不同页面。
+ *  注意：认证 URL（含内嵌凭据）不得进入日志/快照——重定向测试内部使用，
+ *  输出只记录结论不记录 URL。 */
 function startTestSite() {
   return new Promise((resolve) => {
-    const server = http.createServer((_req, res) => {
+    const server = http.createServer((req, res) => {
+      const url = new URL(req.url, 'http://127.0.0.1')
       res.setHeader('content-type', 'text/html; charset=utf-8')
+      if (url.pathname === '/evil') {
+        // 页面加载完成后脚本导航到内嵌凭据地址（will-frame-navigate 触发的
+        // 页面内导航；守卫按凭据检查拦截。about:blank 等特殊协议不触发
+        // will-frame-navigate，javascript:alert 会弹对话框，均不可用作夹具）
+        res.end(`<!doctype html><html><body><h1>evil</h1><script>window.addEventListener("load",()=>{setTimeout(()=>{location.href="http://user:pass@127.0.0.1:${server.address().port}/"},100)})</script></body></html>`)
+        return
+      }
+      if (url.pathname === '/open') {
+        // 页面内 window.open 外链（交系统浏览器）
+        res.end('<!doctype html><html><body><h1>opener</h1><script>window.open("https://example.com/", "_blank")</script></body></html>')
+        return
+      }
+      if (url.pathname === '/redirect-credential') {
+        // 重定向到内嵌凭据地址（逐跳守卫拦截目标；URL 含凭据不记录）
+        res.writeHead(302, { location: `http://user:pass@127.0.0.1:${server.address().port}/` })
+        res.end()
+        return
+      }
+      if (url.pathname === '/redirect-ok') {
+        // 合法重定向（http → http，守卫应放行）
+        res.writeHead(302, { location: `http://127.0.0.1:${server.address().port}/` })
+        res.end()
+        return
+      }
       res.end('<!doctype html><html><body><h1>innate-browser-spike</h1></body></html>')
     })
     server.listen(0, '127.0.0.1', () => resolve(server))
@@ -115,6 +144,9 @@ async function main() {
     factory: createElectronBrowserView,
     onEvent: (event) => events.push(event),
   })
+  // 统计应用内新建 webContents：window.open 被拒（交系统浏览器）时不应增加
+  let webContentsCount = 0
+  app.on('web-contents-created', () => { webContentsCount++ })
 
   // 1. provider 适配器形态
   record('provider 形态：browser/webcontents/deferredUrl', service.provider.id === 'browser'
@@ -168,7 +200,40 @@ async function main() {
   const rejected = await service.navigate('browser-1', { url: 'file:///C:/Windows/' })
   record('file: 协议导航被拒', rejected.ok === false, rejected.detail)
 
-  // 8. 窗口关闭：dispose 统一回收（webContents.close 销毁为异步，等待确认）
+  // 8. 页面内导航到内嵌凭据地址：守卫逐跳拦截（errorCode -3），地址不污染
+  const evilUrl = `${siteUrl}evil`
+  const navEvil = await service.navigate('browser-1', { url: evilUrl })
+  record('页面内导航起始页可加载', navEvil.ok === true, navEvil.detail)
+  const frameGuard = await waitFor(() => events.some((event) => event.errorCode === -3))
+  record('页面内导航守卫：内嵌凭据目标被拦截（errorCode -3）', frameGuard)
+  record('页面内导航守卫：地址不污染', service.state('browser-1')?.currentUrl === evilUrl,
+    service.state('browser-1')?.currentUrl ?? '无')
+
+  // 9. 重定向到内嵌凭据地址：逐跳守卫拦截（errorCode -3），凭据地址不入历史
+  const guardFrom = events.length
+  await service.navigate('browser-1', { url: `${siteUrl}redirect-credential` })
+  const credentialGuard = await waitFor(() => events.slice(guardFrom).some((event) => event.errorCode === -3))
+  record('重定向守卫：内嵌凭据目标被拦截（errorCode -3）', credentialGuard)
+  record('重定向拦截：凭据地址不入历史', (service.state('browser-1')?.currentUrl ?? '').indexOf('@') === -1)
+
+  // 10. 合法重定向（http → http）放行并完成加载
+  const navOk = await service.navigate('browser-1', { url: `${siteUrl}redirect-ok` })
+  const redirectOk = await waitFor(() => service.state('browser-1')?.currentUrl === siteUrl)
+  record('合法重定向放行：最终地址完成加载', redirectOk && navOk.ok === true,
+    `navigate.ok=${navOk.ok} currentUrl=${service.state('browser-1')?.currentUrl ?? '无'} failed=${service.state('browser-1')?.failed ?? '无'} navigated=[${events.filter((event) => event.type === 'navigated').map((event) => event.url).join(' | ')}]`)
+
+  // 11. window.open 外链：交系统浏览器，应用内不新建 webContents
+  const wcBefore = webContentsCount
+  const navOpen = await service.navigate('browser-1', { url: `${siteUrl}open` })
+  const openLoaded = await waitFor(() => service.state('browser-1')?.currentUrl === `${siteUrl}open`)
+  record('window.open 外链：应用内不新建 webContents（交系统浏览器）', openLoaded && webContentsCount === wcBefore,
+    `navigate.ok=${navOpen.ok}`)
+
+  // 12. 地址栏内嵌凭据导航被策略层拒绝
+  const credentialRejected = await service.navigate('browser-1', { url: `http://user:pass@127.0.0.1:${port}/` })
+  record('地址栏内嵌凭据导航被拒', credentialRejected.ok === false, credentialRejected.detail)
+
+  // 13. 窗口关闭：dispose 统一回收（webContents.close 销毁为异步，等待确认）
   service.dispose()
   const disposed = await waitFor(() => wc1.isDestroyed() === true)
   record('窗口关闭统一回收：全部视图销毁', disposed)

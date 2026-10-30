@@ -82,6 +82,10 @@ const browser = vi.hoisted(() => {
         calls.push({ method: 'reload', args: [id] })
         return { ok: true, url: 'https://example.com/' }
       }
+      async stop(id: unknown) {
+        calls.push({ method: 'stop', args: [id] })
+        return { ok: true }
+      }
       state(id: unknown) {
         calls.push({ method: 'state', args: [id] })
         return undefined
@@ -217,7 +221,7 @@ describe('W5.2 browser 窄通道（desktop main）', () => {
     env.userDataDir = 'C:/fake-user-data'
   })
 
-  it('browser 导航/历史/状态通道转发服务端', async () => {
+  it('browser 导航/历史/停止/状态通道转发服务端', async () => {
     registerIpc(new BrowserWindow({}))
     const nav = await invoke('innate:browserNavigate', 'browser-1', { url: 'https://example.com/' })
     expect(nav).toEqual({ ok: true, url: 'https://example.com/' })
@@ -225,6 +229,8 @@ describe('W5.2 browser 窄通道（desktop main）', () => {
     expect(await invoke('innate:browserBack', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
     expect(await invoke('innate:browserForward', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
     expect(await invoke('innate:browserReload', 'browser-1')).toEqual({ ok: true, url: 'https://example.com/' })
+    expect(await invoke('innate:browserStop', 'browser-1')).toEqual({ ok: true })
+    expect(browser.calls.some((call) => call.method === 'stop')).toBe(true)
     expect(await invoke('innate:browserState', 'browser-1')).toBeNull()
     expect(browser.calls.some((call) => call.method === 'state')).toBe(true)
   })

@@ -148,6 +148,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('innate:browserBack', (_e, id: unknown) => browser.back(id))
   ipcMain.handle('innate:browserForward', (_e, id: unknown) => browser.forward(id))
   ipcMain.handle('innate:browserReload', (_e, id: unknown) => browser.reload(id))
+  ipcMain.handle('innate:browserStop', (_e, id: unknown) => browser.stop(id))
   ipcMain.handle('innate:browserState', (_e, id: unknown) => browser.state(id) ?? null)
 
   ipcMain.handle('innate:revealDshHome', () => shell.openPath(dshHome()))

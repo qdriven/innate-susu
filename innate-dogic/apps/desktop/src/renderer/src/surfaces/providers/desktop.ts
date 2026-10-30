@@ -4,6 +4,7 @@ import { SurfaceProviderRegistry } from '../provider-registry'
 import type { SurfaceProvider } from '../provider-registry'
 import { createTerminalProvider } from './terminal'
 import { createWebContentsProvider } from './webcontents'
+import { createBrowserProvider } from './browser'
 
 /**
  * 桌面端 provider 注册表（W1c.2 / W1c.3）。
@@ -26,8 +27,8 @@ export function createDesktopSurfaceProviders(): SurfaceProviderRegistry {
       ],
     }),
     () => createTerminalProvider(api),
-    // browser Surface（W5.2）：复用通用 WebContents 渲染；地址栏与导航交互在 W5.3 挂上。
-    () => createWebContentsProvider({ id: BROWSER_PROVIDER_ID }),
+    // browser Surface（W5.3）：地址栏面板 + 宿主视图生命周期；导航守卫在 main 侧执行。
+    () => createBrowserProvider(api),
   ]
   for (const factory of factories) {
     try {

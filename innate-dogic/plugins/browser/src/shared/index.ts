@@ -74,7 +74,7 @@ export interface BrowserSessionState extends BrowserHistoryState {
 /**
  * 页面事件流（主进程 → renderer）：加载中/加载失败/主框架导航完成/崩溃/
  * 无响应恢复。事件只携带可展示文本与规范化 URL，不携带 webContents 或
- * session 对象；重定向最终地址的再校验在 W5.3 收紧。
+ * session 对象；重定向最终地址的再校验在 W5.3 收紧（navigation guard）。
  */
 export type BrowserSurfaceEvent =
   | { type: 'loading'; id: string; loading: boolean }
@@ -84,8 +84,17 @@ export type BrowserSurfaceEvent =
   | { type: 'unresponsive'; id: string; responsive: boolean }
 
 /**
+ * 错误页展示文本净化（W5.3）：错误消息可能携带页面自身 URL（入口已过白名单），
+ * 但任何内嵌凭据一律剥离——错误页绝不暴露认证 query、凭据或内部堆栈。
+ */
+export function sanitizeBrowserDisplayText(input: string): string {
+  // 剥离 //user:pass@ 形式的内嵌凭据（防御性：入口与重定向守卫已拒绝，此处兜底）。
+  return input.replace(/\/\/[^/@\s]*@/g, '//')
+}
+
+/**
  * browser provider 最小接口（W5.1 定义，W5.2 起由 BrowserSurfaceService 实现）：
- * open/navigate/back/forward/reload/activate/deactivate/close。
+ * open/navigate/back/forward/reload/stop/activate/deactivate/close。
  * 输入一律为不可信 unknown，由实现方在策略层解析。
  */
 export interface BrowserProvider {
@@ -94,10 +103,26 @@ export interface BrowserProvider {
   back(id: unknown): Promise<BrowserNavigateResult>
   forward(id: unknown): Promise<BrowserNavigateResult>
   reload(id: unknown): Promise<BrowserNavigateResult>
+  stop(id: unknown): Promise<BrowserOpenResult>
   activate(id: unknown): Promise<BrowserOpenResult>
   deactivate(id: unknown): Promise<BrowserOpenResult>
   close(id: unknown): Promise<BrowserOpenResult>
   state(id: unknown): BrowserSessionState | undefined
+}
+
+/**
+ * preload 暴露给 renderer 的 browser 窄通道（W5.3 地址栏消费）：
+ * 只提交安全字段（会话 id + 规范化 URL），事件由主进程主动推送，
+ * renderer 无法伪造来源，也不持有 webContents/session 对象。
+ */
+export interface BrowserApi {
+  browserNavigate(id: string, request: BrowserNavigateRequest): Promise<BrowserNavigateResult>
+  browserBack(id: string): Promise<BrowserNavigateResult>
+  browserForward(id: string): Promise<BrowserNavigateResult>
+  browserReload(id: string): Promise<BrowserNavigateResult>
+  browserStop(id: string): Promise<BrowserOpenResult>
+  browserState(id: string): Promise<BrowserSessionState | null>
+  browserOnEvent(cb: (event: BrowserSurfaceEvent) => void): () => void
 }
 
 const browserIdPattern = /^[A-Za-z0-9_-]{1,64}$/

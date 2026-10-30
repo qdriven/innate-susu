@@ -17,6 +17,10 @@
     "./main/electron": {
       "types": "./dist/main/electron-view.d.ts",
       "import": "./dist/main/electron-view.js"
+    },
+    "./renderer": {
+      "types": "./dist/renderer/index.d.ts",
+      "import": "./dist/renderer/index.js"
     }
   },
   "innate": {
@@ -37,6 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
+    "@types/react": "^19.0.0",
     "electron": "43.7.11",
     "typescript": "^5.7.2",
     "vitest": "^2.1.4"

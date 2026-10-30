@@ -23,17 +23,24 @@ function descriptorInput(overrides: Record<string, unknown> = {}): Record<string
 interface FakeView {
   view: BrowserSurfaceView
   loadURL: ReturnType<typeof vi.fn>
+  stop: ReturnType<typeof vi.fn>
   close: ReturnType<typeof vi.fn>
   setBounds: ReturnType<typeof vi.fn>
   subscribe: ReturnType<typeof vi.fn>
   emit(event: BrowserViewEvent): void
 }
 
-function fakeViewFactory(): { factory: BrowserSurfaceViewFactory; views: FakeView[] } {
+function fakeViewFactory(): {
+  factory: BrowserSurfaceViewFactory
+  views: FakeView[]
+  guardCalls: Array<(url: string) => boolean>
+} {
   const views: FakeView[] = []
-  const factory = ((_descriptor: BrowserDescriptor) => {
+  const guards: Array<(url: string) => boolean> = []
+  const factory = ((_descriptor: BrowserDescriptor, guard: (url: string) => boolean) => {
     const listeners = new Set<(event: BrowserViewEvent) => void>()
     const loadURL = vi.fn(async () => {})
+    const stop = vi.fn()
     const close = vi.fn()
     const setBounds = vi.fn()
     const subscribe = vi.fn((listener: (event: BrowserViewEvent) => void) => {
@@ -43,6 +50,7 @@ function fakeViewFactory(): { factory: BrowserSurfaceViewFactory; views: FakeVie
     const view: BrowserSurfaceView = {
       underlying: {} as unknown as WebContentsView,
       loadURL,
+      stop,
       close,
       setBounds,
       subscribe,
@@ -50,6 +58,7 @@ function fakeViewFactory(): { factory: BrowserSurfaceViewFactory; views: FakeVie
     views.push({
       view,
       loadURL,
+      stop,
       close,
       setBounds,
       subscribe,
@@ -57,9 +66,10 @@ function fakeViewFactory(): { factory: BrowserSurfaceViewFactory; views: FakeVie
         for (const listener of [...listeners]) listener(event)
       },
     })
+    guards.push(guard)
     return view
   }) as BrowserSurfaceViewFactory
-  return { factory, views }
+  return { factory, views, guardCalls: guards }
 }
 
 function recordingService() {
@@ -165,12 +175,13 @@ describe('BrowserSurfaceService（会话隔离与导航策略）', () => {
     expect((await service.close('b-1')).ok).toBe(false)
   })
 
-  it('未知会话的导航/历史/可见/关闭操作全部显式失败', async () => {
+  it('未知会话的导航/历史/停止/可见/关闭操作全部显式失败', async () => {
     const { service } = recordingService()
     expect((await service.navigate('ghost', { url: 'https://example.com/' })).ok).toBe(false)
     expect((await service.back('ghost')).ok).toBe(false)
     expect((await service.forward('ghost')).ok).toBe(false)
     expect((await service.reload('ghost')).ok).toBe(false)
+    expect((await service.stop('ghost')).ok).toBe(false)
     expect((await service.activate('ghost')).ok).toBe(false)
     expect((await service.deactivate('ghost')).ok).toBe(false)
     expect((await service.close('ghost')).ok).toBe(false)
@@ -337,5 +348,83 @@ describe('BrowserSurfaceService（多标签与生命周期 W5.2）', () => {
   it('视图抽象不提供 JS 执行通道（类型层保证）', () => {
     // @ts-expect-error BrowserSurfaceView 没有 executeJavaScript 属性
     void ({} as BrowserSurfaceView).executeJavaScript
+  })
+})
+
+describe('BrowserSurfaceService（导航守卫与地址栏 W5.3）', () => {
+  it('stop 停止当前加载（视图层受理）；未知会话显式失败', async () => {
+    const { service, views } = recordingService()
+    await service.open(descriptorInput())
+    expect((await service.stop('browser-1'))).toEqual({ ok: true })
+    expect(views[0]?.stop).toHaveBeenCalledTimes(1)
+    const ghost = await service.stop('ghost')
+    expect(ghost.ok).toBe(false)
+    expect(ghost.detail).toContain('会话不存在')
+  })
+
+  it('工厂收到导航守卫：白名单/凭据/格式一律拒绝，http/https 放行', async () => {
+    const { factory, guardCalls, views } = fakeViewFactory()
+    const service = new BrowserSurfaceService({ factory })
+    await service.open(descriptorInput())
+    // 守卫经工厂第二参数注入（页面内导航与重定向目标同用）
+    expect(guardCalls).toHaveLength(1)
+    const guardFn = guardCalls[0]
+    expect(guardFn('https://example.com/')).toBe(true)
+    expect(guardFn('http://127.0.0.1:8080/')).toBe(true)
+    expect(guardFn('file:///C:/Windows/')).toBe(false)
+    expect(guardFn('javascript:alert(1)')).toBe(false)
+    expect(guardFn('http://user:pass@example.com/')).toBe(false)
+    expect(guardFn('example.com')).toBe(false)
+    expect(guardFn('')).toBe(false)
+    expect(views[0]?.stop).not.toHaveBeenCalled()
+  })
+
+  it('守卫拒绝的导航不产生 loadURL 调用（被守卫拦截在视图层）', async () => {
+    // 守卫逻辑属视图层（electron-view），服务层只保证注入；此处验证注入守卫
+    // 与 navigate 策略同源（同 parseBrowserUrl），非法目标在服务层先行拒绝。
+    const { service } = recordingService()
+    await service.open(descriptorInput())
+    expect((await service.navigate('browser-1', { url: 'file:///etc/passwd' })).ok).toBe(false)
+    expect((await service.navigate('browser-1', { url: 'http://a:b@c/' })).ok).toBe(false)
+    expect(service.state('browser-1')?.failed).toBe('')
+  })
+
+  it('失败消息净化：携带内嵌凭据的错误文本不进入状态与事件', async () => {
+    const { service, views, events } = recordingService()
+    await service.open(descriptorInput())
+    await service.navigate('browser-1', { url: 'https://example.com/' })
+    views[0]?.emit({ type: 'failed', errorCode: -102, message: "ERR_FAILED loading 'http://user:pass@example.com/secret'" })
+    const state = service.state('browser-1')
+    expect(state?.failed).toBe("ERR_FAILED loading 'http://example.com/secret'")
+    expect(state?.failed).not.toContain('user:pass')
+    expect(events).toContainEqual({
+      type: 'failed', id: 'browser-1', errorCode: -102,
+      message: "ERR_FAILED loading 'http://example.com/secret'",
+    })
+  })
+
+  it('守卫拦截事件（errorCode -3）如实上报，不影响会话历史', async () => {
+    const { service, views, events } = recordingService()
+    await service.open(descriptorInput())
+    await service.navigate('browser-1', { url: 'https://example.com/a' })
+    views[0]?.emit({ type: 'failed', errorCode: -3, message: '导航被安全策略拒绝' })
+    expect(service.state('browser-1')?.failed).toBe('导航被安全策略拒绝')
+    expect(service.state('browser-1')?.currentUrl).toBe('https://example.com/a')
+    expect(events).toContainEqual({
+      type: 'failed', id: 'browser-1', errorCode: -3, message: '导航被安全策略拒绝',
+    })
+  })
+
+  it('重定向：navigated 事件（最终地址）先于 loadURL resolve，状态保留最终地址', async () => {
+    const { service, views } = recordingService()
+    await service.open(descriptorInput())
+    // 模拟重定向：loadURL 期间先发出最终地址的 navigated 事件
+    views[0]?.loadURL.mockImplementationOnce(async (url: string) => {
+      views[0]?.emit({ type: 'navigated', url: `${url}final` })
+    })
+    const result = await service.navigate('browser-1', { url: 'https://example.com/a' })
+    expect(result).toEqual({ ok: true, url: 'https://example.com/a' })
+    // did-navigate 先于 loadURL resolve 到达，goto 不得用初始 URL 覆盖最终地址
+    expect(service.state('browser-1')?.currentUrl).toBe('https://example.com/afinal')
   })
 })

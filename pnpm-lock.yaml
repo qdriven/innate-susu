@@ -359,6 +359,9 @@ importers:
       '@types/node':
         specifier: ^22.7.5
         version: 22.20.5
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
       electron:
         specifier: 43.7.11
         version: 43.7.11(supports-color@7.2.0)

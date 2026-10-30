@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w5-3
 title: W5.3 导航与外链规则
 createdAt: 2026-10-28T10:55:19.484615Z
-updatedAt: 2026-10-28T10:55:19.484615Z
-status: draft
+updatedAt: 2026-10-30T00:00:00.000Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -107,9 +107,10 @@ Sprint W5（docs/sprints/w5/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 普通/非法协议/重定向/window.open/错误页/历史
+- F1-V1 [done] 普通/非法协议/重定向/window.open/错误页/历史
   - 方法：测试
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W5/navigation.md（单元测试 browser 43/43、
+    desktop 95/95；electron spike 20/20；全量门禁退出码 0）
 
 ## 涉及模块
 
@@ -122,6 +123,11 @@ Spec：S1
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 2026-10-30 完成：地址栏面板（renderer `plugins/browser/src/renderer/`）
+  + 导航守卫（`will-frame-navigate`/`will-redirect` 逐跳拦截 + 服务层
+  最终地址复验 + 错误消息净化 + window.open 交系统浏览器）；browser
+  43/43、desktop 95/95（面板渲染测试 8）、spike 20/20、门禁退出码 0。
+  证据 docs/susu/plan/evidence/W5/navigation.md。
 
 ## 来源原文
 

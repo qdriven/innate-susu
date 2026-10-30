@@ -7,6 +7,7 @@ import {
   MAX_URL_LENGTH,
   parseBrowserDescriptor,
   parseBrowserUrl,
+  sanitizeBrowserDisplayText,
 } from './index.js'
 
 function descriptorInput(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -112,5 +113,26 @@ describe('parseBrowserDescriptor（provider 隔离与 capability）', () => {
 
   it('providerId 常量固定', () => {
     expect(BROWSER_PROVIDER_ID).toBe('browser')
+  })
+})
+
+describe('sanitizeBrowserDisplayText（错误页展示净化 W5.3）', () => {
+  it('剥离内嵌凭据（错误页绝不暴露认证信息）', () => {
+    expect(sanitizeBrowserDisplayText('ERR_FAILED loading http://user:pass@example.com/x'))
+      .toBe('ERR_FAILED loading http://example.com/x')
+    expect(sanitizeBrowserDisplayText('http://admin:s3cret@host/path'))
+      .toBe('http://host/path')
+  })
+
+  it('保留正常错误文案与普通 URL', () => {
+    expect(sanitizeBrowserDisplayText('ERR_CONNECTION_REFUSED'))
+      .toBe('ERR_CONNECTION_REFUSED')
+    expect(sanitizeBrowserDisplayText("loading 'http://127.0.0.1:8080/'"))
+      .toBe("loading 'http://127.0.0.1:8080/'")
+  })
+
+  it('无凭据输入原样返回', () => {
+    expect(sanitizeBrowserDisplayText('')).toBe('')
+    expect(sanitizeBrowserDisplayText('导航被安全策略拒绝')).toBe('导航被安全策略拒绝')
   })
 })

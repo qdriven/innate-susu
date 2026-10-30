@@ -13,6 +13,14 @@ import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi, WorkspaceRoot } from '@dogic/plugin-workspace'
 import type { TerminalApi, TerminalDescriptor, TerminalEvent, TerminalShowResult } from '@dogic/plugin-terminal'
 import type { ProcessExecuteAck, ProcessProfile, ProcessRequest, ProcessResult } from '@dogic/plugin-terminal'
+import type {
+  BrowserApi,
+  BrowserNavigateRequest,
+  BrowserNavigateResult,
+  BrowserOpenResult,
+  BrowserSessionState,
+  BrowserSurfaceEvent,
+} from '@dogic/plugin-browser'
 
 const api = {
   getStatus: (): Promise<StatusSnapshot> => ipcRenderer.invoke('innate:status'),
@@ -83,7 +91,26 @@ const api = {
     ipcRenderer.invoke('innate:processResult', executionId),
   processCancel: (executionId: string): Promise<boolean> =>
     ipcRenderer.invoke('innate:processCancel', executionId),
-} satisfies WorkspaceApi & TerminalApi & Record<string, unknown>
+  // browser 地址栏窄通道（W5.3）：只提交安全字段（会话 id + 规范化 URL），
+  // 页面事件由主进程推送；无 webContents/session 对象、无页面脚本执行通道。
+  browserNavigate: (id: string, request: BrowserNavigateRequest): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserNavigate', id, request),
+  browserBack: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserBack', id),
+  browserForward: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserForward', id),
+  browserReload: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserReload', id),
+  browserStop: (id: string): Promise<BrowserOpenResult> =>
+    ipcRenderer.invoke('innate:browserStop', id),
+  browserState: (id: string): Promise<BrowserSessionState | null> =>
+    ipcRenderer.invoke('innate:browserState', id),
+  browserOnEvent: (cb: (event: BrowserSurfaceEvent) => void): (() => void) => {
+    const listener = (_e: unknown, event: BrowserSurfaceEvent): void => cb(event)
+    ipcRenderer.on('innate:browser-event', listener)
+    return () => ipcRenderer.removeListener('innate:browser-event', listener)
+  },
+} satisfies WorkspaceApi & TerminalApi & BrowserApi & Record<string, unknown>
 
 contextBridge.exposeInMainWorld('innate', api)
 export type InnateApi = typeof api

@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w5
 title: W5：独立 Browser Surface
 createdAt: 2026-10-28T10:55:18.513563Z
-updatedAt: 2026-10-29T00:00:00.000Z
+updatedAt: 2026-10-30T00:00:00.000Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -131,6 +131,21 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   electron 技术 spike（`plugins/browser/scripts/spike-browser.cjs`，本地
   HTTP 测试站点真实链路）12/12 通过。证据见
   docs/susu/plan/evidence/W5/webcontents.md。
+- 2026-10-30 W5.3 完成：地址栏面板 + 导航守卫（renderer
+  `plugins/browser/src/renderer/BrowserPanel.tsx`：地址栏、前进/后退/
+  刷新/停止、加载进度、崩溃/失败重试与关闭标签；视图生命周期自管理）。
+  导航守卫在视图层逐跳拦截：`will-frame-navigate`/`will-redirect` 主框架
+  目标过协议白名单与凭据检查，拒绝即 `preventDefault` + 固定安全文案
+  （errorCode -3）；服务层 `navigated` 事件兜底复验最终地址（errorCode
+  -2），重定向最终地址优先（修复初始 URL 覆盖缺陷并加回归测试）；
+  错误页文本经 `sanitizeBrowserDisplayText` 净化（剥离内嵌凭据）；
+  window.open http/https 交系统浏览器。desktop ipc/preload 挂
+  browserNavigate/Back/Forward/Reload/Stop/State 窄通道与面板样式；
+  `plugins/terminal` 修复超时/取消终止进程退出码竞态（归一为 null）。
+  单元测试 browser 43/43、desktop 95/95（含面板渲染测试 8），全量门禁
+  `pnpm verify` 退出码 0；electron 技术 spike 扩展至 20/20（守卫拦截、
+  合法重定向放行、window.open 交系统浏览器、凭据拒绝）。证据见
+  docs/susu/plan/evidence/W5/navigation.md。
 
 ## 来源原文
 

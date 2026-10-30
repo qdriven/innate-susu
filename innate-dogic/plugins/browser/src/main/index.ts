@@ -5,8 +5,9 @@
  * - 会话与视图由本服务持有：SurfaceHost.show 经 provider.createView 创建
  *   视图（独立分区 + 安全 webPreferences，由宿主工厂注入），navigate/
  *   back/forward/reload 经视图加载并维护历史；
- * - 每次导航（含历史目标）一律经协议白名单与凭据检查（重定向/伪造历史
- *   不绕过协议约束）；重定向最终地址的再校验在 W5.3 收紧；
+ * - 每次导航（含历史目标）一律经协议白名单与凭据检查；页面内导航与
+ *   重定向目标由守卫（will-frame-navigate/will-redirect）拦截，不只检查
+ *   地址栏初始输入；错误消息经净化，不暴露凭据或内部堆栈（W5.3）；
  * - 标签切换只 detach（SurfaceHost hide/show），不销毁会话（不重载）；
  * - 视图销毁由 SurfaceHost.close 完成，随后经 onViewClosed 回调清理本服务
  *   会话（订阅移除 + 会话移除）；
@@ -20,6 +21,7 @@ import {
   BROWSER_PROVIDER_ID,
   parseBrowserDescriptor,
   parseBrowserUrl,
+  sanitizeBrowserDisplayText,
 } from '../shared/index.js'
 import type {
   BrowserDescriptor,
@@ -62,12 +64,20 @@ export interface BrowserSurfaceView {
   /** 底层宿主视图：SurfaceHost 的 attach/setBounds/destroy 直接作用于它。 */
   readonly underlying: WebContentsView
   loadURL(url: string): Promise<void>
+  /** 停止当前加载（W5.3 地址栏 stop）。 */
+  stop(): void
   close(): void
   setBounds(bounds: BrowserViewBounds): void
   subscribe(listener: (event: BrowserViewEvent) => void): () => void
 }
 
-export type BrowserSurfaceViewFactory = (descriptor: BrowserDescriptor) => BrowserSurfaceView
+/** 导航守卫（W5.3）：页面内导航与重定向目标同样过协议白名单与凭据检查。 */
+export type BrowserNavigationGuard = (url: string) => boolean
+
+export type BrowserSurfaceViewFactory = (
+  descriptor: BrowserDescriptor,
+  guard: BrowserNavigationGuard,
+) => BrowserSurfaceView
 
 export interface BrowserSurfaceServiceOptions {
   factory: BrowserSurfaceViewFactory
@@ -85,6 +95,8 @@ interface Session {
   history: string[]
   index: number
   displayedUrl: string | null
+  /** 本次加载的初始 URL（goto 设置）：navigated 事件（含重定向最终地址）优先生效。 */
+  pendingDisplay: string | null
   loading: boolean
   failed: string
   crashed: boolean
@@ -182,6 +194,13 @@ export class BrowserSurfaceService implements IBrowserProvider {
     return this.goto(session, current)
   }
 
+  async stop(id: unknown): Promise<BrowserOpenResult> {
+    const session = this.requireSession(id)
+    if (!session) return { ok: false, detail: sessionError(id) }
+    session.view.stop()
+    return { ok: true }
+  }
+
   async activate(id: unknown): Promise<BrowserOpenResult> {
     const session = this.requireSession(id)
     if (!session) return { ok: false, detail: sessionError(id) }
@@ -240,7 +259,7 @@ export class BrowserSurfaceService implements IBrowserProvider {
     if (this.sessions.size >= this.maxSessions) {
       throw new Error(`browser 会话超过上限 ${this.maxSessions}`)
     }
-    const view = this.factory(descriptor)
+    const view = this.factory(descriptor, this.guardNavigation)
     const unsubscribe = view.subscribe((event) => this.handleViewEvent(descriptor.id, event))
     const session: Session = {
       id: descriptor.id,
@@ -250,6 +269,7 @@ export class BrowserSurfaceService implements IBrowserProvider {
       history: [],
       index: -1,
       displayedUrl: null,
+      pendingDisplay: null,
       loading: false,
       failed: '',
       crashed: false,
@@ -275,19 +295,24 @@ export class BrowserSurfaceService implements IBrowserProvider {
         this.emit({ type: 'loading', id, loading: event.loading })
         break
       case 'failed':
-        session.failed = event.message
+        // 错误消息可能携带页面 URL（已过白名单）；净化兜底剥离任何内嵌凭据，
+        // 错误页绝不暴露认证 query 或内部堆栈（W5.3）。
+        session.failed = sanitizeBrowserDisplayText(event.message)
         session.loading = false
-        this.emit({ type: 'failed', id, errorCode: event.errorCode, message: event.message })
+        this.emit({ type: 'failed', id, errorCode: event.errorCode, message: session.failed })
         break
       case 'navigated':
         // 重定向最终地址同样过白名单与凭据检查；不合法则不记录并上报失败
         // （W5.3 将在此基础上拦截主导航并细化外链规则）。
         try {
           session.displayedUrl = parseBrowserUrl(event.url)
+          // 本次加载的最终地址以 navigated 为准（did-navigate 先于 loadURL
+          // resolve 到达，goto 随后不得用初始 URL 覆盖）。
+          session.pendingDisplay = null
           this.emit({ type: 'navigated', id, url: session.displayedUrl })
         } catch (reason) {
-          session.failed = messageOf(reason)
-          this.emit({ type: 'failed', id, errorCode: -2, message: messageOf(reason) })
+          session.failed = sanitizeBrowserDisplayText(messageOf(reason))
+          this.emit({ type: 'failed', id, errorCode: -2, message: session.failed })
         }
         break
       case 'crashed':
@@ -323,16 +348,20 @@ export class BrowserSurfaceService implements IBrowserProvider {
     }
     session.loading = true
     session.failed = ''
+    session.pendingDisplay = safe
     try {
       await session.view.loadURL(safe)
     } catch (reason) {
       session.loading = false
-      session.failed = messageOf(reason)
+      session.failed = sanitizeBrowserDisplayText(messageOf(reason))
       this.emit({ type: 'failed', id: session.id, errorCode: -1, message: session.failed })
-      return { ok: false, url: safe, detail: messageOf(reason) }
+      return { ok: false, url: safe, detail: session.failed }
     }
     session.loading = false
-    session.displayedUrl = safe
+    // 若 navigated 事件（含重定向最终地址）已更新 displayedUrl，保留最终地址；
+    // 否则回落到初始 URL（loadURL 已受理但未触发 navigated 的少见情形）。
+    session.displayedUrl = session.pendingDisplay ?? session.displayedUrl
+    session.pendingDisplay = null
     if (index === undefined) {
       // 新导航截断 forward 分支；加载失败（did-fail-load 事件）不回滚历史，
       // 保留重试入口（reload 当前历史项）。
@@ -343,6 +372,20 @@ export class BrowserSurfaceService implements IBrowserProvider {
       session.index = index
     }
     return { ok: true, url: safe }
+  }
+
+  /**
+   * 导航守卫（W5.3）：页面内导航（will-frame-navigate）与重定向
+   * （will-redirect）的目标 URL 同样过协议白名单与凭据检查——不只检查
+   * 地址栏初始输入。守卫由工厂注入 electron-view 使用。
+   */
+  private guardNavigation(url: string): boolean {
+    try {
+      parseBrowserUrl(url)
+      return true
+    } catch {
+      return false
+    }
   }
 
   private requireSession(id: unknown): Session | undefined {
