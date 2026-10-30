@@ -242,4 +242,30 @@ describe('BrowserPanel（W5.3 地址栏与导航控制）', () => {
     // 拒绝事件不驱动导航/历史状态变化
     expect(fake.reload).not.toHaveBeenCalled()
   })
+
+  it('download 事件：呈现受控下载状态行（文件名/来源/进度/终态）', async () => {
+    const fake = makeApi(makeState())
+    render(<BrowserPanel api={fake.api} descriptor={DESCRIPTOR} active onRequestClose={vi.fn()} />)
+    fake.emit({
+      type: 'download', id: 'browser-1', state: 'started',
+      filename: 'report.pdf', origin: 'https://example.com', percent: 0,
+    })
+    await waitFor(() => expect(screen.getByText(/等待保存位置/)).toBeTruthy())
+    fake.emit({
+      type: 'download', id: 'browser-1', state: 'progress',
+      filename: 'report.pdf', origin: 'https://example.com', percent: 42,
+    })
+    await waitFor(() => expect(screen.getByText('42%')).toBeTruthy())
+    fake.emit({
+      type: 'download', id: 'browser-1', state: 'completed',
+      filename: 'report.pdf', origin: 'https://example.com', percent: 100,
+    })
+    await waitFor(() => expect(screen.getByText('已完成')).toBeTruthy())
+    // 文件名与来源 origin 行可见（脱敏字段，不自动执行内容）
+    expect(screen.getByText('report.pdf')).toBeTruthy()
+    expect(screen.getByText('https://example.com')).toBeTruthy()
+    // 同文件名事件就地更新（单行），不驱动导航/历史状态变化
+    expect(screen.getAllByText('report.pdf')).toHaveLength(1)
+    expect(fake.reload).not.toHaveBeenCalled()
+  })
 })

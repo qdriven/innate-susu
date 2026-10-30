@@ -50,8 +50,9 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   // 独立 Browser Surface（W5.2）：会话/历史由 BrowserSurfaceService 维护，
   // 视图经 provider.createView 创建（独立分区 + 安全 webPreferences），
   // 页面事件窄包装到 renderer（不含 webContents/session 对象）。
+  // W5.5：下载保存对话框以主窗口为父弹窗（受控下载路径确认）。
   const browser = new BrowserSurfaceService({
-    factory: createElectronBrowserView,
+    factory: (descriptor, guard) => createElectronBrowserView(descriptor, guard, { parentWindow: mainWindow }),
     onEvent: (event) => {
       if (!mainWindow.isDestroyed()) mainWindow.webContents.send('innate:browser-event', event)
     },

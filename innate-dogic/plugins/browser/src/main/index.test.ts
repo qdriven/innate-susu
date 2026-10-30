@@ -25,6 +25,7 @@ interface FakeView {
   loadURL: ReturnType<typeof vi.fn>
   stop: ReturnType<typeof vi.fn>
   close: ReturnType<typeof vi.fn>
+  cancelDownloads: ReturnType<typeof vi.fn>
   setBounds: ReturnType<typeof vi.fn>
   subscribe: ReturnType<typeof vi.fn>
   emit(event: BrowserViewEvent): void
@@ -42,6 +43,7 @@ function fakeViewFactory(): {
     const loadURL = vi.fn(async () => {})
     const stop = vi.fn()
     const close = vi.fn()
+    const cancelDownloads = vi.fn()
     const setBounds = vi.fn()
     const subscribe = vi.fn((listener: (event: BrowserViewEvent) => void) => {
       listeners.add(listener)
@@ -52,6 +54,7 @@ function fakeViewFactory(): {
       loadURL,
       stop,
       close,
+      cancelDownloads,
       setBounds,
       subscribe,
     }
@@ -60,6 +63,7 @@ function fakeViewFactory(): {
       loadURL,
       stop,
       close,
+      cancelDownloads,
       setBounds,
       subscribe,
       emit: (event) => {
@@ -446,5 +450,74 @@ describe('BrowserSurfaceService（导航守卫与地址栏 W5.3）', () => {
     expect(result).toEqual({ ok: true, url: 'https://example.com/a' })
     // did-navigate 先于 loadURL resolve 到达，goto 不得用初始 URL 覆盖最终地址
     expect(service.state('browser-1')?.currentUrl).toBe('https://example.com/afinal')
+  })
+})
+
+describe('BrowserSurfaceService（受控下载 W5.5）', () => {
+  it('下载事件按会话转发且只作用于本会话', async () => {
+    const { service, views, events } = recordingService()
+    await service.open(descriptorInput())
+    await service.open(descriptorInput({ id: 'browser-2' }))
+    views[0]?.emit({
+      type: 'download', state: 'started', filename: 'report.pdf',
+      origin: 'https://example.com', percent: 0,
+    })
+    views[1]?.emit({
+      type: 'download', state: 'completed', filename: 'archive.zip',
+      origin: 'https://other.test', percent: 100,
+    })
+    const downloads = events.filter((event) => event.type === 'download')
+    expect(downloads).toContainEqual({
+      type: 'download', id: 'browser-1', state: 'started',
+      filename: 'report.pdf', origin: 'https://example.com', percent: 0,
+    })
+    expect(downloads).toContainEqual({
+      type: 'download', id: 'browser-2', state: 'completed',
+      filename: 'archive.zip', origin: 'https://other.test', percent: 100,
+    })
+    // 事件不改变页面状态（只诊断，不干预导航/历史）
+    const state = service.state('browser-1')
+    expect(state?.currentUrl).toBeNull()
+    expect(state?.failed).toBe('')
+    expect(state?.loading).toBe(false)
+  })
+
+  it('close 先取消在途下载再销毁视图（W5.5）', async () => {
+    const { service, views } = recordingService()
+    await service.open(descriptorInput())
+    expect((await service.close('browser-1')).ok).toBe(true)
+    expect(views[0]?.cancelDownloads).toHaveBeenCalledTimes(1)
+    expect(views[0]?.cancelDownloads.mock.invocationCallOrder[0])
+      .toBeLessThan(views[0]?.close.mock.invocationCallOrder[0])
+    expect(views[0]?.close).toHaveBeenCalledTimes(1)
+    // 未知会话 close 不触达视图
+    expect((await service.close('ghost')).ok).toBe(false)
+    expect(views[0]?.cancelDownloads).toHaveBeenCalledTimes(1)
+  })
+
+  it('dispose 统一回收前取消全部在途下载（W5.5）', async () => {
+    const { service, views } = recordingService()
+    await service.open(descriptorInput({ id: 'b-1' }))
+    await service.open(descriptorInput({ id: 'b-2' }))
+    service.dispose()
+    expect(views[0]?.cancelDownloads).toHaveBeenCalledTimes(1)
+    expect(views[1]?.cancelDownloads).toHaveBeenCalledTimes(1)
+    expect(views[0]?.cancelDownloads.mock.invocationCallOrder[0])
+      .toBeLessThan(views[0]?.close.mock.invocationCallOrder[0])
+    expect(views[1]?.cancelDownloads.mock.invocationCallOrder[0])
+      .toBeLessThan(views[1]?.close.mock.invocationCallOrder[0])
+  })
+
+  it('onViewClosed（SurfaceHost 销毁视图后回调）：仍取消在途下载再清理会话（W5.5）', async () => {
+    const { service, views } = recordingService()
+    await service.open(descriptorInput())
+    service.provider.onViewClosed('browser-1')
+    expect(views[0]?.cancelDownloads).toHaveBeenCalledTimes(1)
+    expect(service.state('browser-1')).toBeUndefined()
+  })
+
+  it('视图抽象不提供文件写入通道（类型层保证）', () => {
+    // @ts-expect-error BrowserSurfaceView 没有 writeFile/savePath 属性
+    void ({} as BrowserSurfaceView).writeFile
   })
 })

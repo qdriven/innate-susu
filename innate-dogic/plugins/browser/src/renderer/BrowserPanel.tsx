@@ -2,7 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FormEvent, JSX } from 'react'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { ViewBounds } from '@dogic/core'
-import type { BrowserApi, BrowserSessionState, BrowserSurfaceEvent } from '../shared/index.js'
+import type {
+  BrowserApi,
+  BrowserSessionState,
+  BrowserSurfaceEvent,
+  DownloadState,
+  DownloadStatus,
+} from '../shared/index.js'
 
 /** 面板需要的宿主视图生命周期窄接口（desktop preload 的 surfaceShow/Hide/Bounds/Close）。 */
 export interface BrowserSurfaceLifecycle {
@@ -32,14 +38,52 @@ function readBounds(element: HTMLElement | null): ViewBounds {
   }
 }
 
+/** 下载状态行上限（保留最近若干行，终态行在上限内保留）。 */
+const MAX_DOWNLOAD_LINES = 5
+
 /**
- * browser Surface 面板（W5.3）：地址栏 + 前进/后退/刷新/停止 + 加载进度。
+ * W5.5：下载事件并入状态行。同文件名（同来源）按最新事件更新，
+ * 新文件追加；超过上限丢弃最旧行。
+ */
+function upsertDownload(
+  current: DownloadStatus[],
+  event: BrowserSurfaceEvent & { type: 'download' },
+): DownloadStatus[] {
+  const status: DownloadStatus = {
+    filename: event.filename,
+    origin: event.origin,
+    percent: event.percent,
+    state: event.state,
+  }
+  const index = current.findIndex(
+    (entry) => entry.filename === status.filename && entry.origin === status.origin,
+  )
+  const next = index >= 0
+    ? current.map((entry, i) => (i === index ? status : entry))
+    : [...current, status]
+  return next.length > MAX_DOWNLOAD_LINES ? next.slice(next.length - MAX_DOWNLOAD_LINES) : next
+}
+
+/** 下载终态/中间态文案。 */
+function downloadStateText(state: DownloadState, percent: number): string {
+  if (state === 'started') return '等待保存位置…'
+  if (state === 'progress') return `${percent}%`
+  if (state === 'completed') return '已完成'
+  if (state === 'cancelled') return '已取消'
+  return '下载失败'
+}
+
+/**
+ * browser Surface 面板（W5.3 地址栏，W5.4 权限提示，W5.5 受控下载行）：
+ * 地址栏 + 前进/后退/刷新/停止 + 加载进度。
  *
  * - 视图本体在主进程 WebContentsView（kind=webcontents），面板只占位并
  *   同步 bounds（复用 W1c surfaceShow/Hide/Bounds 语义）；
  * - 地址栏提交一律经 main 策略层解析校验（非法 URL 显式拒并回显安全文案）；
- * - 页面事件（loading/failed/navigated/crashed/unresponsive/permission-denied）
- *   驱动状态刷新，错误提示不暴露凭据或内部堆栈；权限拒绝以脱敏文案呈现；
+ * - 页面事件（loading/failed/navigated/crashed/unresponsive/permission-denied/
+ *   download）驱动状态刷新，错误提示不暴露凭据或内部堆栈；权限拒绝以
+ *   脱敏文案呈现；下载以受控状态行呈现（文件名、来源 origin、进度、终态，
+ *   不自动执行下载内容）；
  * - 崩溃/加载失败/无响应只影响本标签，提供重试/关闭。
  */
 export function BrowserPanel({
@@ -52,6 +96,8 @@ export function BrowserPanel({
   const [input, setInput] = useState('')
   const [notice, setNotice] = useState('')
   const [attempt, setAttempt] = useState(0)
+  /** W5.5：受控下载状态行（按文件名去重更新，最多保留 5 行）。 */
+  const [downloads, setDownloads] = useState<DownloadStatus[]>([])
   const focusedRef = useRef(false)
 
   const bounds = useCallback(() => readBounds(areaRef.current), [])
@@ -75,6 +121,10 @@ export function BrowserPanel({
       else if (event.type === 'unresponsive') setNotice(event.responsive ? '' : '页面无响应')
       else if (event.type === 'navigated') setNotice('')
       else if (event.type === 'permission-denied') setNotice(`已拒绝 ${event.origin} 的 ${event.permission} 权限请求`)
+      else if (event.type === 'download') {
+        // W5.5：受控下载状态行（脱敏文件名/origin/进度/终态，不自动执行内容）
+        setDownloads((prev) => upsertDownload(prev, event))
+      }
       void refresh()
     })
     return unsubscribe
@@ -184,6 +234,17 @@ export function BrowserPanel({
               <button type="button" onClick={onRequestClose}>关闭标签</button>
             </span>
           )}
+        </div>
+      )}
+      {downloads.length > 0 && (
+        <div className="browser-downloads">
+          {downloads.map((download) => (
+            <div key={`${download.filename}:${download.origin}`} className="browser-download">
+              <span className="browser-download-name">{download.filename}</span>
+              <span className="browser-download-origin">{download.origin}</span>
+              <span className="browser-download-state">{downloadStateText(download.state, download.percent)}</span>
+            </div>
+          ))}
         </div>
       )}
       <div ref={areaRef} className="surface-view-area" data-surface-id={descriptor.id} />

@@ -13,9 +13,13 @@
  * W5.4：权限策略接线（见 attachPermissionPolicy）——本分区 session 一律拒绝
  * 权限请求，拒绝事件只记 origin+类型；仅挂 persist:innate-browser 分区，
  * Harness/console 默认 session 不继承。
+ *
+ * W5.5：受控下载接线（见 attachDownloadPolicy）——will-download 一律经
+ * 系统保存对话框由用户确认路径（不写默认目录）；下载事件按来源
+ * webContents 路由；close 前取消在途下载并清理临时状态。
  */
-import { session, shell, WebContentsView } from 'electron'
-import type { Session, WebContents } from 'electron'
+import { dialog, session, shell, WebContentsView } from 'electron'
+import type { BrowserWindow, DownloadItem, Session, WebContents } from 'electron'
 import { BROWSER_PARTITION } from '../shared/index.js'
 import type { BrowserDescriptor } from '../shared/index.js'
 import type {
@@ -25,6 +29,12 @@ import type {
   BrowserViewEvent,
 } from './index.js'
 import { browserPermissionOrigin, denyBrowserPermission } from './permission.js'
+import {
+  mapDownloadItemState,
+  normalizeDownloadPercent,
+  sanitizeDownloadFilename,
+} from './download.js'
+import type { DownloadState } from './download.js'
 
 /** 守卫拦截时的固定安全失败消息（不携带被拒 URL 或内部细节）。 */
 const GUARD_REJECTED_MESSAGE = '导航被安全策略拒绝'
@@ -74,9 +84,98 @@ function attachPermissionPolicy(browserSession: Session): void {
   )
 }
 
+/** 下载 handler 每分区 session 只挂一次（同一 partition 复用同一 Session 对象）。 */
+const downloadPolicyAttachedSessions = new WeakSet<Session>()
+/** 下载事件按来源 webContents 路由到对应视图的 emit（多标签共享同一分区 session）。 */
+const downloadsByWebContents = new WeakMap<WebContents, DownloadTracker[]>()
+
+/** 单个在途/已结算下载的跟踪记录（close 前据此取消在途下载）。 */
+interface DownloadTracker {
+  item: DownloadItem
+  /** 已发出终态事件则跳过后续（防止取消竞态重复结算）。 */
+  settled: boolean
+}
+
+/**
+ * 下载策略接线（W5.5）：只挂 persist:innate-browser 分区 session。
+ * will-download 一律经系统保存对话框确认路径——不写默认目录、无隐式路径；
+ * 对话框取消即 cancel。事件按来源 webContents 路由。
+ */
+function attachDownloadPolicy(browserSession: Session, parentWindow: BrowserWindow | null): void {
+  if (downloadPolicyAttachedSessions.has(browserSession)) return
+  downloadPolicyAttachedSessions.add(browserSession)
+  browserSession.on('will-download', (_event, item, webContents) => {
+    const filename = sanitizeDownloadFilename(item.getFilename())
+    const origin = browserPermissionOrigin(webContents.getURL())
+    const tracker: DownloadTracker = { item, settled: false }
+    const trackers = downloadsByWebContents.get(webContents) ?? []
+    trackers.push(tracker)
+    downloadsByWebContents.set(webContents, trackers)
+    viewEmitByWebContents.get(webContents)?.({
+      type: 'download',
+      state: 'started',
+      filename,
+      origin,
+      percent: 0,
+    })
+    item.on('updated', () => {
+      if (tracker.settled) return
+      viewEmitByWebContents.get(webContents)?.({
+        type: 'download',
+        state: 'progress',
+        filename,
+        origin,
+        percent: normalizeDownloadPercent(item.getPercentComplete()),
+      })
+    })
+    item.once('done', () => {
+      if (tracker.settled) return
+      tracker.settled = true
+      // done 为终态，此后不再有 updated；settled 标志防取消竞态重复结算。
+      const next = downloadsByWebContents.get(webContents) ?? []
+      next.splice(next.findIndex((entry) => entry.item === item), 1)
+      if (next.length > 0) downloadsByWebContents.set(webContents, next)
+      viewEmitByWebContents.get(webContents)?.({
+        type: 'download',
+        state: mapDownloadItemState(item.getState()),
+        filename,
+        origin,
+        percent: normalizeDownloadPercent(item.getPercentComplete()),
+      })
+    })
+    // 保存对话框由用户确认路径；取消则取消下载（内容不落盘）。
+    void confirmSavePath(item, filename, parentWindow).then((saved) => {
+      if (!saved) item.cancel()
+    })
+  })
+}
+
+/**
+ * 系统保存对话框确认路径。父窗口存在则以其为父弹窗，否则父less。
+ * 取消返回 false（不设置路径）；确认返回 true 并 setSavePath——
+ * 写盘只由 main/session 处理，renderer 无文件写通道。
+ */
+async function confirmSavePath(
+  item: DownloadItem,
+  filename: string,
+  parentWindow: BrowserWindow | null,
+): Promise<boolean> {
+  const options: Electron.SaveDialogOptions = {
+    defaultPath: filename,
+    title: '保存下载文件',
+  }
+  const result = parentWindow
+    ? await dialog.showSaveDialog(parentWindow, options)
+    : await dialog.showSaveDialog(options)
+  if (result.canceled || !result.filePath) return false
+  item.setSavePath(result.filePath)
+  return true
+}
+
 export function createElectronBrowserView(
   descriptor: BrowserDescriptor,
   guard: BrowserNavigationGuard,
+  options?: { parentWindow?: BrowserWindow | null },
 ): BrowserSurfaceView {
   const browserSession = session.fromPartition(BROWSER_PARTITION)
   const view = new WebContentsView({
@@ -90,6 +189,9 @@ export function createElectronBrowserView(
   const webContents = view.webContents
   // W5.4：权限策略只挂本分区 session（默认 session 的 Harness/console 不受影响）。
   attachPermissionPolicy(browserSession)
+  // W5.5：下载策略同样只挂本分区 session（默认 session 不继承）。
+  attachDownloadPolicy(browserSession, options?.parentWindow ?? null)
+  downloadsByWebContents.set(webContents, [])
   webContents.setWindowOpenHandler(({ url: target }) => {
     // 用户明确选择的外链交系统浏览器；仅 http/https，其余协议一律拒绝。
     if (/^https?:\/\//i.test(target)) void shell.openExternal(target)
@@ -137,6 +239,29 @@ export function createElectronBrowserView(
     subscribe: (listener) => {
       listeners.add(listener)
       return () => listeners.delete(listener)
+    },
+    cancelDownloads: () => {
+      // W5.5：close 前取消在途下载。事件同步上报，保证服务层在销毁
+      // 会话前转发 cancelled；已结算的 tracker 跳过（防重复结算）。
+      const trackers = downloadsByWebContents.get(webContents)
+      if (!trackers || trackers.length === 0) return
+      for (const tracker of trackers) {
+        if (tracker.settled) continue
+        tracker.settled = true
+        try {
+          tracker.item.cancel()
+        } catch {
+          // 取消竞态：item 已结算或销毁，忽略。
+        }
+        emit({
+          type: 'download',
+          state: 'cancelled',
+          filename: sanitizeDownloadFilename(tracker.item.getFilename()),
+          origin: browserPermissionOrigin(webContents.getURL()),
+          percent: normalizeDownloadPercent(tracker.item.getPercentComplete()),
+        })
+      }
+      downloadsByWebContents.delete(webContents)
     },
   }
 }

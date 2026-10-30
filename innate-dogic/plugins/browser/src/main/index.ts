@@ -18,8 +18,12 @@
  *
  * W5.4：权限策略（纯逻辑在 permission.ts，接线在 electron-view 分区 session）——
  * 一律拒绝权限请求，拒绝事件按会话上报（origin+类型），面板呈现可诊断提示。
+ *
+ * W5.5：受控下载（纯逻辑在 download.ts，接线在 electron-view 分区 session）——
+ * 下载一律经系统保存对话框确认路径；下载事件按会话上报（脱敏文件名、来源
+ * origin、进度、终态）；会话关闭/销毁前取消在途下载并清理临时状态。
  */
-import type { WebContentsView } from 'electron'
+import type { BrowserWindow, WebContentsView } from 'electron'
 import {
   BROWSER_PROVIDER_ID,
   parseBrowserDescriptor,
@@ -33,6 +37,7 @@ import type {
   BrowserProvider as IBrowserProvider,
   BrowserSessionState,
   BrowserSurfaceEvent,
+  DownloadState,
 } from '../shared/index.js'
 
 export type {
@@ -41,6 +46,7 @@ export type {
   BrowserOpenResult,
   BrowserSessionState,
   BrowserSurfaceEvent,
+  DownloadState,
 } from '../shared/index.js'
 
 /** 视图边界（与宿主 Rectangle 同构）。 */
@@ -59,6 +65,13 @@ export type BrowserViewEvent =
   | { type: 'crashed' }
   | { type: 'unresponsive'; responsive: boolean }
   | { type: 'permission-denied'; origin: string; permission: string }
+  | {
+      type: 'download'
+      state: DownloadState
+      filename: string
+      origin: string
+      percent: number
+    }
 
 /**
  * 服务侧视图抽象（真实实现由宿主注入：electron WebContentsView 包装）。
@@ -71,6 +84,11 @@ export interface BrowserSurfaceView {
   /** 停止当前加载（W5.3 地址栏 stop）。 */
   stop(): void
   close(): void
+  /**
+   * W5.5：取消本视图全部在途下载（close 前调用）。取消事件经 subscribe
+   * 通道同步上报，服务层在销毁会话前转发；已结算下载不受影响。
+   */
+  cancelDownloads(): void
   setBounds(bounds: BrowserViewBounds): void
   subscribe(listener: (event: BrowserViewEvent) => void): () => void
 }
@@ -78,9 +96,14 @@ export interface BrowserSurfaceView {
 /** 导航守卫（W5.3）：页面内导航与重定向目标同样过协议白名单与凭据检查。 */
 export type BrowserNavigationGuard = (url: string) => boolean
 
+/**
+ * 视图工厂（宿主注入）。第三参数可选：父窗口（系统保存对话框的父弹窗，
+ * 下载时由桌面主进程传入主窗口）。
+ */
 export type BrowserSurfaceViewFactory = (
   descriptor: BrowserDescriptor,
   guard: BrowserNavigationGuard,
+  options?: { parentWindow?: BrowserWindow | null },
 ) => BrowserSurfaceView
 
 export interface BrowserSurfaceServiceOptions {
@@ -156,7 +179,12 @@ export class BrowserSurfaceService implements IBrowserProvider {
     },
     onViewClosed: (id: string): void => {
       const session = this.requireSession(id)
-      if (session) this.closeSession(session)
+      if (session) {
+        // W5.5：SurfaceHost 先销毁视图再回调；DownloadItem 属会话级，
+        // 在会话删除前取消在途下载（事件同步上报给存活会话）。
+        session.view.cancelDownloads()
+        this.closeSession(session)
+      }
     },
   }
 
@@ -223,6 +251,8 @@ export class BrowserSurfaceService implements IBrowserProvider {
   async close(id: unknown): Promise<BrowserOpenResult> {
     const session = this.requireSession(id)
     if (!session) return { ok: false, detail: sessionError(id) }
+    // W5.5：先取消在途下载（取消事件已同步上报），再销毁视图。
+    session.view.cancelDownloads()
     session.view.close()
     this.closeSession(session)
     return { ok: true }
@@ -250,6 +280,8 @@ export class BrowserSurfaceService implements IBrowserProvider {
   /** 统一回收：应用退出/窗口关闭路径（销毁全部视图并清理会话）。 */
   dispose(): void {
     for (const session of [...this.sessions.values()]) {
+      // W5.5：先取消在途下载（事件同步上报），再销毁视图。
+      session.view.cancelDownloads()
       session.view.close()
       this.closeSession(session)
     }
@@ -332,6 +364,18 @@ export class BrowserSurfaceService implements IBrowserProvider {
         // W5.4：权限拒绝事件按会话上报（origin+类型，不记页面内容），
         // 面板据此呈现可诊断提示；事件只作用于本会话。
         this.emit({ type: 'permission-denied', id, origin: event.origin, permission: event.permission })
+        break
+      case 'download':
+        // W5.5：下载事件按会话转发（脱敏文件名、来源 origin、进度、终态），
+        // 面板据此呈现受控下载状态行；事件只作用于本会话。
+        this.emit({
+          type: 'download',
+          id,
+          state: event.state,
+          filename: event.filename,
+          origin: event.origin,
+          percent: event.percent,
+        })
         break
     }
   }

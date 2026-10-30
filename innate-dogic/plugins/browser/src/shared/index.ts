@@ -73,10 +73,21 @@ export interface BrowserSessionState extends BrowserHistoryState {
 
 /**
  * 页面事件流（主进程 → renderer）：加载中/加载失败/主框架导航完成/崩溃/
- * 无响应恢复/权限拒绝（W5.4：origin+类型，不记页面内容）。事件只携带
- * 可展示文本与规范化 URL，不携带 webContents 或 session 对象；重定向
- * 最终地址的再校验在 W5.3 收紧（navigation guard）。
+ * 无响应恢复/权限拒绝（W5.4：origin+类型，不记页面内容）/下载
+ * （W5.5：受控下载——只进用户确认路径，事件含脱敏文件名、来源 origin、
+ * 进度与终态）。事件只携带可展示文本与规范化 URL，不携带 webContents
+ * 或 session 对象；重定向最终地址的再校验在 W5.3 收紧（navigation guard）。
  */
+export type DownloadState = 'started' | 'progress' | 'completed' | 'cancelled' | 'failed'
+
+/** 下载展示字段（W5.5）：脱敏文件名、来源 origin、进度、状态——面板状态行消费。 */
+export interface DownloadStatus {
+  filename: string
+  origin: string
+  percent: number
+  state: DownloadState
+}
+
 export type BrowserSurfaceEvent =
   | { type: 'loading'; id: string; loading: boolean }
   | { type: 'failed'; id: string; errorCode: number; message: string }
@@ -84,6 +95,14 @@ export type BrowserSurfaceEvent =
   | { type: 'crashed'; id: string }
   | { type: 'unresponsive'; id: string; responsive: boolean }
   | { type: 'permission-denied'; id: string; origin: string; permission: string }
+  | {
+      type: 'download'
+      id: string
+      state: DownloadState
+      filename: string
+      origin: string
+      percent: number
+    }
 
 /**
  * 错误页展示文本净化（W5.3）：错误消息可能携带页面自身 URL（入口已过白名单），

@@ -242,7 +242,7 @@ td .dim { font-size: var(--font-xs); }
 .surface-error-title { margin: 0; color: var(--text); font-size: var(--font-title); }
 .surface-error p { margin: 0; max-width: 420px; }
 
-/* browser Surface 地址栏（W5.3） */
+/* browser Surface 地址栏（W5.3）+ 权限提示（W5.4）+ 受控下载行（W5.5） */
 .browser-surface { display: flex; flex-direction: column; }
 .browser-toolbar {
   flex-shrink: 0; display: flex; align-items: center; gap: 4px; padding: 5px 8px;
@@ -287,6 +287,21 @@ td .dim { font-size: var(--font-xs); }
   background: var(--panel); border: 1px solid var(--border); border-radius: 4px; cursor: pointer;
 }
 .browser-notice-actions button:hover { border-color: var(--accent); }
+/* 受控下载状态行（W5.5）：文件名/来源/进度/终态，不自动执行下载内容 */
+.browser-downloads {
+  flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; padding: 4px 10px;
+  font-size: var(--font-xs); background: var(--panel-2); border-bottom: 1px solid var(--border);
+}
+.browser-download { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.browser-download-name {
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 40%; flex-shrink: 0;
+}
+.browser-download-origin {
+  color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 40%; flex: 1 1 auto; min-width: 0;
+}
+.browser-download-state { flex-shrink: 0; margin-left: auto; color: var(--dim); }
 
 /* 工作区插件：中央文档 + 右侧文件/Git 面板 */
 .workspace-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }

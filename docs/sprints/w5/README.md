@@ -159,6 +159,21 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   `pnpm verify` 退出码 0；electron 技术 spike 扩展至 23/23（页面逐类
   请求权限全拒、事件携带 origin+类型、不改变页面状态）。证据见
   docs/susu/plan/evidence/W5/permissions.md。
+- 2026-10-30 W5.5 完成：受控下载。下载策略纯模块
+  `plugins/browser/src/main/download.ts`（文件名净化：剥离路径分隔符/
+  控制字符、折叠空白、截断 120、Windows 保留名加后缀、空名兜底；
+  终态映射 completed/cancelled/interrupted→failed；进度归一）+ 接线
+  `electron-view.ts` 的 `attachDownloadPolicy`（`will-download` 一律经
+  系统保存对话框由用户确认路径，取消即 cancel；事件按来源 webContents
+  路由，每分区 session 只挂一次）；`cancelDownloads` 在 close 前取消
+  在途下载并清理 tracker（session 级 DownloadItem，`onViewClosed`
+  路径可达）。服务层 `download` 事件按会话转发，面板呈现完成/取消/
+  失败/在途进度。desktop ipc 透传下载事件。单元测试 browser 61/61
+  （新增 7）、desktop 97/97，typecheck 退出码 0；electron 技术 spike
+  扩展至 34/34（取消/完成/恶意文件名净化/关闭取消在途/失败路径不落
+  隐式路径/事件脱敏）。interrupted→failed 映射由单元测试覆盖（Chromium
+  下载重试策略使网络/保存机制均无法确定性触发终态 interrupted，已记录
+  6 种机制实验结论）。证据见 docs/susu/plan/evidence/W5/downloads.md。
 
 ## 来源原文
 
