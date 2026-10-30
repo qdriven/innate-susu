@@ -38,8 +38,8 @@ function readBounds(element: HTMLElement | null): ViewBounds {
  * - 视图本体在主进程 WebContentsView（kind=webcontents），面板只占位并
  *   同步 bounds（复用 W1c surfaceShow/Hide/Bounds 语义）；
  * - 地址栏提交一律经 main 策略层解析校验（非法 URL 显式拒并回显安全文案）；
- * - 页面事件（loading/failed/navigated/crashed/unresponsive）驱动状态刷新，
- *   错误提示不暴露凭据或内部堆栈；
+ * - 页面事件（loading/failed/navigated/crashed/unresponsive/permission-denied）
+ *   驱动状态刷新，错误提示不暴露凭据或内部堆栈；权限拒绝以脱敏文案呈现；
  * - 崩溃/加载失败/无响应只影响本标签，提供重试/关闭。
  */
 export function BrowserPanel({
@@ -74,6 +74,7 @@ export function BrowserPanel({
       else if (event.type === 'crashed') setNotice('页面已崩溃')
       else if (event.type === 'unresponsive') setNotice(event.responsive ? '' : '页面无响应')
       else if (event.type === 'navigated') setNotice('')
+      else if (event.type === 'permission-denied') setNotice(`已拒绝 ${event.origin} 的 ${event.permission} 权限请求`)
       void refresh()
     })
     return unsubscribe

@@ -231,4 +231,15 @@ describe('BrowserPanel（W5.3 地址栏与导航控制）', () => {
     await new Promise((resolve) => setTimeout(resolve, 30))
     expect(screen.queryByText(/其他标签失败/)).toBeNull()
   })
+
+  it('permission-denied 事件：呈现脱敏拒绝文案（origin+类型）', async () => {
+    const fake = makeApi(makeState())
+    render(<BrowserPanel api={fake.api} descriptor={DESCRIPTOR} active onRequestClose={vi.fn()} />)
+    fake.emit({ type: 'permission-denied', id: 'browser-1', origin: 'https://example.com', permission: 'geolocation' })
+    await waitFor(() =>
+      expect(screen.getByText(/已拒绝 https:\/\/example\.com 的 geolocation 权限请求/)).toBeTruthy(),
+    )
+    // 拒绝事件不驱动导航/历史状态变化
+    expect(fake.reload).not.toHaveBeenCalled()
+  })
 })

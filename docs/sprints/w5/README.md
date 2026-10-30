@@ -146,6 +146,19 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   `pnpm verify` 退出码 0；electron 技术 spike 扩展至 20/20（守卫拦截、
   合法重定向放行、window.open 交系统浏览器、凭据拒绝）。证据见
   docs/susu/plan/evidence/W5/navigation.md。
+- 2026-10-30 W5.4 完成：默认拒绝敏感权限。权限策略纯模块
+  `plugins/browser/src/main/permission.ts`（origin 脱敏提取：仅
+  http/https、剥除凭据/路径/query；全拒决策，生成脱敏记录）+ 接线
+  `electron-view.ts` 的 `attachPermissionPolicy`（只挂
+  `persist:innate-browser` 分区 session 的 `setPermissionRequestHandler`/
+  `setPermissionCheckHandler`，一律拒绝；事件按来源 webContents 路由，
+  每分区 session 只挂一次）；服务层 `permission-denied` 事件按会话转发，
+  面板呈现脱敏拒绝文案（已拒绝 <origin> 的 <type> 权限请求）。
+  Harness/console 默认 session 不继承 browser handler。单元测试
+  browser 49/49（新增 6）、desktop 96/96（新增 1），全量门禁
+  `pnpm verify` 退出码 0；electron 技术 spike 扩展至 23/23（页面逐类
+  请求权限全拒、事件携带 origin+类型、不改变页面状态）。证据见
+  docs/susu/plan/evidence/W5/permissions.md。
 
 ## 来源原文
 

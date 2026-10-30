@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
- * W5.2+W5.3 browser 技术 spike（开发环境）：
+ * W5.2+W5.3+W5.4 browser 技术 spike（开发环境）：
  * 在 Electron 主进程内验证独立 WebContentsView 生命周期全链路——
  * 独立持久分区、安全 webPreferences、导航/历史、加载失败、多标签
  * 切换不重载、关闭回收、窗口关闭统一回收；以及 W5.3 导航守卫——
  * 页面内导航（will-frame-navigate）与重定向（will-redirect）逐跳拦截、
- * 合法重定向放行、window.open 外链交系统浏览器、地址栏凭据拒绝。
+ * 合法重定向放行、window.open 外链交系统浏览器、地址栏凭据拒绝；
+ * 以及 W5.4 权限策略——页面逐类请求权限全部被拒且事件携带脱敏
+ * origin+类型，其他 Surface（默认 session）不受影响。
  *
  * 运行前先构建插件：pnpm --filter @dogic/plugin-browser build
  * 运行：innate-dogic/apps/desktop/node_modules/electron/dist/electron.exe \
@@ -49,6 +51,16 @@ function startTestSite() {
       if (url.pathname === '/open') {
         // 页面内 window.open 外链（交系统浏览器）
         res.end('<!doctype html><html><body><h1>opener</h1><script>window.open("https://example.com/", "_blank")</script></body></html>')
+        return
+      }
+      if (url.pathname === '/perm') {
+        // 页面加载完成后逐类请求权限（W5.4：全部拒绝并记录 origin+类型；
+        // 页面脚本只发起请求，无权限操作）
+        res.end(`<!doctype html><html><body><h1>perm</h1><script>window.addEventListener("load",()=>{setTimeout(()=>{
+          try { navigator.geolocation.getCurrentPosition(()=>{},()=>{}) } catch {}
+          try { Notification.requestPermission() } catch {}
+          try { navigator.clipboard.writeText("spike") } catch {}
+        },100)})</script></body></html>`)
         return
       }
       if (url.pathname === '/redirect-credential') {
@@ -229,11 +241,28 @@ async function main() {
   record('window.open 外链：应用内不新建 webContents（交系统浏览器）', openLoaded && webContentsCount === wcBefore,
     `navigate.ok=${navOpen.ok}`)
 
-  // 12. 地址栏内嵌凭据导航被策略层拒绝
+  // 12. 权限请求：页面逐类请求权限（geolocation/notifications/clipboard），
+  //     浏览器分区 session 一律拒绝并记录 origin+类型（W5.4）
+  const permFrom = events.length
+  const navPerm = await service.navigate('browser-1', { url: `${siteUrl}perm` })
+  record('权限请求页可加载', navPerm.ok === true, navPerm.detail)
+  const denied = () => events.slice(permFrom).filter((event) => event.type === 'permission-denied')
+  const permDenied = await waitFor(() => denied().length >= 2)
+  const list = denied()
+  const origins = [...new Set(list.map((event) => event.origin))]
+  const perms = list.map((event) => event.permission)
+  record('权限请求全部被拒：事件携带 origin+类型', permDenied
+    && origins.every((origin) => origin === `http://127.0.0.1:${port}`)
+    && perms.includes('geolocation'),
+    `permissions=[${perms.join(', ')}] origins=[${origins.join(', ')}]`)
+  record('权限拒绝不改变页面状态', service.state('browser-1')?.currentUrl === `${siteUrl}perm`
+    && !(service.state('browser-1')?.failed ?? '').length)
+
+  // 13. 地址栏内嵌凭据导航被策略层拒绝
   const credentialRejected = await service.navigate('browser-1', { url: `http://user:pass@127.0.0.1:${port}/` })
   record('地址栏内嵌凭据导航被拒', credentialRejected.ok === false, credentialRejected.detail)
 
-  // 13. 窗口关闭：dispose 统一回收（webContents.close 销毁为异步，等待确认）
+  // 14. 窗口关闭：dispose 统一回收（webContents.close 销毁为异步，等待确认）
   service.dispose()
   const disposed = await waitFor(() => wc1.isDestroyed() === true)
   record('窗口关闭统一回收：全部视图销毁', disposed)

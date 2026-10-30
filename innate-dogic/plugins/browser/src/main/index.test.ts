@@ -274,6 +274,26 @@ describe('BrowserSurfaceService（多标签与生命周期 W5.2）', () => {
     ])
   })
 
+  it('权限拒绝事件按会话上报且只作用于本会话（W5.4）', async () => {
+    const { service, views, events } = recordingService()
+    await service.open(descriptorInput())
+    await service.open(descriptorInput({ id: 'browser-2' }))
+    views[0]?.emit({ type: 'permission-denied', origin: 'https://example.com', permission: 'geolocation' })
+    views[1]?.emit({ type: 'permission-denied', origin: 'https://other.test', permission: 'notifications' })
+    const denied = events.filter((event) => event.type === 'permission-denied')
+    expect(denied).toContainEqual({
+      type: 'permission-denied', id: 'browser-1', origin: 'https://example.com', permission: 'geolocation',
+    })
+    expect(denied).toContainEqual({
+      type: 'permission-denied', id: 'browser-2', origin: 'https://other.test', permission: 'notifications',
+    })
+    // 事件不改变页面状态（只诊断，不干预导航/历史）
+    const state = service.state('browser-1')
+    expect(state?.currentUrl).toBeNull()
+    expect(state?.failed).toBe('')
+    expect(state?.loading).toBe(false)
+  })
+
   it('重定向到非白名单/内嵌凭据地址：不记录并上报 failed', async () => {
     const { service, views, events } = recordingService()
     await service.open(descriptorInput())

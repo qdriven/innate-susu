@@ -15,6 +15,9 @@
  *   renderer 呈现重试/关闭；
  * - 禁止 executeJavaScript：视图抽象不提供任何页面脚本执行通道；
  * - 并发会话上限受控；dispose 统一回收（应用退出/窗口关闭路径）。
+ *
+ * W5.4：权限策略（纯逻辑在 permission.ts，接线在 electron-view 分区 session）——
+ * 一律拒绝权限请求，拒绝事件按会话上报（origin+类型），面板呈现可诊断提示。
  */
 import type { WebContentsView } from 'electron'
 import {
@@ -55,6 +58,7 @@ export type BrowserViewEvent =
   | { type: 'navigated'; url: string }
   | { type: 'crashed' }
   | { type: 'unresponsive'; responsive: boolean }
+  | { type: 'permission-denied'; origin: string; permission: string }
 
 /**
  * 服务侧视图抽象（真实实现由宿主注入：electron WebContentsView 包装）。
@@ -323,6 +327,11 @@ export class BrowserSurfaceService implements IBrowserProvider {
       case 'unresponsive':
         session.unresponsive = !event.responsive
         this.emit({ type: 'unresponsive', id, responsive: event.responsive })
+        break
+      case 'permission-denied':
+        // W5.4：权限拒绝事件按会话上报（origin+类型，不记页面内容），
+        // 面板据此呈现可诊断提示；事件只作用于本会话。
+        this.emit({ type: 'permission-denied', id, origin: event.origin, permission: event.permission })
         break
     }
   }

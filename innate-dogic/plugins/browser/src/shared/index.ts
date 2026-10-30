@@ -73,8 +73,9 @@ export interface BrowserSessionState extends BrowserHistoryState {
 
 /**
  * 页面事件流（主进程 → renderer）：加载中/加载失败/主框架导航完成/崩溃/
- * 无响应恢复。事件只携带可展示文本与规范化 URL，不携带 webContents 或
- * session 对象；重定向最终地址的再校验在 W5.3 收紧（navigation guard）。
+ * 无响应恢复/权限拒绝（W5.4：origin+类型，不记页面内容）。事件只携带
+ * 可展示文本与规范化 URL，不携带 webContents 或 session 对象；重定向
+ * 最终地址的再校验在 W5.3 收紧（navigation guard）。
  */
 export type BrowserSurfaceEvent =
   | { type: 'loading'; id: string; loading: boolean }
@@ -82,6 +83,7 @@ export type BrowserSurfaceEvent =
   | { type: 'navigated'; id: string; url: string }
   | { type: 'crashed'; id: string }
   | { type: 'unresponsive'; id: string; responsive: boolean }
+  | { type: 'permission-denied'; id: string; origin: string; permission: string }
 
 /**
  * 错误页展示文本净化（W5.3）：错误消息可能携带页面自身 URL（入口已过白名单），
