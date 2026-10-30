@@ -18,6 +18,7 @@ export const PAGES: PageDef[] = [
   { id: 'overview', label: '总览', icon: '⌂', modes: ['dev'] },
   { id: 'workspace', label: '工作区', icon: '▤', modes: ['dev'] },
   { id: 'terminal', label: '终端', icon: '❯', modes: ['dev'] },
+  { id: 'browser', label: '浏览器', icon: '◍', modes: ['dev'] },
   { id: 'models', label: '模型', icon: '◫', modes: ['dev'] },
   { id: 'console', label: '模型配置', icon: '⚙', modes: ['dev'] },
   { id: 'tools', label: '工具', icon: '⌘', modes: ['dev'] },

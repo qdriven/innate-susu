@@ -12,7 +12,7 @@ import {
 describe('W1b 页面注册 slot/mode 元数据', () => {
   it('每个现有页面保留原 ID，slot 声明合法（现集全为 content，right 为 W3 预留）', () => {
     const ids = PAGES.map((page) => page.id)
-    expect(ids).toEqual(['chat', 'settings', 'overview', 'workspace', 'terminal', 'models', 'console', 'tools'])
+    expect(ids).toEqual(['chat', 'settings', 'overview', 'workspace', 'terminal', 'browser', 'models', 'console', 'tools'])
     for (const page of PAGES) {
       expect(['content', 'right']).toContain(pageSlot(page))
     }
@@ -22,14 +22,14 @@ describe('W1b 页面注册 slot/mode 元数据', () => {
   it('simple/dev 门控集合与 W1a 基线完全一致，默认页不变', () => {
     expect(pagesForMode('simple').map((page) => page.id)).toEqual(['chat', 'settings'])
     expect(pagesForMode('dev').map((page) => page.id)).toEqual([
-      'chat', 'overview', 'workspace', 'terminal', 'models', 'console', 'tools',
+      'chat', 'overview', 'workspace', 'terminal', 'browser', 'models', 'console', 'tools',
     ])
     expect(defaultPageId('simple')).toBe('chat')
     expect(defaultPageId('dev')).toBe('overview')
   })
 
   it('pagesForSlot 过滤与全量守恒', () => {
-    expect(pagesForSlot('dev', 'content')).toHaveLength(7)
+    expect(pagesForSlot('dev', 'content')).toHaveLength(8)
     expect(pagesForSlot('dev', 'right')).toHaveLength(0)
     expect(pagesForSlot('simple', 'content')).toHaveLength(2)
   })

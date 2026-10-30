@@ -50,5 +50,6 @@ export function surfacePageId(providerId: string, mode: AppMode): string | undef
   if (providerId === HARNESS_PROVIDER_ID) return 'chat'
   if (providerId === MAGPIE_CONSOLE_PROVIDER_ID) return mode === 'simple' ? 'settings' : 'console'
   if (providerId === TERMINAL_PROVIDER_ID) return mode === 'dev' ? 'terminal' : undefined
+  if (providerId === BROWSER_PROVIDER_ID) return mode === 'dev' ? 'browser' : undefined
   return undefined
 }

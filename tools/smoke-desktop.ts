@@ -548,7 +548,7 @@ try {
   await sleep(3_000)
   const devNav = await evaluate<string[]>("[...document.querySelectorAll('.nav-item')].map(b=>b.getAttribute('title'))")
   console.log('[smoke] dev nav:', devNav)
-  if (!Array.isArray(devNav) || devNav.length !== 7 || !devNav.includes('工作区') || !devNav.includes('对话') || !devNav.includes('终端')) {
+  if (!Array.isArray(devNav) || devNav.length !== 8 || !devNav.includes('工作区') || !devNav.includes('对话') || !devNav.includes('终端') || !devNav.includes('浏览器')) {
     throw new Error('dev 模式页面或工作区插件注册失败')
   }
 

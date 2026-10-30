@@ -192,6 +192,23 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   恢复只重导航不复活认证状态。electron spike 不扩展（布局恢复为
   renderer 侧逻辑，已由单元+面板测试完整覆盖，spike 保持 34/34）。
   证据见 docs/susu/plan/evidence/W5/layout.md。
+- 2026-10-30 W5.7 完成：端到端与便携验收。新增 `tools/smoke-browser.ts`
+  —— CDP 驱动真实 Electron 宿主（dev 构建 + 独立 user-data + 远程调试
+  端口），本地受控 HTTP 测试站（/evil /open /perm /dl 路由，不依赖
+  公网）验证：导航、页面内导航守卫（内嵌凭据地址拦截 + 凭据不回显）、
+  外链（window.open 交系统浏览器、应用内不新建 webContents）、权限
+  （逐类请求全拒、脱敏文案）、受控下载（事件到达面板状态行、关闭
+  取消在途）、布局恢复（挂载消费快照 → 用户可见重导航、普通 URL
+  持久化不含敏感字段）、标签生命周期（多浏览器并存、detach 不销毁、
+  关闭隔离）、bounds（视图区域正尺寸）、交替切换（终端/浏览器往返
+  会话保留）、便携检查（独立 CDP 目标存活）。红线断言：渲染壳
+  window.innate 无 executeJavaScript 通道 + 通道集合无脚本执行入口
+  （访客视图不可被注入执行）；全程不向访客视图注入脚本。补齐渲染壳
+  浏览器页（`BrowserPage.tsx` + PAGES/catalog/App 接线——此前 browser
+  Surface 无入口页，`browserSurface()` 从未被调用）。smoke-browser
+  23/23、smoke-desktop（W4 回归）OK、desktop 100/100、browser 76/76、
+  W4 terminal 44/44、全量 `pnpm verify` 退出码 0。证据见
+  docs/susu/plan/evidence/W5/e2e.md。
 
 ## 来源原文
 

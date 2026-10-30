@@ -6,6 +6,7 @@ import { api } from './api'
 import ConsolePage from './ConsolePage'
 import HarnessPage from './HarnessPage'
 import ModeGate from './ModeGate'
+import BrowserPage from './BrowserPage'
 import { WorkspacePanel } from './plugin-registry'
 import Titlebar from './Titlebar'
 import { defaultPageId, pagesForMode, resolveActivePage } from './pages'
@@ -201,6 +202,14 @@ export default function App({ rightPanel = true }: { rightPanel?: boolean }): JS
           {activeTab === 'workspace' && <WorkspacePanel />}
           {activeTab === 'terminal' && (
             <TerminalPage
+              tabs={tabs}
+              providers={providers}
+              onSwitchSurface={switchSurface}
+              onCloseSurface={closeSurface}
+            />
+          )}
+          {activeTab === 'browser' && (
+            <BrowserPage
               tabs={tabs}
               providers={providers}
               onSwitchSurface={switchSurface}
