@@ -29,6 +29,20 @@ const appResources = join(outDir, 'resources', 'app')
 rmSync(appResources, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 })
 mkdirSync(appResources, { recursive: true })
 cpSync(join(appDir, 'out'), join(appResources, 'out'), { recursive: true })
+// W4.7：node-pty 原生模块（N-API 预编译二进制）随便携包分发。
+// main bundle externalize 了 require("node-pty")，从 resources/app/out/main/index.js
+// 向上解析到 resources/app/node_modules/node-pty；lib/utils.js 按
+// build/Release → build/Debug → prebuilds/<platform>-<arch> 顺序加载 .node。
+const nodePtySource = join(appDir, 'node_modules', 'node-pty')
+if (!existsSync(nodePtySource)) {
+  console.error('未找到 desktop/node_modules/node-pty，请先 pnpm install（PTY 无法随包分发）')
+  process.exit(1)
+}
+mkdirSync(join(appResources, 'node_modules'), { recursive: true })
+// dereference：pnpm 下 node_modules/node-pty 是指向 .pnpm store 的符号链接，
+// 必须跟随拷贝真实内容，否则便携包里只剩死链接。
+cpSync(nodePtySource, join(appResources, 'node_modules', 'node-pty'), { recursive: true, dereference: true })
+console.log('✓ node-pty 原生资源已纳入便携包（prebuilds + lib）')
 cpSync(
   join(appDir, 'resources', 'innate-simple.patch.yml'),
   join(outDir, 'resources', 'innate-simple.patch.yml'),

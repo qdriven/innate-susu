@@ -3,9 +3,9 @@ schemaVersion: 1.0.0
 id: task-local-w5-7
 title: W5.7 端到端与便携验收
 createdAt: 2026-10-28T10:55:21.328708Z
-updatedAt: 2026-10-28T10:55:21.328708Z
-status: draft
-branch: 
+updatedAt: 2026-10-30T00:00:00.000000Z
+status: done
+branch: qdriven/implement-w4-w5
 repository: 
 sourceKind: local
 sourcePath: 
@@ -106,9 +106,9 @@ Sprint W5（docs/sprints/w5/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 全部通过+红线断言
+- F1-V1 [done] 全部通过+红线断言
   - 方法：smoke+审查
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W5/e2e.md（smoke-browser 23/23 + smoke-desktop W4 回归 OK + 全量门禁绿）
 
 ## 涉及模块
 
@@ -121,6 +121,7 @@ Spec：S1
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 2026-10-30 实施完成：新增 tools/smoke-browser.ts（CDP 驱动真实 Electron 宿主 + 本地受控 HTTP 测试站，23 条断言全过）；补齐渲染壳浏览器页（BrowserPage + PAGES/catalog/App 接线，此前 browser Surface 无入口页）；红线断言（渲染壳无 executeJavaScript 通道 + 通道集合无脚本执行入口）。证据见 docs/susu/plan/evidence/W5/e2e.md。
 
 ## 来源原文
 

@@ -107,6 +107,47 @@ async function shot(name: string): Promise<void> {
   writeFileSync(path.join(outDir, `${name}.png`), Buffer.from(response.data, 'base64'))
   console.log(`[smoke] saved ${name}.png`)
 }
+// W4.4：向当前焦点终端（xterm textarea）逐字符敲入文本并回车。
+// Enter 用 keyDown/keyUp（type=char 不映射为回车）。
+async function typeIntoTerminal(text: string): Promise<void> {
+  // 等待 xterm textarea 挂载完成（重开后新 xterm 重建需要时间）再聚焦，
+  // 否则按键会落在已 disposed 的旧 textarea 上丢失。
+  for (let i = 0; i < 20; i++) {
+    const ready = await evaluate<boolean>("Boolean(document.querySelector('.terminal-area textarea'))") ?? false
+    if (ready) break
+    await sleep(500)
+  }
+  await evaluate("document.querySelector('.terminal-area textarea')?.focus()")
+  for (const char of text) {
+    await cdp('Input.dispatchKeyEvent', { type: 'char', text: char })
+    await sleep(30)
+  }
+  await cdp('Input.dispatchKeyEvent', {
+    type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13,
+  })
+  await cdp('Input.dispatchKeyEvent', {
+    type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13,
+  })
+}
+// 轮询终端面板 innerText 直到包含标记（PTY 冷启动 + echo 回显需要时间）。
+async function pollTerminalText(marker: string, attempts = 40): Promise<string> {
+  let text = ''
+  for (let i = 0; i < attempts; i++) {
+    text = await evaluate<string>("document.querySelector('.terminal-area')?.innerText ?? ''") ?? ''
+    if (text.includes(marker)) return text
+    await sleep(500)
+  }
+  return text
+}
+// 等待新 PTY 的 cmd 提示符出现（banner + prompt 行尾 '>'）：提示符出现即 shell 已就绪可接收输入。
+async function waitTerminalReady(attempts = 40): Promise<void> {
+  for (let i = 0; i < attempts; i++) {
+    const text = await evaluate<string>("document.querySelector('.terminal-area')?.innerText ?? ''") ?? ''
+    if (/>\s*$/m.test(text)) return
+    await sleep(500)
+  }
+  throw new Error('终端提示符未出现（PTY 未就绪）')
+}
 const nativeWindowType = `
 Add-Type -TypeDefinition @"
 using System;
@@ -451,7 +492,19 @@ try {
   console.log('[smoke] simple nav:', simpleNav)
   const simpleOk = Array.isArray(simpleNav) && simpleNav.length === 2 && simpleNav.includes('对话') && simpleNav.includes('设置')
   if (!simpleOk) throw new Error('simple 模式页面门控不符合预期')
+  if (simpleNav.includes('终端')) throw new Error('simple 模式出现终端导航（门控失效）')
   console.log('[smoke] simple 模式门控通过')
+  // W4.6：simple 模式下 process:execute 窄通道必须全拒（主进程门控，不触达服务端）
+  const simpleProcess = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: [] })",
+  )
+  if (simpleProcess?.ok) throw new Error('simple 模式 process:execute 未被拒绝')
+  if (simpleProcess?.detail !== 'simple 模式不提供 process:execute') {
+    throw new Error(`simple 模式 process 拒绝 detail 不符合预期: ${simpleProcess?.detail ?? ''}`)
+  }
+  const simpleCancel = await evaluate<boolean>("window.innate.processCancel('exec-1')")
+  if (simpleCancel) throw new Error('simple 模式 processCancel 未被拒绝')
+  console.log('[smoke] simple 模式 process:execute 门控全拒通过')
   await shot('simple-home')
   console.log('[smoke] simple hero:', await evaluate("document.querySelector('.simple-hero')?.textContent?.slice(0, 120)"))
   let harnessPort: number | undefined
@@ -495,9 +548,9 @@ try {
   await sleep(3_000)
   const devNav = await evaluate<string[]>("[...document.querySelectorAll('.nav-item')].map(b=>b.getAttribute('title'))")
   console.log('[smoke] dev nav:', devNav)
-  // W3：工作区不再是中栏导航项（迁至右栏常驻 Panel）
-  if (!Array.isArray(devNav) || devNav.length !== 5 || devNav.includes('工作区') || !devNav.includes('对话')) {
-    throw new Error('dev 模式页面门控不符合预期（W3：工作区迁至右栏）')
+  // W3：工作区不再是中栏导航项（迁至右栏常驻 Panel）；W4/W5 新增终端与浏览器导航项
+  if (!Array.isArray(devNav) || devNav.length !== 7 || devNav.includes('工作区') || !devNav.includes('对话') || !devNav.includes('终端') || !devNav.includes('浏览器')) {
+    throw new Error('dev 模式页面门控不符合预期（W3：工作区迁至右栏；W4/W5：终端/浏览器导航项）')
   }
   const rightPanelReady = await evaluate<boolean>("Boolean(document.querySelector('.right-panel'))")
   if (!rightPanelReady) throw new Error('dev 右栏工作区面板未渲染')
@@ -621,6 +674,149 @@ try {
   if (!diffReady) throw new Error('Git diff 预览失败')
   await shot('workspace-git')
   console.log('[smoke] 文件树、文本/Markdown 预览与只读 Git diff 通过')
+
+  // W4.4：终端 Surface（真实 PTY + xterm）——交互、多标签切换保留、退出重开、伪造负路径
+  await evaluate("localStorage.setItem('color-mode', 'dark'); window.dispatchEvent(new Event('innate-theme-storage'))")
+  await sleep(300)
+  await evaluate("[...document.querySelectorAll('.nav-item')].find(b=>b.getAttribute('title')==='终端')?.click()")
+  await sleep(2_000)
+  const terminalRootLabel = await evaluate<string>("document.querySelector('.terminal-root-label')?.textContent ?? ''")
+  if (!terminalRootLabel?.includes(repoName)) throw new Error(`终端页未加载工作区根: ${terminalRootLabel}`)
+  await shot('terminal-page')
+
+  await evaluate("document.querySelector('.terminal-page > .terminal-toolbar > button.primary')?.click()")
+  await sleep(1_500)
+  const terminalReady = await evaluate<boolean>("Boolean(document.querySelector('.terminal-area textarea'))")
+  if (!terminalReady) throw new Error('新建终端后未出现 xterm 面板')
+  const firstTabLabel = await evaluate<string>("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].map(b=>b.textContent ?? '').join('|')")
+  if (!firstTabLabel?.includes('终端 1')) throw new Error(`终端标签命名不符合预期: ${firstTabLabel}`)
+
+  await waitTerminalReady()
+  await typeIntoTerminal('echo smoke-terminal-ok')
+  const terminalOutput = await pollTerminalText('smoke-terminal-ok')
+  if (!terminalOutput.includes('smoke-terminal-ok')) throw new Error(`终端 echo 输出未捕获: ${terminalOutput.slice(-300)}`)
+  await shot('terminal-output')
+  console.log('[smoke] 终端 PTY 交互通过')
+
+  // 第二个终端 + 切回第一个：detach 只隐藏视图，scrollback 保留
+  await evaluate("document.querySelector('.terminal-page > .terminal-toolbar > button.primary')?.click()")
+  await sleep(1_500)
+  await evaluate("[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].find(b=>b.textContent?.includes('终端 1'))?.click()")
+  await sleep(1_500)
+  const retained = await evaluate<boolean>("document.querySelector('.terminal-area')?.innerText?.includes('smoke-terminal-ok') ?? false")
+  if (!retained) throw new Error('标签切换后终端 scrollback 未保留')
+  console.log('[smoke] 多终端标签切换保留通过')
+
+  // W4.7：PTY resize 通道 + 标签关闭生命周期（关闭一个不影响另一个）
+  const resizeOk = await evaluate<boolean>(
+    "window.innate.terminalResize('terminal-1-s1', { cols: 100, rows: 30 })",
+  )
+  if (!resizeOk) throw new Error('terminalResize 通道未生效')
+  console.log('[smoke] 终端 PTY resize 通道通过')
+  await evaluate("document.querySelector('[aria-label=\"关闭 终端 2\"]')?.click()")
+  await sleep(1_500)
+  const tabsAfterClose = await evaluate<string[]>(
+    "[...document.querySelectorAll('.surface-tab [role=\"tab\"]')].map(b=>b.textContent ?? '')",
+  ) ?? []
+  if (tabsAfterClose.some((label) => label.includes('终端 2'))) {
+    throw new Error(`关闭终端 2 后标签仍在: ${JSON.stringify(tabsAfterClose)}`)
+  }
+  if (!tabsAfterClose.some((label) => label.includes('终端 1'))) {
+    throw new Error(`关闭终端 2 后终端 1 标签丢失: ${JSON.stringify(tabsAfterClose)}`)
+  }
+  console.log('[smoke] 终端标签关闭生命周期通过（终端 2 移除、终端 1 保留）')
+
+  // exit 后显示退出提示；重开派生新 PTY 并可再次交互
+  await typeIntoTerminal('exit')
+  let exited = false
+  for (let i = 0; i < 30 && !exited; i++) {
+    exited = await evaluate<boolean>("Boolean(document.querySelector('.terminal-exited'))") ?? false
+    if (!exited) await sleep(500)
+  }
+  if (!exited) throw new Error('exit 后未显示会话退出提示')
+  await shot('terminal-exited')
+  await evaluate("document.querySelector('.terminal-actions button.primary')?.click()")
+  await waitTerminalReady()
+  await typeIntoTerminal('echo smoke-reopen-ok')
+  let reopenOutput = await pollTerminalText('smoke-reopen-ok')
+  if (!reopenOutput.includes('smoke-reopen-ok')) {
+    // 输入与 PTY 就绪竞争：重敲一次再判定
+    await waitTerminalReady()
+    await typeIntoTerminal('echo smoke-reopen-ok')
+    reopenOutput = await pollTerminalText('smoke-reopen-ok')
+  }
+  if (!reopenOutput.includes('smoke-reopen-ok')) throw new Error(`重开后终端不可交互: ${reopenOutput.slice(-300)}`)
+  console.log('[smoke] 会话退出提示与重开通过')
+
+  // W4.4 安全负路径：伪造 workspaceId 的 terminalCreate 必须被服务端拒绝
+  const forgedTerminal = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.terminalCreate({ id: 'forged-term', providerId: 'terminal', kind: 'terminal', title: '伪造', cols: 80, rows: 24, profile: { id: 'default' }, workspaceId: 'C:/nowhere' })",
+  )
+  if (forgedTerminal?.ok) throw new Error('伪造 workspaceId 的 terminalCreate 未被拒绝')
+  console.log('[smoke] 伪造 workspaceId 被拒绝，终端负路径通过')
+
+  // W4.7 安全：伪造 capability 的 Surface descriptor 必须被解析层拒绝
+  const forgedCapability = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.surfaceShow({ id: 'magpie-console', providerId: 'magpie-console', kind: 'webcontents', title: '伪造能力', capabilities: ['shell:exec'] }, { x: 0, y: 0, width: 10, height: 10 })",
+  )
+  if (forgedCapability?.ok) throw new Error('伪造 capability 未被拒绝')
+  if (!forgedCapability?.detail?.includes('capability')) {
+    throw new Error(`伪造 capability 拒绝 detail 不符合预期: ${forgedCapability?.detail ?? ''}`)
+  }
+  console.log('[smoke] 伪造 capability 被拒绝，Surface 能力白名单通过')
+
+  // W4.6：受控 process:execute 窄通道 E2E——profile 注册、受理回执、结果取回、负路径
+  const registerProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processProfileRegister({ id: 'echoer', command: 'cmd.exe', args: ['/c'] })",
+  )
+  if (!registerProfile?.ok) throw new Error(`process profile 注册失败: ${registerProfile?.detail ?? ''}`)
+  const profiles = await evaluate<string[]>('window.innate.processProfiles()')
+  if (!Array.isArray(profiles) || !profiles.includes('echoer')) {
+    throw new Error(`process profile 白名单未生效: ${JSON.stringify(profiles)}`)
+  }
+  console.log('[smoke] process profile 注册与白名单通过')
+
+  const ack = await evaluate<{ executionId: string; ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: ['echo', 'smoke-process-ok'] })",
+  )
+  if (!ack?.ok || !ack.executionId) {
+    throw new Error(`processExecute 受理回执不符合预期: ${JSON.stringify(ack)}`)
+  }
+  let processOutcome: {
+    ok: boolean; exitCode: number | null; stdout: string; timedOut: boolean; cancelled: boolean; detail?: string
+  } | undefined
+  for (let i = 0; i < 30 && !processOutcome?.ok; i++) {
+    processOutcome = await evaluate(`window.innate.processResult('${ack.executionId}')`)
+    if (!processOutcome?.ok) await sleep(500)
+  }
+  if (!processOutcome?.ok) throw new Error(`process 执行未成功: ${JSON.stringify(processOutcome)}`)
+  if (processOutcome.exitCode !== 0) throw new Error(`process 退出码非零: ${JSON.stringify(processOutcome)}`)
+  if (processOutcome.timedOut || processOutcome.cancelled) {
+    throw new Error(`process 终态异常: ${JSON.stringify(processOutcome)}`)
+  }
+  if (!processOutcome.stdout.includes('smoke-process-ok')) {
+    throw new Error(`process stdout 未捕获: ${JSON.stringify(processOutcome)}`)
+  }
+  console.log('[smoke] process:execute 正路径（受理→结果→stdout）通过')
+
+  // 负路径：未注册 profile / cwd 逃逸 / 非法 profile 注册 / 未知 executionId
+  const ghostProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'ghost', args: ['echo', 'x'] })",
+  )
+  if (ghostProfile?.ok) throw new Error('未注册 profile 未被拒绝')
+  const escapeCwd = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processExecute({ profileId: 'echoer', args: ['echo', 'x'], cwdRelative: '../..' })",
+  )
+  if (escapeCwd?.ok) throw new Error('cwd 逃逸未被拒绝')
+  const badProfile = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processProfileRegister({ id: 'bad', command: 'cmd.exe &', args: [] })",
+  )
+  if (badProfile?.ok) throw new Error('含非法字符的 profile 未被拒绝')
+  const ghostResult = await evaluate<{ ok: boolean; detail?: string }>(
+    "window.innate.processResult('ghost-exec')",
+  )
+  if (ghostResult?.ok) throw new Error('未知 executionId 未被拒绝')
+  console.log('[smoke] process 负路径（未注册 profile/cwd 逃逸/非法 profile/未知执行）全拒通过')
 
   if (harnessPort !== undefined) {
     // W1a 基线：跨 simple 重载与 dev 多页导航后，Harness 仍是同一页面（URL 未变 + 存活标记在 = 未 reload）

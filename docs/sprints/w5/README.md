@@ -3,7 +3,7 @@ schemaVersion: 1.0.0
 id: sprint-w5
 title: W5：独立 Browser Surface
 createdAt: 2026-10-28T10:55:18.513563Z
-updatedAt: 2026-10-28T11:01:37.724365Z
+updatedAt: 2026-10-30T00:00:00.000Z
 status: analyzed
 repository: 
 sourceKind: file
@@ -111,7 +111,104 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
 ## 交付记录
 
 - 2026-10-28 拆解为计划态（analyzed 前置），未实施任何子任务。
-- 拆解完成（计划态）；实施按门禁：待 W4)
+- 2026-10-29 W5.1 完成：新包 `plugins/browser`——browser 契约（协议白名单
+  http/https、独立持久分区 `persist:innate-browser`、`network:navigate`
+  capability 声明、非法 descriptor/capability 拒绝、凭据内嵌 URL 拒绝）
+  与 `BrowserProvider` 策略层实现（会话/历史状态机、activate/deactivate
+  不销毁、close 隔离、并发上限 8、dispose 统一回收）；单元测试 26/26，
+  全量门禁 `pnpm verify` 退出码 0。证据见 docs/susu/plan/evidence/W5/contract.md。
+- 2026-10-29 W5.2 完成：W5.1 策略层升级为持有真实视图的会话服务
+  `BrowserSurfaceService`（`plugins/browser/src/main/index.ts`）：
+  SurfaceHost 经 provider.createView 创建独立 WebContentsView（新工厂
+  `electron-view.ts`：独立持久分区 + contextIsolation/nodeIntegration
+  禁用 + sandbox、窗口新开拒绝、事件中性上报），多标签按 providerId
+  匹配共存、切换只 detach 不重载、close 只回收本会话、崩溃/失败隔离、
+  dispose 统一回收、禁止 executeJavaScript（类型层断言）。SurfaceHost
+  新增 provider 钩子（createView/deferredUrl/onViewAttached/onViewDetached/
+  onViewClosed），desktop ipc 挂 navigate/back/forward/reload/state 窄
+  通道与 `innate:browser-event` 广播，renderer 挂 W1c registry。
+  单元测试 browser 34/34、desktop 87/87，全量门禁 `pnpm verify` 退出码 0；
+  electron 技术 spike（`plugins/browser/scripts/spike-browser.cjs`，本地
+  HTTP 测试站点真实链路）12/12 通过。证据见
+  docs/susu/plan/evidence/W5/webcontents.md。
+- 2026-10-30 W5.3 完成：地址栏面板 + 导航守卫（renderer
+  `plugins/browser/src/renderer/BrowserPanel.tsx`：地址栏、前进/后退/
+  刷新/停止、加载进度、崩溃/失败重试与关闭标签；视图生命周期自管理）。
+  导航守卫在视图层逐跳拦截：`will-frame-navigate`/`will-redirect` 主框架
+  目标过协议白名单与凭据检查，拒绝即 `preventDefault` + 固定安全文案
+  （errorCode -3）；服务层 `navigated` 事件兜底复验最终地址（errorCode
+  -2），重定向最终地址优先（修复初始 URL 覆盖缺陷并加回归测试）；
+  错误页文本经 `sanitizeBrowserDisplayText` 净化（剥离内嵌凭据）；
+  window.open http/https 交系统浏览器。desktop ipc/preload 挂
+  browserNavigate/Back/Forward/Reload/Stop/State 窄通道与面板样式；
+  `plugins/terminal` 修复超时/取消终止进程退出码竞态（归一为 null）。
+  单元测试 browser 43/43、desktop 95/95（含面板渲染测试 8），全量门禁
+  `pnpm verify` 退出码 0；electron 技术 spike 扩展至 20/20（守卫拦截、
+  合法重定向放行、window.open 交系统浏览器、凭据拒绝）。证据见
+  docs/susu/plan/evidence/W5/navigation.md。
+- 2026-10-30 W5.4 完成：默认拒绝敏感权限。权限策略纯模块
+  `plugins/browser/src/main/permission.ts`（origin 脱敏提取：仅
+  http/https、剥除凭据/路径/query；全拒决策，生成脱敏记录）+ 接线
+  `electron-view.ts` 的 `attachPermissionPolicy`（只挂
+  `persist:innate-browser` 分区 session 的 `setPermissionRequestHandler`/
+  `setPermissionCheckHandler`，一律拒绝；事件按来源 webContents 路由，
+  每分区 session 只挂一次）；服务层 `permission-denied` 事件按会话转发，
+  面板呈现脱敏拒绝文案（已拒绝 <origin> 的 <type> 权限请求）。
+  Harness/console 默认 session 不继承 browser handler。单元测试
+  browser 49/49（新增 6）、desktop 96/96（新增 1），全量门禁
+  `pnpm verify` 退出码 0；electron 技术 spike 扩展至 23/23（页面逐类
+  请求权限全拒、事件携带 origin+类型、不改变页面状态）。证据见
+  docs/susu/plan/evidence/W5/permissions.md。
+- 2026-10-30 W5.5 完成：受控下载。下载策略纯模块
+  `plugins/browser/src/main/download.ts`（文件名净化：剥离路径分隔符/
+  控制字符、折叠空白、截断 120、Windows 保留名加后缀、空名兜底；
+  终态映射 completed/cancelled/interrupted→failed；进度归一）+ 接线
+  `electron-view.ts` 的 `attachDownloadPolicy`（`will-download` 一律经
+  系统保存对话框由用户确认路径，取消即 cancel；事件按来源 webContents
+  路由，每分区 session 只挂一次）；`cancelDownloads` 在 close 前取消
+  在途下载并清理 tracker（session 级 DownloadItem，`onViewClosed`
+  路径可达）。服务层 `download` 事件按会话转发，面板呈现完成/取消/
+  失败/在途进度。desktop ipc 透传下载事件。单元测试 browser 61/61
+  （新增 7）、desktop 97/97，typecheck 退出码 0；electron 技术 spike
+  扩展至 34/34（取消/完成/恶意文件名净化/关闭取消在途/失败路径不落
+  隐式路径/事件脱敏）。interrupted→failed 映射由单元测试覆盖（Chromium
+  下载重试策略使网络/保存机制均无法确定性触发终态 interrupted，已记录
+  6 种机制实验结论）。证据见 docs/susu/plan/evidence/W5/downloads.md。
+- 2026-10-30 W5.6 完成：安全浏览布局状态。布局策略纯模块
+  `plugins/browser/src/main/layout.ts`（`isSensitiveBrowserUrl`：
+  内嵌凭据/非 http(s)/token-key-secret-password 等敏感 query 参数；
+  `buildBrowserLayoutSnapshot`/`parseBrowserLayoutSnapshot` 白名单
+  解析 + 双过滤敏感 URL；`BrowserLayoutStore`：saveUrl 敏感拒绝并
+  删除已有记录、consume 取出即移除、clear、setActive、snapshot、
+  restore；版本不兼容/结构非法/重复 id 抛错或构造时丢弃坏快照安全
+  回退）。面板 `BrowserPanel` 挂载消费恢复 URL 用户可见地重新导航
+  （提示"正在恢复上次浏览的页面…"），会话 URL 变化后保存当前普通
+  URL，卸载/关闭清理布局；provider `createBrowserProvider(api, layout)`
+  注入，desktop 以 localStorage 为后端实例化（与核心 SurfaceTabs
+  快照分离——核心快照不含 URL）。单元测试 browser 76/76（新增 15）、
+  desktop 100/100（新增 3），browser/desktop typecheck 与全仓
+  `pnpm verify` 退出码 0。快照只含普通 URL 与标签 id，不保存
+  cookie/session/DOM/表单/下载内容/WebContents；敏感 URL 不入快照，
+  恢复只重导航不复活认证状态。electron spike 不扩展（布局恢复为
+  renderer 侧逻辑，已由单元+面板测试完整覆盖，spike 保持 34/34）。
+  证据见 docs/susu/plan/evidence/W5/layout.md。
+- 2026-10-30 W5.7 完成：端到端与便携验收。新增 `tools/smoke-browser.ts`
+  —— CDP 驱动真实 Electron 宿主（dev 构建 + 独立 user-data + 远程调试
+  端口），本地受控 HTTP 测试站（/evil /open /perm /dl 路由，不依赖
+  公网）验证：导航、页面内导航守卫（内嵌凭据地址拦截 + 凭据不回显）、
+  外链（window.open 交系统浏览器、应用内不新建 webContents）、权限
+  （逐类请求全拒、脱敏文案）、受控下载（事件到达面板状态行、关闭
+  取消在途）、布局恢复（挂载消费快照 → 用户可见重导航、普通 URL
+  持久化不含敏感字段）、标签生命周期（多浏览器并存、detach 不销毁、
+  关闭隔离）、bounds（视图区域正尺寸）、交替切换（终端/浏览器往返
+  会话保留）、便携检查（独立 CDP 目标存活）。红线断言：渲染壳
+  window.innate 无 executeJavaScript 通道 + 通道集合无脚本执行入口
+  （访客视图不可被注入执行）；全程不向访客视图注入脚本。补齐渲染壳
+  浏览器页（`BrowserPage.tsx` + PAGES/catalog/App 接线——此前 browser
+  Surface 无入口页，`browserSurface()` 从未被调用）。smoke-browser
+  23/23、smoke-desktop（W4 回归）OK、desktop 100/100、browser 76/76、
+  W4 terminal 44/44、全量 `pnpm verify` 退出码 0。证据见
+  docs/susu/plan/evidence/W5/e2e.md。
 
 ## 来源原文
 

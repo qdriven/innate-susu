@@ -8,6 +8,8 @@ const coreSrc = resolve(__dirname, '../../packages/core/src/index.ts')
 const kernelSrc = resolve(__dirname, '../../packages/kernel/src')
 const workspaceSrc = resolve(__dirname, '../../plugins/workspace/src')
 const serviceGatewaySrc = resolve(__dirname, '../../services/model-gateway/src/index.ts')
+const terminalSrc = resolve(__dirname, '../../plugins/terminal/src')
+const browserSrc = resolve(__dirname, '../../plugins/browser/src')
 const aliases = {
   '@dogic/core/surface': resolve(__dirname, '../../packages/core/src/surface.ts'),
   '@dogic/core/redact': resolve(__dirname, '../../packages/core/src/redact.ts'),
@@ -20,8 +22,15 @@ const aliases = {
   '@dogic/plugin-workspace/plugin': resolve(workspaceSrc, 'plugin.ts'),
   '@dogic/plugin-workspace/renderer': resolve(workspaceSrc, 'renderer/index.ts'),
   '@dogic/plugin-workspace': resolve(workspaceSrc, 'shared/index.ts'),
+  '@dogic/plugin-terminal/main': resolve(terminalSrc, 'main/index.ts'),
+  '@dogic/plugin-terminal/renderer': resolve(terminalSrc, 'renderer/index.ts'),
+  '@dogic/plugin-terminal': resolve(terminalSrc, 'shared/index.ts'),
+  '@dogic/plugin-browser/main/electron': resolve(browserSrc, 'main/electron-view.ts'),
+  '@dogic/plugin-browser/main': resolve(browserSrc, 'main/index.ts'),
+  '@dogic/plugin-browser/renderer': resolve(browserSrc, 'renderer/index.ts'),
+  '@dogic/plugin-browser': resolve(browserSrc, 'shared/index.ts'),
 }
-const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/service-model-gateway', '@dogic/syntax-highlighting']
+const bundled = ['@dogic/core', '@dogic/kernel', '@dogic/plugin-workspace', '@dogic/service-model-gateway', '@dogic/plugin-terminal', '@dogic/plugin-browser', '@dogic/syntax-highlighting']
 
 export default defineConfig({
   main: {
@@ -34,6 +43,11 @@ export default defineConfig({
   },
   renderer: {
     plugins: [tailwindcss(), react()],
-    resolve: { alias: aliases },
+    resolve: {
+      // 插件 renderer 源码（TS 直链）没有本地 react：统一从桌面包解析，
+      // 保证自动 JSX 运行时（react/jsx-runtime）与单一 React 实例。
+      dedupe: ['react', 'react-dom'],
+      alias: aliases,
+    },
   },
 })

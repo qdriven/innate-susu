@@ -3,8 +3,8 @@ schemaVersion: 1.0.0
 id: task-local-w5-4
 title: W5.4 默认拒绝敏感权限
 createdAt: 2026-10-28T10:55:19.947315Z
-updatedAt: 2026-10-28T10:55:19.947315Z
-status: draft
+updatedAt: 2026-10-30T00:00:00.000Z
+status: done
 branch: 
 repository: 
 sourceKind: local
@@ -106,9 +106,10 @@ Sprint W5（docs/sprints/w5/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 逐类权限请求均拒
+- F1-V1 [done] 逐类权限请求均拒
   - 方法：测试页验证
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W5/permissions.md（单元测试 browser 49/49、
+    desktop 96/96；electron spike 23/23；全量门禁退出码 0）
 
 ## 涉及模块
 
@@ -121,6 +122,13 @@ Spec：S1
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 2026-10-30 完成：权限策略纯模块 `permission.ts`（origin 脱敏提取 +
+  全拒决策，不依赖 electron）+ 接线 `attachPermissionPolicy`（只挂
+  `persist:innate-browser` 分区 session 的 request/check handler，
+  request/check 一律拒绝，事件按来源 webContents 路由）；服务层
+  `permission-denied` 事件按会话转发；面板呈现脱敏拒绝文案。
+  browser 49/49、desktop 96/96、spike 23/23、门禁退出码 0。
+  证据 docs/susu/plan/evidence/W5/permissions.md。
 
 ## 来源原文
 

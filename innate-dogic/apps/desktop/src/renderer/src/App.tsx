@@ -18,12 +18,14 @@ import HarnessPage from './HarnessPage'
 import ModeGate from './ModeGate'
 import { createWorkspaceDocumentProviders, WorkspaceDocumentContext } from './plugin-registry'
 import type { WorkspaceDocumentOpener } from './plugin-registry'
+import BrowserPage from './BrowserPage'
 import Titlebar from './Titlebar'
 import { defaultPageId, pagesForMode, resolveActivePage } from './pages'
 import ContentArea from './shell/ContentArea'
 import RightPanelHost from './shell/RightPanelHost'
 import ShellSidebar from './shell/ShellSidebar'
 import SurfaceSlot from './surfaces/SurfaceSlot'
+import TerminalPage from './TerminalPage'
 import { SurfaceTabs } from './surfaces/surface-tabs'
 import { createDesktopSurfaceProviders } from './surfaces/providers/desktop'
 import type { SurfaceProviderRegistry } from './surfaces/provider-registry'
@@ -370,6 +372,22 @@ function ContentBody({
           onSwitchSurface={onSwitchSurface}
           onCloseSurface={onCloseSurface}
           onReconnect={onReconnect}
+        />
+      )}
+      {activeTab === 'terminal' && (
+        <TerminalPage
+          tabs={tabs}
+          providers={providers}
+          onSwitchSurface={onSwitchSurface}
+          onCloseSurface={onCloseSurface}
+        />
+      )}
+      {activeTab === 'browser' && (
+        <BrowserPage
+          tabs={tabs}
+          providers={providers}
+          onSwitchSurface={onSwitchSurface}
+          onCloseSurface={onCloseSurface}
         />
       )}
       {activeTab === 'overview' && (

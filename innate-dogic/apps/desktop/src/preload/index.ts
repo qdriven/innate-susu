@@ -13,6 +13,16 @@ import type {
 import type { AppMode } from '@dogic/core'
 import type { SurfaceDescriptor, SurfaceShowResult } from '@dogic/core/surface'
 import type { WorkspaceApi, WorkspaceContext, WorkspaceRootChanged } from '@dogic/plugin-workspace'
+import type { TerminalApi, TerminalDescriptor, TerminalEvent, TerminalShowResult } from '@dogic/plugin-terminal'
+import type { ProcessExecuteAck, ProcessProfile, ProcessRequest, ProcessResult } from '@dogic/plugin-terminal'
+import type {
+  BrowserApi,
+  BrowserNavigateRequest,
+  BrowserNavigateResult,
+  BrowserOpenResult,
+  BrowserSessionState,
+  BrowserSurfaceEvent,
+} from '@dogic/plugin-browser'
 
 const api = {
   getStatus: (): Promise<StatusSnapshot> => ipcRenderer.invoke('innate:status'),
@@ -82,7 +92,50 @@ const api = {
     ipcRenderer.on('innate:workspace-root-changed', listener)
     return () => ipcRenderer.removeListener('innate:workspace-root-changed', listener)
   },
-} satisfies WorkspaceApi & Record<string, unknown>
+  // 主进程 PTY Terminal 窄通道（W4.3）：只提交安全字段，事件由主进程推送。
+  terminalCreate: (descriptor: TerminalDescriptor): Promise<TerminalShowResult> =>
+    ipcRenderer.invoke('innate:terminalCreate', descriptor),
+  terminalInput: (terminalId: string, data: string): Promise<boolean> =>
+    ipcRenderer.invoke('innate:terminalInput', terminalId, data),
+  terminalResize: (terminalId: string, size: { cols: number; rows: number }): Promise<boolean> =>
+    ipcRenderer.invoke('innate:terminalResize', terminalId, size),
+  terminalClose: (terminalId: string): Promise<boolean> => ipcRenderer.invoke('innate:terminalClose', terminalId),
+  terminalOnEvent: (cb: (event: TerminalEvent) => void): (() => void) => {
+    const listener = (_e: unknown, event: TerminalEvent): void => cb(event)
+    ipcRenderer.on('innate:terminal-event', listener)
+    return () => ipcRenderer.removeListener('innate:terminal-event', listener)
+  },
+  // 受控 process:execute 窄通道（W4.6）：profile 白名单 + 结构化请求；
+  // 受理即返回执行 id，结果经 processResult 取回，simple 模式由主进程门控拒绝。
+  processProfileRegister: (profile: ProcessProfile): Promise<TerminalShowResult> =>
+    ipcRenderer.invoke('innate:processProfileRegister', profile),
+  processProfiles: (): Promise<string[]> => ipcRenderer.invoke('innate:processProfiles'),
+  processExecute: (request: ProcessRequest): Promise<ProcessExecuteAck> =>
+    ipcRenderer.invoke('innate:processExecute', request),
+  processResult: (executionId: string): Promise<ProcessResult> =>
+    ipcRenderer.invoke('innate:processResult', executionId),
+  processCancel: (executionId: string): Promise<boolean> =>
+    ipcRenderer.invoke('innate:processCancel', executionId),
+  // browser 地址栏窄通道（W5.3）：只提交安全字段（会话 id + 规范化 URL），
+  // 页面事件由主进程推送；无 webContents/session 对象、无页面脚本执行通道。
+  browserNavigate: (id: string, request: BrowserNavigateRequest): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserNavigate', id, request),
+  browserBack: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserBack', id),
+  browserForward: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserForward', id),
+  browserReload: (id: string): Promise<BrowserNavigateResult> =>
+    ipcRenderer.invoke('innate:browserReload', id),
+  browserStop: (id: string): Promise<BrowserOpenResult> =>
+    ipcRenderer.invoke('innate:browserStop', id),
+  browserState: (id: string): Promise<BrowserSessionState | null> =>
+    ipcRenderer.invoke('innate:browserState', id),
+  browserOnEvent: (cb: (event: BrowserSurfaceEvent) => void): (() => void) => {
+    const listener = (_e: unknown, event: BrowserSurfaceEvent): void => cb(event)
+    ipcRenderer.on('innate:browser-event', listener)
+    return () => ipcRenderer.removeListener('innate:browser-event', listener)
+  },
+} satisfies WorkspaceApi & TerminalApi & BrowserApi & Record<string, unknown>
 
 contextBridge.exposeInMainWorld('innate', api)
 export type InnateApi = typeof api

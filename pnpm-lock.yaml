@@ -216,6 +216,12 @@ importers:
       '@dogic/kernel':
         specifier: workspace:*
         version: link:../../packages/kernel
+      '@dogic/plugin-browser':
+        specifier: workspace:*
+        version: link:../../plugins/browser
+      '@dogic/plugin-terminal':
+        specifier: workspace:*
+        version: link:../../plugins/terminal
       '@dogic/plugin-workspace':
         specifier: workspace:*
         version: link:../../plugins/workspace
@@ -228,6 +234,9 @@ importers:
       '@innate/ui':
         specifier: ^0.1.2
         version: 0.1.2(@date-fns/tz@1.5.0)(@standard-schema/spec@1.1.0)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(ajv@8.20.0)(react-dom@19.3.1(react@19.3.1))(react-is@17.0.2)(react@19.3.1)(redux@5.0.1)
+      node-pty:
+        specifier: ^1.1.0-beta.42
+        version: 1.1.0
       react:
         specifier: ^19.0.0
         version: 19.3.1
@@ -344,6 +353,28 @@ importers:
         specifier: ^2.1.4
         version: 2.1.9(@types/node@26.6.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(supports-color@7.2.0))(lightningcss@1.32.0)(supports-color@7.2.0)
 
+  innate-dogic/plugins/browser:
+    dependencies:
+      '@dogic/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      '@types/node':
+        specifier: ^22.7.5
+        version: 22.20.5
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      electron:
+        specifier: 43.7.11
+        version: 43.7.11(supports-color@7.2.0)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(supports-color@7.2.0))(lightningcss@1.32.0)(supports-color@7.2.0)
+
   innate-dogic/plugins/model-gateway:
     dependencies:
       '@dogic/kernel':
@@ -358,6 +389,40 @@ importers:
         version: 22.20.5
       typescript:
         specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@22.20.5)(jsdom@27.4.0(@noble/hashes@1.8.0)(supports-color@7.2.0))(lightningcss@1.32.0)(supports-color@7.2.0)
+
+  innate-dogic/plugins/terminal:
+    dependencies:
+      '@dogic/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@dogic/kernel':
+        specifier: workspace:*
+        version: link:../../packages/kernel
+      '@dogic/plugin-workspace':
+        specifier: workspace:*
+        version: link:../workspace
+      '@xterm/addon-fit':
+        specifier: ^0.10.0
+        version: 0.10.0(@xterm/xterm@5.5.0)
+      '@xterm/xterm':
+        specifier: ^5.5.0
+        version: 5.5.0
+      node-pty:
+        specifier: ^1.1.0-beta.42
+        version: 1.1.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.7.5
+        version: 22.20.5
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
         version: 5.9.3
       vitest:
         specifier: ^2.1.4
@@ -2087,6 +2152,14 @@ packages:
     resolution: {integrity: sha512-/5NV/vDALVFDXgLmfsy9TRCBlKwO2LNBFzpzvb9iIj+jR+eSc6DLYYvVOdivT/jm7MtU6TebYuRmzEOI7w40UA==}
     engines: {node: '>=10.0.0'}
 
+  '@xterm/addon-fit@0.10.0':
+    resolution: {integrity: sha512-UFYkDm4HUahf2lnEyHvio51TNGiLK66mqP2JoATy7hRZeXaGMRDr00JiSF7m63vR5WKATF605yEggJKsw0JpMQ==}
+    peerDependencies:
+      '@xterm/xterm': ^5.0.0
+
+  '@xterm/xterm@5.5.0':
+    resolution: {integrity: sha512-hqJHYaQb5OptNunnyAnkHyM8aCjZ1MEIDTQu1iIbbTD/xops91NB5yq1ZK/dC2JDbVWtF23zUtl9JE2NqwT87A==}
+
   abbrev@4.0.0:
     resolution: {integrity: sha512-a1wflyaL0tHtJSmLSOVybYhy22vRih4eduhhrkcjgrWGnRfrZtovJ2FRjxuTtkkj47O/baf0R86QU5OuYpz8fA==}
     engines: {node: ^20.17.0 || >=22.9.0}
@@ -3254,6 +3327,9 @@ packages:
     resolution: {integrity: sha512-GuvqvtrOk+AC27RidBxBsMzVNkwNl7PjHgc4NXbmdvSVLgIUjpaqcG1FjNRYnt2Yn9Ytq+Ln37XsBaglUcte/w==}
     engines: {node: '>=22.12.0'}
 
+  node-addon-api@7.1.1:
+    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
+
   node-api-version@0.2.1:
     resolution: {integrity: sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q==}
 
@@ -3264,6 +3340,9 @@ packages:
 
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
+
+  node-pty@1.1.0:
+    resolution: {integrity: sha512-20JqtutY6JPXTUnL0ij1uad7Qe1baT46lyolh2sSENDd4sTzKZ4nmAFkeAARDKwmlLjPx6XKRlwRUxwjOy+lUg==}
 
   node-releases@2.0.60:
     resolution: {integrity: sha512-OmO8+GM1JUZqXET720VrJCwkjUCXmCMQm0Z3UDDRbfNLHS4NEAvY60j5jiFv0tkKw2PNNlqOLhahVmwJIOLDIQ==}
@@ -5543,6 +5622,12 @@ snapshots:
 
   '@xmldom/xmldom@0.8.15': {}
 
+  '@xterm/addon-fit@0.10.0(@xterm/xterm@5.5.0)':
+    dependencies:
+      '@xterm/xterm': 5.5.0
+
+  '@xterm/xterm@5.5.0': {}
+
   abbrev@4.0.0: {}
 
   agent-base@7.1.4: {}
@@ -7048,6 +7133,8 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
+  node-addon-api@7.1.1: {}
+
   node-api-version@0.2.1:
     dependencies:
       semver: 7.7.4
@@ -7066,6 +7153,10 @@ snapshots:
       which: 6.0.1
 
   node-int64@0.4.0: {}
+
+  node-pty@1.1.0:
+    dependencies:
+      node-addon-api: 7.1.1
 
   node-releases@2.0.60: {}
 

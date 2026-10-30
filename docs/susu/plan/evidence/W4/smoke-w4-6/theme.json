@@ -1,0 +1,16 @@
+{
+  "light": {
+    "colorMode": "light",
+    "darkClass": false,
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyFont": "Geist, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "card": "#fff"
+  },
+  "dark": {
+    "colorMode": "dark",
+    "darkClass": true,
+    "bodyBackground": "rgb(10, 10, 10)",
+    "bodyFont": "Geist, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "card": "#171717"
+  }
+}

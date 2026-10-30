@@ -4,8 +4,8 @@ id: task-local-w5-5
 title: W5.5 受控下载
 createdAt: 2026-10-28T10:55:20.310881Z
 updatedAt: 2026-10-28T10:55:20.310881Z
-status: draft
-branch: 
+status: done
+branch: qdriven/implement-w4-w5
 repository: 
 sourceKind: local
 sourcePath: 
@@ -106,9 +106,9 @@ Sprint W5（docs/sprints/w5/README.md）子任务；需求细节见其来源原�
 模块：M1
 Spec：S1
 
-- F1-V1 [pending] 下载各路径测试
+- F1-V1 [done] 下载各路径测试
   - 方法：测试
-  - 证据：-
+  - 证据：docs/susu/plan/evidence/W5/downloads.md
 
 ## 涉及模块
 
@@ -121,6 +121,20 @@ Spec：S1
 ## 交付记录
 
 - 2026-10-28 建档并入 Sprint 拆解（计划态，未实施）。
+- 2026-10-30 W5.5 完成：受控下载（系统保存对话框确认路径 +
+  脱敏下载事件 + 关闭取消在途下载）。下载策略纯模块
+  `plugins/browser/src/main/download.ts`（文件名净化/终态映射/进度
+  归一）+ 接线 `electron-view.ts` 的 `attachDownloadPolicy`
+  （will-download 一律经系统保存对话框确认路径，取消即 cancel；
+  事件按来源 webContents 路由，每分区 session 只挂一次）；
+  `cancelDownloads` 在 close 前取消在途下载并清理 tracker。服务层
+  `download` 事件按会话转发，面板呈现完成/取消/失败/在途进度，
+  desktop ipc 透传。单元测试 browser 61/61（新增 7）、desktop 97/97，
+  typecheck 退出码 0；electron 技术 spike 扩展至 34/34（取消/完成/
+  恶意文件名净化/关闭取消在途/失败路径不落隐式路径/事件脱敏）。
+  interrupted→failed 映射由单元测试覆盖（Chromium 下载重试策略使
+  网络/保存机制均无法确定性触发终态 interrupted，已记录 6 种机制
+  实验结论）。证据见 docs/susu/plan/evidence/W5/downloads.md。
 
 ## 来源原文
 

@@ -8,10 +8,10 @@ describe('W1a 页面注册基线', () => {
     expect(pages[0]?.id).toBe('chat')
   })
 
-  it('dev 保留五个公开页面（W3：工作区迁至右栏，移出中栏导航）及总览默认落点', () => {
+  it('dev 保留七个公开页面（W3 工作区移出中栏导航 + W4 终端 + W5 浏览器）及总览默认落点', () => {
     const pages = pagesForMode('dev')
     expect(pages.map((page) => page.id)).toEqual([
-      'chat', 'overview', 'models', 'console', 'tools',
+      'chat', 'overview', 'terminal', 'browser', 'models', 'console', 'tools',
     ])
     expect(pages.some((page) => page.id === 'overview')).toBe(true)
     expect(pages.some((page) => page.id === 'settings')).toBe(false)
@@ -25,6 +25,6 @@ describe('W1a 页面注册基线', () => {
     expect(simple).toContain('chat')
     expect(dev).toContain('chat')
     expect(simple.filter((id) => id !== 'chat')).toEqual(['settings'])
-    expect(dev).toHaveLength(5)
+    expect(dev).toHaveLength(7)
   })
 })
