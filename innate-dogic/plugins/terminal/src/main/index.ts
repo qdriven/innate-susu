@@ -521,7 +521,9 @@ export class TerminalService {
     const result: ProcessResult = {
       executionId: execution.id,
       ok: execution.exitCode === 0 && !execution.timedOut && !execution.cancelled,
-      exitCode: execution.exitCode,
+      // 被超时/取消终止的进程没有自然退出码：taskkill 杀出的事件 code
+      // （Windows 常报 1）无意义，一律归一为 null（与测试契约一致）。
+      exitCode: execution.timedOut || execution.cancelled ? null : execution.exitCode,
       signal: execution.signal,
       durationMs,
       stdout: execution.stdout.snapshot(),
@@ -540,7 +542,7 @@ export class TerminalService {
       startedAt: execution.startedAt,
       finishedAt: finishedAt.toISOString(),
       durationMs,
-      exitCode: execution.exitCode,
+      exitCode: execution.timedOut || execution.cancelled ? null : execution.exitCode,
       ok: result.ok,
       ...(detail ? { detail } : {}),
     })
