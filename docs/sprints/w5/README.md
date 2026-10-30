@@ -174,6 +174,24 @@ innate-desktop 唯一前向仓；plan（docs/susu/plan/）为执行源；本 Spr
   隐式路径/事件脱敏）。interrupted→failed 映射由单元测试覆盖（Chromium
   下载重试策略使网络/保存机制均无法确定性触发终态 interrupted，已记录
   6 种机制实验结论）。证据见 docs/susu/plan/evidence/W5/downloads.md。
+- 2026-10-30 W5.6 完成：安全浏览布局状态。布局策略纯模块
+  `plugins/browser/src/main/layout.ts`（`isSensitiveBrowserUrl`：
+  内嵌凭据/非 http(s)/token-key-secret-password 等敏感 query 参数；
+  `buildBrowserLayoutSnapshot`/`parseBrowserLayoutSnapshot` 白名单
+  解析 + 双过滤敏感 URL；`BrowserLayoutStore`：saveUrl 敏感拒绝并
+  删除已有记录、consume 取出即移除、clear、setActive、snapshot、
+  restore；版本不兼容/结构非法/重复 id 抛错或构造时丢弃坏快照安全
+  回退）。面板 `BrowserPanel` 挂载消费恢复 URL 用户可见地重新导航
+  （提示"正在恢复上次浏览的页面…"），会话 URL 变化后保存当前普通
+  URL，卸载/关闭清理布局；provider `createBrowserProvider(api, layout)`
+  注入，desktop 以 localStorage 为后端实例化（与核心 SurfaceTabs
+  快照分离——核心快照不含 URL）。单元测试 browser 76/76（新增 15）、
+  desktop 100/100（新增 3），browser/desktop typecheck 与全仓
+  `pnpm verify` 退出码 0。快照只含普通 URL 与标签 id，不保存
+  cookie/session/DOM/表单/下载内容/WebContents；敏感 URL 不入快照，
+  恢复只重导航不复活认证状态。electron spike 不扩展（布局恢复为
+  renderer 侧逻辑，已由单元+面板测试完整覆盖，spike 保持 34/34）。
+  证据见 docs/susu/plan/evidence/W5/layout.md。
 
 ## 来源原文
 

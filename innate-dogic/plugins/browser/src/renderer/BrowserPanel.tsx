@@ -9,6 +9,7 @@ import type {
   DownloadState,
   DownloadStatus,
 } from '../shared/index.js'
+import type { BrowserLayoutStore } from '../main/layout.js'
 
 /** 面板需要的宿主视图生命周期窄接口（desktop preload 的 surfaceShow/Hide/Bounds/Close）。 */
 export interface BrowserSurfaceLifecycle {
@@ -25,6 +26,12 @@ export interface BrowserPanelProps {
   descriptor: SurfaceDescriptor
   active: boolean
   onRequestClose(): void
+  /**
+   * W5.6：浏览器布局持久化（安全浏览布局快照）。面板挂载时消费恢复 URL
+   * （用户可见地重新导航），导航后保存当前普通 URL；标签关闭时清理布局。
+   * 敏感 URL 不会入快照（保存即拒绝）。缺省时布局不持久化。
+   */
+  layout?: BrowserLayoutStore
 }
 
 function readBounds(element: HTMLElement | null): ViewBounds {
@@ -87,7 +94,7 @@ function downloadStateText(state: DownloadState, percent: number): string {
  * - 崩溃/加载失败/无响应只影响本标签，提供重试/关闭。
  */
 export function BrowserPanel({
-  api, descriptor, active, onRequestClose,
+  api, descriptor, active, onRequestClose, layout,
 }: BrowserPanelProps): JSX.Element {
   const areaRef = useRef<HTMLDivElement>(null)
   const descriptorRef = useRef<SurfaceDescriptor>(descriptor)
@@ -99,6 +106,8 @@ export function BrowserPanel({
   /** W5.5：受控下载状态行（按文件名去重更新，最多保留 5 行）。 */
   const [downloads, setDownloads] = useState<DownloadStatus[]>([])
   const focusedRef = useRef(false)
+  /** W5.6：本次挂载是否已完成布局恢复（避免重复重导航）。 */
+  const restoredRef = useRef(false)
 
   const bounds = useCallback(() => readBounds(areaRef.current), [])
 
@@ -160,6 +169,37 @@ export function BrowserPanel({
   }, [active, attempt, bounds, api])
 
   useEffect(() => { void refresh() }, [refresh, attempt])
+
+  // W5.6：挂载时消费布局恢复 URL——用户可见地重新导航；恢复后不再重复导航。
+  useEffect(() => {
+    if (!layout || restoredRef.current) return
+    const restored = layout.consume(descriptorRef.current.id)
+    if (restored === undefined) {
+      restoredRef.current = true
+      return
+    }
+    restoredRef.current = true
+    setInput(restored)
+    setNotice('正在恢复上次浏览的页面…')
+    void api.browserNavigate(descriptorRef.current.id, { url: restored }).then((result) => {
+      if (result.ok) setNotice('')
+      else setNotice(result.detail ?? '布局恢复导航失败')
+      void refresh()
+    })
+  }, [api, layout, refresh])
+
+  // W5.6：导航/会话 URL 变化后保存当前普通 URL（敏感 URL 由布局层拒绝）。
+  useEffect(() => {
+    if (!layout) return
+    const current = state?.currentUrl
+    if (current) layout.saveUrl(descriptorRef.current.id, current)
+  }, [state?.currentUrl, layout])
+
+  // W5.6：标签关闭/面板卸载时清理布局记录（布局不跨标签生命周期残留）。
+  useEffect(() => {
+    if (!layout) return
+    return () => { layout.clear(descriptorRef.current.id) }
+  }, [layout])
 
   const navigate = useCallback(async (raw: string): Promise<void> => {
     const result = await api.browserNavigate(descriptorRef.current.id, { url: raw })

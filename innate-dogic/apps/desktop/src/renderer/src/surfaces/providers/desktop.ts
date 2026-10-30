@@ -5,6 +5,7 @@ import type { SurfaceProvider } from '../provider-registry'
 import { createTerminalProvider } from './terminal'
 import { createWebContentsProvider } from './webcontents'
 import { createBrowserProvider } from './browser'
+import { BrowserLayoutStore, DEFAULT_BROWSER_LAYOUT_KEY } from '@dogic/plugin-browser/renderer'
 
 /**
  * 桌面端 provider 注册表（W1c.2 / W1c.3）。
@@ -14,6 +15,19 @@ import { createBrowserProvider } from './browser'
  */
 export function createDesktopSurfaceProviders(): SurfaceProviderRegistry {
   const registry = new SurfaceProviderRegistry()
+
+  // W5.6：浏览器布局持久化——renderer 本地 localStorage 快照（普通 URL +
+  // 标签 id + activeId；敏感 URL 拒绝入快照）。与核心 SurfaceTabs 快照分离
+  // （核心快照不含 URL）。
+  let layout: BrowserLayoutStore | undefined
+  try {
+    if (typeof localStorage !== 'undefined') {
+      layout = new BrowserLayoutStore({ key: DEFAULT_BROWSER_LAYOUT_KEY, storage: localStorage })
+    }
+  } catch {
+    layout = undefined
+  }
+
   const factories: Array<() => SurfaceProvider> = [
     () => createWebContentsProvider({
       id: HARNESS_PROVIDER_ID,
@@ -28,7 +42,7 @@ export function createDesktopSurfaceProviders(): SurfaceProviderRegistry {
     }),
     () => createTerminalProvider(api),
     // browser Surface（W5.3）：地址栏面板 + 宿主视图生命周期；导航守卫在 main 侧执行。
-    () => createBrowserProvider(api),
+    () => createBrowserProvider(api, layout),
   ]
   for (const factory of factories) {
     try {

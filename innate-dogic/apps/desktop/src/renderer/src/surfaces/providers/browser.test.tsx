@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { BrowserNavigateRequest, BrowserSessionState, BrowserSurfaceEvent } from '@dogic/plugin-browser'
-import type { BrowserPanelApi } from '@dogic/plugin-browser/renderer'
-import { BrowserPanel } from '@dogic/plugin-browser/renderer'
+import type { BrowserPanelApi, BrowserLayoutStore } from '@dogic/plugin-browser/renderer'
+import { BrowserPanel, BrowserLayoutStore as LayoutStore } from '@dogic/plugin-browser/renderer'
 import type { SurfaceDescriptor } from '@dogic/core/surface'
 import type { ViewBounds } from '@dogic/core'
 
@@ -267,5 +267,94 @@ describe('BrowserPanel（W5.3 地址栏与导航控制）', () => {
     // 同文件名事件就地更新（单行），不驱动导航/历史状态变化
     expect(screen.getAllByText('report.pdf')).toHaveLength(1)
     expect(fake.reload).not.toHaveBeenCalled()
+  })
+})
+
+describe('BrowserPanel（W5.6 安全浏览布局状态）', () => {
+  /** 内存持久化后端。 */
+  function memLayout(): { store: BrowserLayoutStore; data: Map<string, string> } {
+    const data = new Map<string, string>()
+    const store = new LayoutStore({
+      key: 'test-browser-layout',
+      storage: {
+        getItem: (k: string) => data.get(k) ?? null,
+        setItem: (k: string, v: string) => { data.set(k, v) },
+        removeItem: (k: string) => { data.delete(k) },
+      },
+    })
+    return { store, data }
+  }
+
+  it('挂载时消费恢复 URL：用户可见地重新导航，恢复后不再重复导航', async () => {
+    const { store, data } = memLayout()
+    // 上一会话保存的布局（普通 URL）
+    store.saveUrl('browser-1', 'https://restore.example.com/')
+
+    const fake = makeApi(makeState({ currentUrl: null }))
+    const onRequestClose = vi.fn()
+    const { unmount } = render(
+      <BrowserPanel api={fake.api} descriptor={DESCRIPTOR} active onRequestClose={onRequestClose} layout={store} />,
+    )
+
+    await waitFor(() =>
+      expect(fake.navigate).toHaveBeenCalledWith('browser-1', { url: 'https://restore.example.com/' }),
+    )
+    // 恢复是用户可见的重导航：恢复导航成功后提示清空
+    await waitFor(() => expect(screen.queryByText(/正在恢复上次浏览的页面/)).toBeNull())
+    // 恢复导航完成后，当前 URL 重新入布局（供下次会话恢复）
+    await waitFor(() => expect(data.get('test-browser-layout')).toContain('example.com'))
+    // 恢复只触发一次导航（导航后的保存不触发重导航）
+    expect(fake.navigate).toHaveBeenCalledTimes(1)
+
+    // 卸载清理布局记录（标签关闭不留残留）
+    unmount()
+    expect(store.consume('browser-1')).toBeUndefined()
+    expect(fake.hide).toHaveBeenCalled()
+  })
+
+  it('挂载时布局为敏感 URL：不恢复导航，仅按新标签处理', async () => {
+    const { store } = memLayout()
+    // 敏感 URL 保存即拒绝（布局层已过滤）——验证不触发任何恢复导航
+    store.saveUrl('browser-1', 'https://restore.example.com/?token=x')
+
+    const fake = makeApi(makeState({ currentUrl: null }))
+    const { unmount } = render(
+      <BrowserPanel api={fake.api} descriptor={DESCRIPTOR} active onRequestClose={vi.fn()} layout={store} />,
+    )
+    // 等待足以覆盖恢复时窗的时长
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(fake.navigate).not.toHaveBeenCalled()
+    unmount()
+  })
+
+  it('导航/会话 URL 变化后保存当前普通 URL；卸载清理布局记录', async () => {
+    const { store, data } = memLayout()
+    const fake = makeApi(makeState({ currentUrl: null }))
+    const { unmount } = render(
+      <BrowserPanel api={fake.api} descriptor={DESCRIPTOR} active onRequestClose={vi.fn()} layout={store} />,
+    )
+
+    // 地址栏提交新地址 → 会话 URL 变化 → 布局保存普通 URL
+    fireEvent.change(screen.getByPlaceholderText('输入 http/https 地址'), {
+      target: { value: 'https://example.com/a' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '前往' }))
+    await waitFor(() => expect(fake.navigate).toHaveBeenCalledTimes(1))
+    // 导航成功后服务端状态更新 → 布局保存新 URL 并持久化
+    await waitFor(() => expect(data.get('test-browser-layout')).toContain('example.com'))
+    // 布局中确实保存了当前 URL（用独立 store 读取，不干扰面板生命周期）
+    const readBack = new LayoutStore({
+      key: 'test-browser-layout',
+      storage: {
+        getItem: (k: string) => data.get(k) ?? null,
+        setItem: (k: string, v: string) => { data.set(k, v) },
+        removeItem: (k: string) => { data.delete(k) },
+      },
+    })
+    expect(readBack.consume('browser-1')).toBe('https://example.com/')
+
+    // 卸载时清理布局记录
+    unmount()
+    expect(store.consume('browser-1')).toBeUndefined()
   })
 })
